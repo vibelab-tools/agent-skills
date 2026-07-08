@@ -15,6 +15,8 @@ const windowsTaskName = "VibeLabAgentSkillsRelay";
 const runtimeDir = path.join(serviceRoot, "runtime");
 const binPath = path.join(serviceRoot, "bin", "relay-daemon.mjs");
 const nodePath = process.execPath;
+const darwinBundleId = label;
+const darwinAppName = "VibeLab Relay";
 
 function ensureDirs() {
   fs.mkdirSync(runtimeDir, { recursive: true });
@@ -56,11 +58,52 @@ function xmlEscape(value) {
     .replaceAll('"', "&quot;");
 }
 
+function writeDarwinAppLauncher() {
+  const appRoot = path.join(serviceRoot, `${darwinAppName}.app`);
+  const contentsDir = path.join(appRoot, "Contents");
+  const macOSDir = path.join(contentsDir, "MacOS");
+  const resourcesDir = path.join(contentsDir, "Resources");
+  const executablePath = path.join(macOSDir, darwinAppName);
+  fs.mkdirSync(macOSDir, { recursive: true });
+  fs.mkdirSync(resourcesDir, { recursive: true });
+
+  const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key>
+  <string>${darwinAppName}</string>
+  <key>CFBundleExecutable</key>
+  <string>${darwinAppName}</string>
+  <key>CFBundleIdentifier</key>
+  <string>${darwinBundleId}</string>
+  <key>CFBundleName</key>
+  <string>${darwinAppName}</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+</dict>
+</plist>
+`;
+  fs.writeFileSync(path.join(contentsDir, "Info.plist"), infoPlist, { mode: 0o644 });
+
+  const launcher = `#!/bin/sh
+exec ${JSON.stringify(nodePath)} ${JSON.stringify(binPath)}
+`;
+  fs.writeFileSync(executablePath, launcher, { mode: 0o755 });
+  tryRun("codesign", ["--force", "--deep", "--sign", "-", appRoot], { stdio: "ignore" });
+  return executablePath;
+}
+
 function installDarwin() {
   ensureDirs();
   const uid = process.getuid();
   const agentsDir = path.join(os.homedir(), "Library", "LaunchAgents");
   const plistPath = path.join(agentsDir, `${label}.plist`);
+  const launcherPath = writeDarwinAppLauncher();
   fs.mkdirSync(agentsDir, { recursive: true });
   const plist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -68,10 +111,13 @@ function installDarwin() {
 <dict>
   <key>Label</key>
   <string>${label}</string>
+  <key>AssociatedBundleIdentifiers</key>
+  <array>
+    <string>${darwinBundleId}</string>
+  </array>
   <key>ProgramArguments</key>
   <array>
-    <string>${xmlEscape(nodePath)}</string>
-    <string>${xmlEscape(binPath)}</string>
+    <string>${xmlEscape(launcherPath)}</string>
   </array>
   <key>WorkingDirectory</key>
   <string>${xmlEscape(path.join(serviceRoot, "daemon"))}</string>
