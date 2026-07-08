@@ -1,0 +1,41 @@
+{
+  "mode": "auto",
+  "provider": "openai-compatible",
+  "clear_proxy_env": true,
+  "frame": {
+    "interval_seconds": 1.0,
+    "max_frames": 240,
+    "max_side": 720,
+    "jpeg_quality": 3,
+    "output_root": "~/.vibe-coding-skill/video-understanding/frames",
+    "keep_frames": true,
+    "ffmpeg": "ffmpeg",
+    "ffprobe": "ffprobe",
+    "timeout_seconds": 1800
+  },
+  "multimodal": {
+    "fallback_to_frames": true,
+    "batch_size": 8,
+    "request_timeout_seconds": 180,
+    "openai_compatible": {
+      "endpoint": "https://api.openai.com/v1/chat/completions",
+      "api_key": "",
+      "api_key_env": "OPENAI_API_KEY",
+      "model": "",
+      "temperature": 0.2,
+      "max_tokens": 2048,
+      "max_tokens_field": "max_tokens",
+      "headers": {},
+      "image_detail": "low"
+    },
+    "gemini": {
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+      "api_key": "",
+      "api_key_env": "GEMINI_API_KEY",
+      "model": "",
+      "temperature": 0.2,
+      "max_output_tokens": 2048,
+      "headers": {}
+    }
+  }
+}

@@ -1,0 +1,48 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor and local workspace files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs and runtime state
+*.log
+*.pid
+logs/
+tmp/
+temp/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Node.js
+**/node_modules/
+**/dist/
+**/.turbo/
+**/.vite/
+**/.wrangler/
+**/.next/
+**/coverage/
+
+# Java and Maven
+**/target/
+*.class
+
+# Python helper environments and caches
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local installed/runtime copies
+.vibe-coding-skill/

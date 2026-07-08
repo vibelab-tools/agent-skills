@@ -1,0 +1,35 @@
+{
+  "name": "relay",
+  "version": "1.0.0",
+  "description": "Multi-platform IM relay for Claude Code and Codex CLI sessions.",
+  "author": {
+    "name": "VibeLab Tools",
+    "url": "https://github.com/vibelab-tools"
+  },
+  "homepage": "https://github.com/vibelab-tools/agent-skills/tree/main/relay#readme",
+  "repository": "https://github.com/vibelab-tools/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "relay",
+    "telegram",
+    "dingtalk",
+    "feishu",
+    "notification",
+    "remote",
+    "hooks",
+    "bidirectional"
+  ],
+  "interface": {
+    "displayName": "Relay",
+    "shortDescription": "Relay Codex and Claude Code sessions through IM.",
+    "longDescription": "Relay connects local tmux sessions to Telegram, DingTalk, and Feishu through a local daemon so you can receive notifications and reply remotely.",
+    "developerName": "VibeLab Tools",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "Use relay hooks for this coding-agent session."
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "MarkItDown"
+  short_description: "Convert documents and media to Markdown"
+  default_prompt: "Use $markitdown to convert a PDF, Office document, media file, or URL into Markdown before analyzing it."

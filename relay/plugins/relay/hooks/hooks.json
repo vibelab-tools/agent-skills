@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_RELAY_PLUGIN_DIR:-$HOME/.vibe-coding-skill/relay/codex-marketplace/plugins/relay}/scripts/hook-user-prompt.sh\" 2>/dev/null || \"$HOME/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-user-prompt.sh\" 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_RELAY_PLUGIN_DIR:-$HOME/.vibe-coding-skill/relay/codex-marketplace/plugins/relay}/scripts/hook-stop.sh\" 2>/dev/null || \"$HOME/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-stop.sh\" 2>/dev/null || true",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

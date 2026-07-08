@@ -1,0 +1,4 @@
+interface:
+  display_name: "Video Understanding"
+  short_description: "Analyze local videos through sampled frames or configured vision APIs."
+  default_prompt: "Use video-understanding to analyze a local video file."

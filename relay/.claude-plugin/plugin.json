@@ -1,0 +1,20 @@
+{
+  "name": "relay",
+  "description": "Multi-platform IM relay for Claude Code and Codex CLI. Bidirectional real-time communication with Telegram, DingTalk, and Feishu, session isolation, and unified daemon management.",
+  "version": "1.0.0",
+  "author": {
+    "name": "VibeLab Tools",
+    "url": "https://github.com/vibelab-tools"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/vibelab-tools/agent-skills",
+  "homepage": "https://github.com/vibelab-tools/agent-skills/tree/main/relay#readme",
+  "keywords": [
+    "relay",
+    "telegram",
+    "notification",
+    "remote",
+    "hooks",
+    "bidirectional"
+  ]
+}

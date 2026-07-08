@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit Messages"
+  short_description: "Conventional Commit message guardrails"
+  default_prompt: "Use $git-commit to draft a compliant commit message for the current staged changes."

@@ -1,0 +1,56 @@
+{
+  "name": "relay",
+  "description": "Multi-platform IM relay for Claude Code and Codex CLI with bidirectional IM support, session isolation, and unified daemon management.",
+  "version": "1.0.0",
+  "author": {
+    "name": "VibeLab Tools",
+    "url": "https://github.com/vibelab-tools"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/vibelab-tools/agent-skills",
+  "homepage": "https://github.com/vibelab-tools/agent-skills/tree/main/relay#readme",
+  "keywords": [
+    "relay",
+    "telegram",
+    "notification",
+    "remote",
+    "bidirectional"
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-user-prompt.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-user-prompt.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-ask-user.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-ask-user.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-stop.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-stop.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

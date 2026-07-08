@@ -1,0 +1,24 @@
+{
+  "name": "@vibelab-tools/relay-daemon",
+  "version": "1.0.0",
+  "description": "Local daemon for VibeLab Relay: polls Worker, manages sessions, and injects tmux input",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.59.0",
+    "axios": "^1.18.1",
+    "dingtalk-stream-sdk-nodejs": "^2.0.4",
+    "https-proxy-agent": "^7.0.6",
+    "pino": "^10.3.1",
+    "socks-proxy-agent": "^8.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}

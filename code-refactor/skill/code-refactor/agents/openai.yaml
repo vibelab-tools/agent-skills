@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Refactor"
+  short_description: "AST-backed refactoring analysis"
+  default_prompt: "Use $code-refactor to analyze this project for Fowler code smells and safe refactoring steps."
