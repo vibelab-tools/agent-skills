@@ -19,7 +19,7 @@ questions about a local video file. It supports two execution modes:
 Runtime configuration lives under:
 
 ```text
-~/.vibe-coding-skill/video-understanding/config.json
+~/.vibelab-tools/agent-skills/video-understanding/config.json
 ```
 
 `make install-runtime` copies `config.example.json` into the runtime directory
@@ -54,7 +54,7 @@ Installed locations:
 
 - Codex: `~/.codex/skills/video-understanding`
 - Claude Code: `~/.claude/skills/video-understanding`
-- Runtime: `~/.vibe-coding-skill/video-understanding`
+- Runtime: `~/.vibelab-tools/agent-skills/video-understanding`
 
 ## Usage
 

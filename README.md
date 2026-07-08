@@ -25,15 +25,15 @@ Regular skills are installed into the native skill directories for each agent:
 - Claude Code: `~/.claude/skills/<skill-name>`
 
 Skills that need tool dependencies may also install a shared runtime under
-`~/.vibe-coding-skill/<skill-name>`. For example, `markitdown` installs
-`markitdown[all]` into `~/.vibe-coding-skill/markitdown/venv` and exposes a
-managed executable at `~/.vibe-coding-skill/markitdown/bin/markitdown`. Its
+`~/.vibelab-tools/agent-skills/<skill-name>`. For example, `markitdown` installs
+`markitdown[all]` into `~/.vibelab-tools/agent-skills/markitdown/venv` and exposes a
+managed executable at `~/.vibelab-tools/agent-skills/markitdown/bin/markitdown`. Its
 installer accepts any Python 3.10+ runtime that passes capability checks,
 including pyenv-managed interpreters, and supports
 `RUNTIME_PYTHON=/path/to/python` for explicit selection.
 
 `video-understanding` installs runtime configuration under
-`~/.vibe-coding-skill/video-understanding`. Its core dependency is `ffmpeg`,
+`~/.vibelab-tools/agent-skills/video-understanding`. Its core dependency is `ffmpeg`,
 which is used to extract timestamped frames for both local frame fallback and
 provider-backed multimodal analysis.
 
@@ -41,7 +41,7 @@ provider-backed multimodal analysis.
 files, service controller, and plugin marketplaces are installed under:
 
 ```text
-~/.vibe-coding-skill/relay/
+~/.vibelab-tools/agent-skills/relay/
 ```
 
 Codex and Claude Code then register plugin entry points from that shared relay

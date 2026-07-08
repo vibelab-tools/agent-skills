@@ -8,7 +8,7 @@ import os from "node:os";
 import path from "node:path";
 
 const action = process.argv[2] || "status";
-const serviceRoot = path.resolve(process.argv[3] || path.join(os.homedir(), ".vibe-coding-skill", "relay"));
+const serviceRoot = path.resolve(process.argv[3] || path.join(os.homedir(), ".vibelab-tools", "agent-skills", "relay"));
 const label = "tools.vibelab.agent-skills.relay";
 const systemdUnit = "vibelab-agent-skills-relay.service";
 const windowsTaskName = "VibeLabAgentSkillsRelay";

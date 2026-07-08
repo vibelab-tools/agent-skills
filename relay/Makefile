@@ -1,12 +1,17 @@
 SHELL := /bin/bash
 
-SERVICE_ROOT ?= $(HOME)/.vibe-coding-skill/relay
+SERVICE_ROOT ?= $(HOME)/.vibelab-tools/agent-skills/relay
+LEGACY_SERVICE_PARENT ?= $(HOME)/.vibe-coding-skill
+LEGACY_SERVICE_ROOT ?= $(HOME)/.vibe-coding-skill/relay
 RUNTIME_DIR ?= $(SERVICE_ROOT)/runtime
+LEGACY_RUNTIME_DIR := $(LEGACY_SERVICE_ROOT)/runtime
 DAEMON_INSTALL_DIR := $(SERVICE_ROOT)/daemon
 BIN_DIR := $(SERVICE_ROOT)/bin
 CODEX_MARKETPLACE_ROOT ?= $(SERVICE_ROOT)/codex-marketplace
+LEGACY_CODEX_MARKETPLACE_ROOT := $(LEGACY_SERVICE_ROOT)/codex-marketplace
 CODEX_MARKETPLACE_NAME ?= vibelab-tools
 CLAUDE_MARKETPLACE_ROOT ?= $(SERVICE_ROOT)/claude-marketplace
+LEGACY_CLAUDE_MARKETPLACE_ROOT := $(LEGACY_SERVICE_ROOT)/claude-marketplace
 CLAUDE_MARKETPLACE_NAME ?= vibelab-tools
 PLUGIN_NAME ?= relay
 NODE ?= node
@@ -115,22 +120,26 @@ uninstall:
 	$(MAKE) uninstall-service
 	$(MAKE) uninstall-codex
 	$(MAKE) uninstall-claude
-	rm -rf "$(SERVICE_ROOT)"
+	rm -rf "$(SERVICE_ROOT)" "$(LEGACY_SERVICE_ROOT)"
+	rmdir "$(LEGACY_SERVICE_PARENT)" 2>/dev/null || true
 
 uninstall-codex:
 	codex plugin remove "$(PLUGIN_NAME)@$(CODEX_MARKETPLACE_NAME)" 2>/dev/null || true
 	codex plugin marketplace remove "$(CODEX_MARKETPLACE_NAME)" 2>/dev/null || true
-	rm -rf "$(CODEX_MARKETPLACE_ROOT)"
+	rm -rf "$(CODEX_MARKETPLACE_ROOT)" "$(LEGACY_CODEX_MARKETPLACE_ROOT)"
 	node scripts/remove-codex-relay-settings.mjs "$(RUNTIME_DIR)"
+	node scripts/remove-codex-relay-settings.mjs "$(LEGACY_RUNTIME_DIR)"
 
 uninstall-claude:
 	claude plugin uninstall --scope user "$(PLUGIN_NAME)@$(CLAUDE_MARKETPLACE_NAME)" 2>/dev/null || true
 	claude plugin marketplace remove "$(CLAUDE_MARKETPLACE_NAME)" 2>/dev/null || true
-	rm -rf "$(CLAUDE_MARKETPLACE_ROOT)"
+	rm -rf "$(CLAUDE_MARKETPLACE_ROOT)" "$(LEGACY_CLAUDE_MARKETPLACE_ROOT)"
 
 uninstall-service:
 	@if [ -x "$(BIN_DIR)/relay-service.mjs" ]; then \
 		$(NODE) "$(BIN_DIR)/relay-service.mjs" uninstall "$(SERVICE_ROOT)"; \
+	elif [ -x "$(LEGACY_SERVICE_ROOT)/bin/relay-service.mjs" ]; then \
+		$(NODE) "$(LEGACY_SERVICE_ROOT)/bin/relay-service.mjs" uninstall "$(LEGACY_SERVICE_ROOT)"; \
 	else \
 		$(NODE) scripts/relay-service.mjs uninstall "$(SERVICE_ROOT)" || true; \
 	fi

@@ -46,7 +46,7 @@ function loadProxyConfig(prefix: "TELEGRAM" | "DINGTALK" | "FEISHU"): ProxyConfi
 export function loadConfig(): DaemonConfig {
   const hostname = os.hostname();
   const homeDir = os.homedir();
-  const relayDir = process.env.RELAY_HOME || path.join(homeDir, ".vibe-coding-skill", "relay", "runtime");
+  const relayDir = process.env.RELAY_HOME || path.join(homeDir, ".vibelab-tools", "agent-skills", "relay", "runtime");
 
   return {
     port: parseInt(process.env.RELAY_DAEMON_PORT || "3580", 10),

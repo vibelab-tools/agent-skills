@@ -8,7 +8,7 @@ and Feishu messaging through the shared local daemon.
 Claude Code uses three relay surfaces:
 
 - Claude plugin marketplace:
-  `~/.vibe-coding-skill/relay/claude-marketplace`
+  `~/.vibelab-tools/agent-skills/relay/claude-marketplace`
 - Claude plugin hooks, `UserPromptSubmit`, `PreToolUse`, and `Stop`, call the
   shared hook scripts under `plugins/relay/scripts/`.
 - The local daemon sends IM notifications, polls replies, and injects remote
@@ -56,9 +56,9 @@ make install-claude
 
 This installs:
 
-- daemon files: `~/.vibe-coding-skill/relay/daemon`
-- runtime state and logs: `~/.vibe-coding-skill/relay/runtime`
-- Claude plugin marketplace: `~/.vibe-coding-skill/relay/claude-marketplace`
+- daemon files: `~/.vibelab-tools/agent-skills/relay/daemon`
+- runtime state and logs: `~/.vibelab-tools/agent-skills/relay/runtime`
+- Claude plugin marketplace: `~/.vibelab-tools/agent-skills/relay/claude-marketplace`
 - platform user service: launchd on macOS, `systemd --user` on Linux, or Task
   Scheduler on Windows
 

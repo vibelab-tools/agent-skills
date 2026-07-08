@@ -37,11 +37,11 @@ the installed surface:
 Read configuration from:
 
 ```text
-~/.vibe-coding-skill/video-understanding/config.json
+~/.vibelab-tools/agent-skills/video-understanding/config.json
 ```
 
 Override it per command with `--config`. Use
-`~/.vibe-coding-skill/video-understanding/config.example.json` as the template.
+`~/.vibelab-tools/agent-skills/video-understanding/config.example.json` as the template.
 
 Important fields:
 

@@ -3,7 +3,9 @@ SHELL := /bin/sh
 SKILL_NAME := markitdown
 CODEX_HOME ?= $(HOME)/.codex
 CLAUDE_HOME ?= $(HOME)/.claude
-TOOL_ROOT ?= $(HOME)/.vibe-coding-skill/$(SKILL_NAME)
+TOOL_ROOT ?= $(HOME)/.vibelab-tools/agent-skills/$(SKILL_NAME)
+LEGACY_TOOL_PARENT ?= $(HOME)/.vibe-coding-skill
+LEGACY_TOOL_ROOT ?= $(HOME)/.vibe-coding-skill/$(SKILL_NAME)
 VENV_DIR ?= $(TOOL_ROOT)/venv
 BIN_DIR := $(TOOL_ROOT)/bin
 MARKITDOWN_PACKAGE ?= markitdown[all]
@@ -101,8 +103,10 @@ install-claude: validate install-runtime
 uninstall: uninstall-codex uninstall-claude uninstall-runtime
 
 uninstall-runtime:
-	rm -rf "$(TOOL_ROOT)"
+	rm -rf "$(TOOL_ROOT)" "$(LEGACY_TOOL_ROOT)"
+	@rmdir "$(LEGACY_TOOL_PARENT)" 2>/dev/null || true
 	@echo "Uninstalled $(SKILL_NAME) runtime from $(TOOL_ROOT)"
+	@echo "Removed legacy runtime at $(LEGACY_TOOL_ROOT) if present"
 
 uninstall-codex:
 	rm -rf "$(CODEX_INSTALL_DIR)"

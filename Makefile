@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
 SKILLS := markitdown git-commit code-refactor video-understanding relay
+LEGACY_RUNTIME_ROOT ?= $(HOME)/.vibe-coding-skill
 
 .DEFAULT_GOAL := build
 
@@ -35,6 +36,7 @@ uninstall:
 		echo "==> $$skill: uninstall"; \
 		$(MAKE) -C "$$skill" uninstall; \
 	done
+	@rmdir "$(LEGACY_RUNTIME_ROOT)" 2>/dev/null || true
 
 uninstall-codex:
 	@for skill in $(SKILLS); do \

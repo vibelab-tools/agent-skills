@@ -5,8 +5,8 @@ description: Start the relay daemon service
 
 ## Context
 
-- Service root: `~/.vibe-coding-skill/relay`
-- Service controller: `~/.vibe-coding-skill/relay/bin/relay-service.mjs`
+- Service root: `~/.vibelab-tools/agent-skills/relay`
+- Service controller: `~/.vibelab-tools/agent-skills/relay/bin/relay-service.mjs`
 
 ## Your task
 
@@ -20,7 +20,7 @@ Start the relay daemon using the platform service controller. Follow these steps
 
 2. Start the platform service:
    ```bash
-   node ~/.vibe-coding-skill/relay/bin/relay-service.mjs start ~/.vibe-coding-skill/relay
+   node ~/.vibelab-tools/agent-skills/relay/bin/relay-service.mjs start ~/.vibelab-tools/agent-skills/relay
    ```
 
 3. If the service script does not exist, tell the user to run:

@@ -41,7 +41,7 @@ can reuse them. For Codex-only setups, create `~/.codex/relay-settings.json`:
     "DINGTALK_PROXY_ENABLED": "false",
     "FEISHU_PROXY_ENABLED": "false",
     "RELAY_DAEMON_PORT": "3580",
-    "RELAY_HOME": "/Users/you/.vibe-coding-skill/relay/runtime"
+    "RELAY_HOME": "/Users/you/.vibelab-tools/agent-skills/relay/runtime"
   }
 }
 ```
@@ -91,10 +91,10 @@ make install-codex
 
 This installs:
 
-- daemon files: `~/.vibe-coding-skill/relay/daemon`
-- Codex wrapper: `~/.vibe-coding-skill/relay/bin/codex-tmux`
-- runtime state and logs: `~/.vibe-coding-skill/relay/runtime`
-- Codex plugin marketplace: `~/.vibe-coding-skill/relay/codex-marketplace`
+- daemon files: `~/.vibelab-tools/agent-skills/relay/daemon`
+- Codex wrapper: `~/.vibelab-tools/agent-skills/relay/bin/codex-tmux`
+- runtime state and logs: `~/.vibelab-tools/agent-skills/relay/runtime`
+- Codex plugin marketplace: `~/.vibelab-tools/agent-skills/relay/codex-marketplace`
 - platform user service: launchd on macOS, `systemd --user` on Linux, or Task
   Scheduler on Windows
 
@@ -107,13 +107,13 @@ WSL or Git Bash until PowerShell hook equivalents are added.
 Run Codex through the tmux wrapper:
 
 ```bash
-~/.vibe-coding-skill/relay/bin/codex-tmux
+~/.vibelab-tools/agent-skills/relay/bin/codex-tmux
 ```
 
 Optional shell alias:
 
 ```bash
-alias codex-tmux="$HOME/.vibe-coding-skill/relay/bin/codex-tmux"
+alias codex-tmux="$HOME/.vibelab-tools/agent-skills/relay/bin/codex-tmux"
 ```
 
 ## Hook Trust

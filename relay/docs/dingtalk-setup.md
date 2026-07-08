@@ -71,7 +71,7 @@ receives the first mention:
 3. Inspect the daemon log:
 
 ```bash
-grep "\[dingtalk\] Message" ~/.vibe-coding-skill/relay/runtime/daemon.log
+grep "\[dingtalk\] Message" ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
 ```
 
 The log output includes a value like `cidXXXXXX==`; save it as the

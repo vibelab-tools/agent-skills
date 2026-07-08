@@ -82,7 +82,7 @@ The daemon can discover the Feishu `chat_id` when the bot receives a message:
 4. Inspect the daemon log:
 
 ```bash
-grep "\[feishu\] Message in chat" ~/.vibe-coding-skill/relay/runtime/daemon.log
+grep "\[feishu\] Message in chat" ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
 ```
 
 The log includes a value like `oc_xxxx`; save it as `FEISHU_CHAT_ID`.

@@ -164,7 +164,7 @@ relay/
 Installed runtime layout:
 
 ```text
-~/.vibe-coding-skill/relay/
+~/.vibelab-tools/agent-skills/relay/
 ├── daemon/              # compiled daemon and production Node dependencies
 ├── runtime/             # bindings, pid, and logs
 ├── bin/                 # codex-tmux and service controller scripts

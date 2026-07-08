@@ -118,9 +118,9 @@ is not designed for multiple consumers sharing one app.
 | --- | --- | --- |
 | `relay.json` | `<project>/.claude/relay.json` | Claude Code project binding |
 | `relay.json` | `<project>/.codex/relay.json` | Codex project binding |
-| `bindings.json` | `~/.vibe-coding-skill/relay/runtime/bindings.json` | Runtime binding state |
-| `relay-service.mjs` | `~/.vibe-coding-skill/relay/bin/relay-service.mjs` | Service controller |
-| `daemon.log` | `~/.vibe-coding-skill/relay/runtime/daemon.log` | Daemon log |
+| `bindings.json` | `~/.vibelab-tools/agent-skills/relay/runtime/bindings.json` | Runtime binding state |
+| `relay-service.mjs` | `~/.vibelab-tools/agent-skills/relay/bin/relay-service.mjs` | Service controller |
+| `daemon.log` | `~/.vibelab-tools/agent-skills/relay/runtime/daemon.log` | Daemon log |
 
 ## Remote Deployment
 
@@ -137,7 +137,7 @@ is not designed for multiple consumers sharing one app.
 
 ```bash
 make -C /path/to/agent-skills/relay status
-tail -n 30 ~/.vibe-coding-skill/relay/runtime/daemon.log
+tail -n 30 ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
 lsof -i :${RELAY_DAEMON_PORT:-3580}
 ```
 

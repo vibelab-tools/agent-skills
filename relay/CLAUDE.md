@@ -20,7 +20,7 @@ Three components:
 - `daemon/src/index.ts` — Entry point, initializes all providers, must use `dns.setDefaultResultOrder("ipv4first")`
 - `daemon/src/server.ts` — Local HTTP API (port 3580), sends to all configured providers
 - `daemon/src/poller.ts` — 1s poll loop for Telegram messages via Worker
-- `daemon/src/session-manager.ts` — tmux↔topic/conversation/thread bindings, persisted to `~/.vibe-coding-skill/relay/runtime/bindings.json`
+- `daemon/src/session-manager.ts` — tmux↔topic/conversation/thread bindings, persisted to `~/.vibelab-tools/agent-skills/relay/runtime/bindings.json`
 - `daemon/src/providers/telegram.ts` — Telegram provider via Worker relay
 - `daemon/src/providers/dingtalk.ts` — DingTalk provider via Stream SDK
 - `daemon/src/providers/feishu.ts` — Feishu provider via SDK WSClient, reply_in_thread for topic isolation

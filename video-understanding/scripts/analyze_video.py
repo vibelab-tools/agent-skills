@@ -32,7 +32,7 @@ VIDEO_EXTENSIONS = {
     ".wmv",
 }
 
-DEFAULT_RUNTIME_ROOT = Path.home() / ".vibe-coding-skill" / "video-understanding"
+DEFAULT_RUNTIME_ROOT = Path.home() / ".vibelab-tools" / "agent-skills" / "video-understanding"
 DEFAULT_CONFIG_PATH = DEFAULT_RUNTIME_ROOT / "config.json"
 DEFAULT_FRAME_OUTPUT_ROOT = DEFAULT_RUNTIME_ROOT / "frames"
 DEFAULT_QUESTION = (
@@ -106,7 +106,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--config",
         default=os.environ.get("VIDEO_UNDERSTANDING_CONFIG", str(DEFAULT_CONFIG_PATH)),
-        help="JSON config path. Default: ~/.vibe-coding-skill/video-understanding/config.json.",
+        help="JSON config path. Default: ~/.vibelab-tools/agent-skills/video-understanding/config.json.",
     )
     parser.add_argument(
         "--mode",

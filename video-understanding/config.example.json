@@ -7,7 +7,7 @@
     "max_frames": 240,
     "max_side": 720,
     "jpeg_quality": 3,
-    "output_root": "~/.vibe-coding-skill/video-understanding/frames",
+    "output_root": "~/.vibelab-tools/agent-skills/video-understanding/frames",
     "keep_frames": true,
     "ffmpeg": "ffmpeg",
     "ffprobe": "ffprobe",

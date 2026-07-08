@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-user-prompt.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-user-prompt.sh",
+            "command": "~/.vibelab-tools/agent-skills/relay/claude-marketplace/plugins/relay/scripts/hook-user-prompt.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-user-prompt.sh",
             "timeout": 5
           }
         ]
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-ask-user.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-ask-user.sh",
+            "command": "~/.vibelab-tools/agent-skills/relay/claude-marketplace/plugins/relay/scripts/hook-ask-user.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-ask-user.sh",
             "timeout": 10
           }
         ]
@@ -47,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.vibe-coding-skill/relay/claude-marketplace/plugins/relay/scripts/hook-stop.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-stop.sh"
+            "command": "~/.vibelab-tools/agent-skills/relay/claude-marketplace/plugins/relay/scripts/hook-stop.sh 2>/dev/null || ~/.claude/plugins/local/relay/scripts/hook-stop.sh"
           }
         ]
       }

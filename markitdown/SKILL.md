@@ -20,7 +20,7 @@ Official source: https://github.com/microsoft/markitdown
 2. Prefer the managed executable installed by this skill, then fall back to an
    existing executable on `PATH`.
    ```bash
-   MARKITDOWN="${MARKITDOWN:-$HOME/.vibe-coding-skill/markitdown/bin/markitdown}"
+   MARKITDOWN="${MARKITDOWN:-$HOME/.vibelab-tools/agent-skills/markitdown/bin/markitdown}"
    if [ -x "$MARKITDOWN" ]; then
      "$MARKITDOWN" --help
    elif command -v markitdown >/dev/null 2>&1; then

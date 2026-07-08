@@ -35,15 +35,15 @@ Installed locations:
 
 - Codex: `~/.codex/skills/markitdown`
 - Claude Code: `~/.claude/skills/markitdown`
-- Runtime: `~/.vibe-coding-skill/markitdown`
+- Runtime: `~/.vibelab-tools/agent-skills/markitdown`
 
 ## Notes
 
 The skill does not vendor MarkItDown into this repository. `make install`
 creates an isolated Python virtual environment under
-`~/.vibe-coding-skill/markitdown/venv` and installs `markitdown[all]` there.
+`~/.vibelab-tools/agent-skills/markitdown/venv` and installs `markitdown[all]` there.
 The installed skill instructions prefer
-`~/.vibe-coding-skill/markitdown/bin/markitdown` before falling back to a
+`~/.vibelab-tools/agent-skills/markitdown/bin/markitdown` before falling back to a
 system `markitdown` executable or a temporary one-off environment.
 
 The installer searches for a suitable Python runtime by capability, not by
