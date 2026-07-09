@@ -164,21 +164,26 @@ Installed locations:
 
 ## Usage
 
-Frame-only analysis:
-
-```bash
-~/.codex/skills/video-understanding/scripts/analyze-video video.mp4 --mode frames
-```
-
-Multimodal analysis:
+Default analysis, using `config.json` for mode and provider selection:
 
 ```bash
 ~/.codex/skills/video-understanding/scripts/analyze-video \
   video.mp4 \
-  --mode multimodal \
-  --provider openai-compatible \
   --question "Summarize this video."
 ```
+
+Do not pass `--mode` or `--provider` in normal agent calls. Configure these
+values in:
+
+```text
+~/.vibelab-tools/agent-skills/video-understanding/config.json
+```
+
+This avoids ambiguity between command-line flags and runtime configuration.
+
+The CLI still accepts `--mode` and `--provider` as one-off manual override flags,
+but agent-generated commands should not include them unless the user explicitly
+asks to ignore the runtime configuration for that command.
 
 The script prints JSON. In `frames` mode, use `frame_manifest.frames` to inspect
 the sampled images directly. In `multimodal` mode, use `answer` as the final

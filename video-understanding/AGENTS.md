@@ -91,6 +91,11 @@ Configuration is layered:
 3. CLI overrides such as `--mode`, `--provider`, `--frame-interval-seconds`,
    `--max-frames`, and `--frame-output-dir`.
 
+For agent-driven usage, treat runtime `config.json` as the source of truth. Do
+not add `--mode` or `--provider` to generated commands unless the user
+explicitly asks for a one-off override. This prevents accidental changes from
+multimodal mode to frame-only mode, or from one configured provider to another.
+
 Provider keys can be supplied either inline through `api_key` or indirectly
 through `api_key_env`. Prefer established provider key names such as
 `OPENAI_API_KEY`, `DASHSCOPE_API_KEY`, and `GOOGLE_AI_API_KEY`. If a local
@@ -110,7 +115,7 @@ frames to the configured provider. Treat this as cloud processing.
 
 When working with sensitive videos:
 
-- Prefer `--mode frames`.
+- Prefer a runtime config with `mode` set to `frames`.
 - Do not enable multimodal mode without user intent.
 - Keep `frame.keep_frames` behavior explicit because extracted frames can
   contain sensitive visual content.

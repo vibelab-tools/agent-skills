@@ -24,6 +24,11 @@ Run from any working directory:
   --question "Summarize the video."
 ```
 
+Do not pass `--mode` or `--provider` during normal skill use. The runtime
+`config.json` is the source of truth for mode and provider selection. Only pass
+those flags when the user explicitly asks for a one-off override in the current
+command.
+
 For Claude Code, use the same script path under `~/.claude/skills` when that is
 the installed surface:
 
@@ -41,7 +46,7 @@ Read configuration from:
 ~/.vibelab-tools/agent-skills/video-understanding/config.json
 ```
 
-Override it per command with `--config`. Use
+Override the config path per command with `--config`. Use
 `~/.vibelab-tools/agent-skills/video-understanding/config.example.json` as the template.
 
 Important fields:
@@ -70,14 +75,9 @@ It extracts timestamped JPEG frames and prints JSON with:
 When this appears, inspect the returned frames directly and answer from visible
 evidence. Use timestamps from `frame_manifest.frames` for timeline references.
 
-Use frame mode explicitly:
-
-```bash
-~/.codex/skills/video-understanding/scripts/analyze-video \
-  video.mp4 \
-  --mode frames \
-  --frame-interval-seconds 1
-```
+To use frame mode, set `mode` to `frames` in the runtime config. Do not add
+`--mode frames` to generated commands unless the user explicitly asks for a
+one-off override.
 
 ## Multimodal Mode
 
@@ -87,14 +87,9 @@ batch observations into a final answer. It currently supports:
 - OpenAI-compatible Chat Completions vision endpoints.
 - Gemini `generateContent` endpoints.
 
-Use multimodal mode explicitly:
-
-```bash
-~/.codex/skills/video-understanding/scripts/analyze-video \
-  video.mp4 \
-  --mode multimodal \
-  --provider openai-compatible
-```
+To use multimodal mode, set `mode` to `multimodal` and `provider` to the desired
+provider in the runtime config. Do not add `--mode multimodal` or `--provider`
+to generated commands unless the user explicitly asks for a one-off override.
 
 If multimodal mode fails and `multimodal.fallback_to_frames` is `true`, the
 script returns frame-mode JSON instead of failing hard.
@@ -102,8 +97,9 @@ script returns frame-mode JSON instead of failing hard.
 ## Privacy Boundary
 
 Do not send video-derived frames to a remote provider unless the user has asked
-for video analysis and the configured mode allows cloud processing. Use
-`--mode frames` for sensitive videos or when provider credentials are missing.
+for video analysis and the configured mode allows cloud processing. For
+sensitive videos or when provider credentials are missing, use a runtime config
+with `mode` set to `frames`.
 
 ## Output Handling
 
