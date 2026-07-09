@@ -1,30 +1,45 @@
-// ABOUTME: Injects text into tmux sessions via send-keys command.
-// ABOUTME: Handles literal text input and Enter key for agent interaction.
+// ABOUTME: Injects text into tmux sessions through paste buffers.
+// ABOUTME: Preserves multiline prompts and submits them to the target agent.
 
 // 2026-03-17: Implement tmux text injection for remote message delivery
 
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
 
 const log = createLogger("tmux-injector");
 
 /**
- * Inject text into a tmux session using send-keys.
- * Uses -l flag to send literal text (avoids key binding interpretation).
+ * Inject text into a tmux session, then submit it.
+ *
+ * tmux send-keys -l turns embedded newlines into key events, and sending the
+ * submit key immediately after literal text can be missed by some TUIs. A
+ * bracketed paste keeps the prompt as text, then C-m submits it after a short
+ * drain interval.
  */
 export function injectText(tmuxSession: string, text: string): boolean {
+  const normalizedText = text.replace(/\r\n?/g, "\n").trimEnd();
+  if (!normalizedText) {
+    return false;
+  }
+
+  const bufferName = `vibelab-relay-${process.pid}-${Date.now()}`;
+
   try {
-    // Use -l to send literal text, preventing tmux key binding conflicts
-    execSync(`tmux send-keys -t ${escapeShellArg(tmuxSession)} -l ${escapeShellArg(text)}`, {
+    execFileSync("tmux", ["load-buffer", "-b", bufferName, "-"], {
+      input: normalizedText,
       timeout: 5000,
     });
-    // Send Enter separately
-    execSync(`tmux send-keys -t ${escapeShellArg(tmuxSession)} Enter`, {
+    execFileSync("tmux", ["paste-buffer", "-dpr", "-b", bufferName, "-t", tmuxSession], {
+      timeout: 5000,
+    });
+    sleepMs(120);
+    execFileSync("tmux", ["send-keys", "-t", tmuxSession, "C-m"], {
       timeout: 5000,
     });
     return true;
   } catch (err) {
+    cleanupBuffer(bufferName);
     log.error({ err, tmuxSession }, "Failed to inject");
     return false;
   }
@@ -35,7 +50,8 @@ export function injectText(tmuxSession: string, text: string): boolean {
  */
 export function sessionExists(tmuxSession: string): boolean {
   try {
-    execSync(`tmux has-session -t ${escapeShellArg(tmuxSession)} 2>/dev/null`, {
+    execFileSync("tmux", ["has-session", "-t", tmuxSession], {
+      stdio: "ignore",
       timeout: 3000,
     });
     return true;
@@ -44,7 +60,17 @@ export function sessionExists(tmuxSession: string): boolean {
   }
 }
 
-/** Escape a string for safe shell argument usage */
-function escapeShellArg(arg: string): string {
-  return `'${arg.replace(/'/g, "'\\''")}'`;
+function sleepMs(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function cleanupBuffer(bufferName: string): void {
+  try {
+    execFileSync("tmux", ["delete-buffer", "-b", bufferName], {
+      stdio: "ignore",
+      timeout: 1000,
+    });
+  } catch {
+    // Ignore cleanup failures.
+  }
 }
