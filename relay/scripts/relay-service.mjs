@@ -17,6 +17,8 @@ const binPath = path.join(serviceRoot, "bin", "relay-daemon.mjs");
 const nodePath = process.execPath;
 const darwinBundleId = label;
 const darwinAppName = "VibeLab Relay";
+const darwinIconName = "VibeLabRelay";
+const darwinIconSource = path.join(serviceRoot, "assets", "vibelab-agent-skills-avatar.png");
 
 function ensureDirs() {
   fs.mkdirSync(runtimeDir, { recursive: true });
@@ -58,6 +60,50 @@ function xmlEscape(value) {
     .replaceAll('"', "&quot;");
 }
 
+function createDarwinIcon(resourcesDir) {
+  if (!fs.existsSync(darwinIconSource)) {
+    return false;
+  }
+
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "vibelab-relay-icon-"));
+  const iconsetDir = path.join(tempRoot, `${darwinIconName}.iconset`);
+  const icnsPath = path.join(resourcesDir, `${darwinIconName}.icns`);
+  const sizes = [
+    ["icon_16x16.png", 16],
+    ["icon_16x16@2x.png", 32],
+    ["icon_32x32.png", 32],
+    ["icon_32x32@2x.png", 64],
+    ["icon_128x128.png", 128],
+    ["icon_128x128@2x.png", 256],
+    ["icon_256x256.png", 256],
+    ["icon_256x256@2x.png", 512],
+    ["icon_512x512.png", 512],
+    ["icon_512x512@2x.png", 1024],
+  ];
+
+  try {
+    fs.mkdirSync(iconsetDir, { recursive: true });
+    for (const [filename, size] of sizes) {
+      const output = path.join(iconsetDir, filename);
+      const result = tryRun("sips", ["-z", String(size), String(size), darwinIconSource, "--out", output], { stdio: "ignore" });
+      if (result.status !== 0) {
+        return false;
+      }
+    }
+    const result = tryRun("iconutil", ["-c", "icns", iconsetDir, "-o", icnsPath], { stdio: "ignore" });
+    return result.status === 0 && fs.existsSync(icnsPath);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
+function registerDarwinAppBundle(appRoot) {
+  const lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
+  if (fs.existsSync(lsregister)) {
+    tryRun(lsregister, ["-f", appRoot], { stdio: "ignore" });
+  }
+}
+
 function writeDarwinAppLauncher() {
   const appRoot = path.join(serviceRoot, `${darwinAppName}.app`);
   const contentsDir = path.join(appRoot, "Contents");
@@ -66,6 +112,7 @@ function writeDarwinAppLauncher() {
   const executablePath = path.join(macOSDir, darwinAppName);
   fs.mkdirSync(macOSDir, { recursive: true });
   fs.mkdirSync(resourcesDir, { recursive: true });
+  const hasIcon = createDarwinIcon(resourcesDir);
 
   const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -75,6 +122,9 @@ function writeDarwinAppLauncher() {
   <string>${darwinAppName}</string>
   <key>CFBundleExecutable</key>
   <string>${darwinAppName}</string>
+${hasIcon ? `  <key>CFBundleIconFile</key>
+  <string>${darwinIconName}</string>
+` : ""}
   <key>CFBundleIdentifier</key>
   <string>${darwinBundleId}</string>
   <key>CFBundleName</key>
@@ -95,6 +145,7 @@ exec ${JSON.stringify(nodePath)} ${JSON.stringify(binPath)}
 `;
   fs.writeFileSync(executablePath, launcher, { mode: 0o755 });
   tryRun("codesign", ["--force", "--deep", "--sign", "-", appRoot], { stdio: "ignore" });
+  registerDarwinAppBundle(appRoot);
   return executablePath;
 }
 

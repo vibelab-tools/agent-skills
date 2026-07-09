@@ -7,6 +7,8 @@ RUNTIME_DIR ?= $(SERVICE_ROOT)/runtime
 LEGACY_RUNTIME_DIR := $(LEGACY_SERVICE_ROOT)/runtime
 DAEMON_INSTALL_DIR := $(SERVICE_ROOT)/daemon
 BIN_DIR := $(SERVICE_ROOT)/bin
+ASSETS_DIR := $(SERVICE_ROOT)/assets
+APP_ICON_SOURCE ?= ../assets/vibelab-agent-skills-avatar.png
 CODEX_MARKETPLACE_ROOT ?= $(SERVICE_ROOT)/codex-marketplace
 LEGACY_CODEX_MARKETPLACE_ROOT := $(LEGACY_SERVICE_ROOT)/codex-marketplace
 CODEX_MARKETPLACE_NAME ?= vibelab-tools
@@ -56,9 +58,12 @@ install-daemon:
 	rsync -a --delete daemon/dist/ "$(DAEMON_INSTALL_DIR)/dist/"
 	cp daemon/package.json daemon/pnpm-lock.yaml daemon/pnpm-workspace.yaml "$(DAEMON_INSTALL_DIR)/"
 	cd "$(DAEMON_INSTALL_DIR)" && pnpm install --prod --frozen-lockfile
-	mkdir -p "$(BIN_DIR)" "$(RUNTIME_DIR)"
+	mkdir -p "$(BIN_DIR)" "$(RUNTIME_DIR)" "$(ASSETS_DIR)"
 	cp scripts/relay-daemon.mjs scripts/relay-service.mjs "$(BIN_DIR)/"
 	cp scripts/codex-tmux.sh "$(BIN_DIR)/codex-tmux"
+	@if [ -f "$(APP_ICON_SOURCE)" ]; then \
+		cp "$(APP_ICON_SOURCE)" "$(ASSETS_DIR)/vibelab-agent-skills-avatar.png"; \
+	fi
 	chmod +x "$(BIN_DIR)/relay-daemon.mjs" "$(BIN_DIR)/relay-service.mjs" "$(BIN_DIR)/codex-tmux"
 
 install-codex-plugin:
