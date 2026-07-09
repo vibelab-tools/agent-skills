@@ -55,6 +55,55 @@ function waitForDarwinUnload(uid) {
   return !isDarwinLoaded(uid);
 }
 
+function readDaemonPid() {
+  const pidPath = path.join(runtimeDir, "daemon.pid");
+  try {
+    const pid = Number.parseInt(fs.readFileSync(pidPath, "utf8").trim(), 10);
+    return Number.isFinite(pid) && pid > 0 ? pid : null;
+  } catch {
+    return null;
+  }
+}
+
+function processIsRunning(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function waitForProcessExit(pid, timeoutMs = 3000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (!processIsRunning(pid)) {
+      return true;
+    }
+    sleepMs(100);
+  }
+  return !processIsRunning(pid);
+}
+
+function terminateDaemonPid(pid) {
+  if (!pid || !processIsRunning(pid)) {
+    return;
+  }
+  try {
+    process.kill(pid, "SIGTERM");
+  } catch {
+    return;
+  }
+  if (waitForProcessExit(pid, 3000)) {
+    return;
+  }
+  try {
+    process.kill(pid, "SIGKILL");
+  } catch {
+    // Ignore stale PIDs.
+  }
+}
+
 function xmlEscape(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -246,6 +295,7 @@ function installDarwin() {
   const uid = process.getuid();
   const agentsDir = path.join(os.homedir(), "Library", "LaunchAgents");
   const plistPath = path.join(agentsDir, `${label}.plist`);
+  const previousDaemonPid = readDaemonPid();
   const launcherPath = writeDarwinAppLauncher();
   fs.mkdirSync(agentsDir, { recursive: true });
   const plist = `<?xml version="1.0" encoding="UTF-8"?>
@@ -279,6 +329,7 @@ function installDarwin() {
   tryRun("launchctl", ["bootout", `gui/${uid}/${label}`], { stdio: "ignore" });
   tryRun("launchctl", ["bootout", `gui/${uid}`, plistPath], { stdio: "ignore" });
   waitForDarwinUnload(uid);
+  terminateDaemonPid(previousDaemonPid);
   tryRun("launchctl", ["enable", `gui/${uid}/${label}`], { stdio: "ignore" });
   const bootstrap = tryRun("launchctl", ["bootstrap", `gui/${uid}`, plistPath]);
   if (bootstrap.status !== 0 && !isDarwinLoaded(uid)) {
@@ -296,7 +347,10 @@ function startDarwin() {
 
 function stopDarwin() {
   const uid = process.getuid();
+  const previousDaemonPid = readDaemonPid();
   tryRun("launchctl", ["bootout", `gui/${uid}/${label}`], { stdio: "ignore" });
+  waitForDarwinUnload(uid);
+  terminateDaemonPid(previousDaemonPid);
 }
 
 function statusDarwin() {
