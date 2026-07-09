@@ -46,6 +46,73 @@ The installed skill instructions prefer
 `~/.vibelab-tools/agent-skills/markitdown/bin/markitdown` before falling back to a
 system `markitdown` executable or a temporary one-off environment.
 
+## Visual Asset Extraction
+
+The runtime also installs `markitdown-assets`, a local wrapper for image-heavy
+documents. It first converts with MarkItDown, then writes visual assets into a
+local `assets/` directory and records them in `manifest.json`. The Markdown
+output includes local image links so Codex, Claude Code, or another agent can
+open the extracted images directly when visual evidence matters.
+
+Example:
+
+```bash
+~/.vibelab-tools/agent-skills/markitdown/bin/markitdown-assets input.pdf -o output.md
+```
+
+Default output layout when `-o output.md` is used:
+
+```text
+output.md
+output.assets/
+  assets/
+    pdf-page-0001.png
+    slide-001-image-001.png
+  manifest.json
+```
+
+If `-o` is omitted, the converted Markdown is printed to stdout and also written
+under `~/.vibelab-tools/agent-skills/markitdown/runs/<run-id>/document.md`.
+
+Supported asset sources:
+
+| Format | Asset behavior |
+| --- | --- |
+| `PDF` | Renders pages to PNG by default. This preserves scanned pages, charts, diagrams, screenshots, and visual layout. |
+| `PPTX` | Extracts embedded picture shapes and rewrites MarkItDown placeholder image links to local asset paths. |
+| `DOCX` | Extracts embedded images from `word/media/*`. |
+| `XLSX` | Extracts worksheet images and records sheet/cell metadata when available. |
+| `HTML/HTM` | Copies local image references and saves data-URI images. Remote HTTP images are left unchanged. |
+| `EPUB` | Extracts image files stored in the EPUB archive and rewrites matching local chapter links where possible. |
+| `ZIP` | Extracts image files stored in the archive. |
+| Standalone images | Copies the source image into the assets directory and indexes it. |
+
+Legacy `.ppt` and `.xls` files remain text/table-only because embedded image
+extraction for those binary Office formats requires separate parsers.
+
+Useful options:
+
+```bash
+markitdown-assets input.pdf -o output.md
+markitdown-assets input.pdf -o output.md --pdf-dpi 180
+markitdown-assets input.pdf -o output.md --max-pdf-pages 20
+markitdown-assets input.pdf -o output.md --pdf-pages skip
+markitdown-assets input.pptx -o output.md --relative-links
+markitdown-assets input.docx -o output.md --assets-dir ./output-assets/assets
+```
+
+`manifest.json` is the source of truth for extracted assets. It records the
+absolute path, relative path, source format, source reference, hash, and any
+page/slide/sheet/cell metadata found during extraction. A local image link means
+the image is available for inspection; it does not mean the image content has
+already been understood by the model.
+
+`markitdown-assets` is intentionally local-file oriented. Use normal
+`markitdown` for URL conversion unless the URL has already been downloaded to a
+local file.
+
+## Python Runtime
+
 The installer searches for a suitable Python runtime by capability, not by
 installation manager. A pyenv, asdf, uv, Homebrew, system, or manually installed
 Python is acceptable when it is Python 3.10+ and has working standard-library

@@ -9,6 +9,8 @@ LEGACY_TOOL_ROOT ?= $(HOME)/.vibe-coding-skill/$(SKILL_NAME)
 VENV_DIR ?= $(TOOL_ROOT)/venv
 BIN_DIR := $(TOOL_ROOT)/bin
 MARKITDOWN_PACKAGE ?= markitdown[all]
+ASSETS_SCRIPT := scripts/markitdown-assets.py
+ASSETS_WRAPPER := scripts/markitdown-assets
 CODEX_INSTALL_DIR := $(CODEX_HOME)/skills/$(SKILL_NAME)
 CLAUDE_INSTALL_DIR := $(CLAUDE_HOME)/skills/$(SKILL_NAME)
 VALIDATOR := $(CODEX_HOME)/skills/.system/skill-creator/scripts/quick_validate.py
@@ -52,6 +54,9 @@ validate:
 	else \
 		echo "Skipping validation: $(VALIDATOR) not found"; \
 	fi
+	$(PYTHON) -m py_compile "$(ASSETS_SCRIPT)"
+	chmod +x "$(ASSETS_WRAPPER)"
+	"$(ASSETS_WRAPPER)" --help >/dev/null
 
 install: install-all
 
@@ -77,7 +82,11 @@ install-runtime:
 	"$(VENV_PYTHON)" -m pip install -U pip
 	"$(VENV_PYTHON)" -m pip install -U "$(MARKITDOWN_PACKAGE)"
 	@ln -sf "$(MARKITDOWN_BIN)" "$(BIN_DIR)/markitdown"
+	cp "$(ASSETS_SCRIPT)" "$(BIN_DIR)/markitdown-assets.py"
+	cp "$(ASSETS_WRAPPER)" "$(BIN_DIR)/markitdown-assets"
+	chmod +x "$(BIN_DIR)/markitdown-assets.py" "$(BIN_DIR)/markitdown-assets"
 	@"$(MARKITDOWN_BIN)" --help >/dev/null
+	@"$(BIN_DIR)/markitdown-assets" --help >/dev/null
 	@echo "Installed $(MARKITDOWN_PACKAGE) runtime to $(TOOL_ROOT)"
 
 install-codex: validate install-runtime
@@ -117,7 +126,7 @@ uninstall-claude:
 	@echo "Uninstalled $(SKILL_NAME) from $(CLAUDE_INSTALL_DIR)"
 
 clean:
-	@:
+	rm -rf scripts/__pycache__
 
 help:
 	@printf '%s\n' \
@@ -126,6 +135,7 @@ help:
 		"  make validate          Validate the skill structure." \
 		"  make install           Install the runtime and skill for Codex and Claude Code." \
 		"  make install-runtime   Install MarkItDown into an isolated runtime venv." \
+		"                         Also installs markitdown-assets for local image assets." \
 		"  make install-codex     Install the skill to $(CODEX_INSTALL_DIR)." \
 		"  make install-claude    Install the skill to $(CLAUDE_INSTALL_DIR)." \
 		"  make uninstall         Remove both installed copies and the runtime." \

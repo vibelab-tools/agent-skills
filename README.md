@@ -27,9 +27,11 @@ Regular skills are installed into the native skill directories for each agent:
 Skills that need tool dependencies may also install a shared runtime under
 `~/.vibelab-tools/agent-skills/<skill-name>`. For example, `markitdown` installs
 `markitdown[all]` into `~/.vibelab-tools/agent-skills/markitdown/venv` and exposes a
-managed executable at `~/.vibelab-tools/agent-skills/markitdown/bin/markitdown`. Its
-installer accepts any Python 3.10+ runtime that passes capability checks,
-including pyenv-managed interpreters, and supports
+managed executable at `~/.vibelab-tools/agent-skills/markitdown/bin/markitdown`. It
+also installs `markitdown-assets`, which writes local image assets and a manifest
+for image-heavy PDF, PPTX, DOCX, XLSX, HTML, EPUB, ZIP, and standalone image
+inputs. The installer accepts any Python 3.10+ runtime that passes capability
+checks, including pyenv-managed interpreters, and supports
 `RUNTIME_PYTHON=/path/to/python` for explicit selection.
 
 `video-understanding` installs runtime configuration under
