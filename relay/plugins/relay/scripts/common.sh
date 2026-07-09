@@ -3,27 +3,53 @@
 # ABOUTME: Detects tmux sessions, agent type, and per-agent project config paths.
 
 relay_daemon_url() {
-    local port="${RELAY_DAEMON_PORT:-}"
-    if [ -z "$port" ]; then
-        port="$(relay_env_value RELAY_DAEMON_PORT)"
-    fi
+    local port
+    port="$(relay_env_value RELAY_DAEMON_PORT)"
     [ -n "$port" ] || port="3580"
     printf 'http://127.0.0.1:%s' "$port"
 }
 
 relay_env_value() {
     local key="$1"
-    local value="${!key:-}"
+    local value
     local file
+    local query
 
-    if [ -n "$value" ]; then
-        printf '%s' "$value"
-        return
-    fi
+    case "$key" in
+        RELAY_DAEMON_PORT) query='(.daemon.port // .env.RELAY_DAEMON_PORT // empty)' ;;
+        TELEGRAM_BOT_TOKEN) query='(.telegram.bot_token // .env.TELEGRAM_BOT_TOKEN // empty)' ;;
+        TELEGRAM_CHAT_ID) query='(.telegram.chat_id // .env.TELEGRAM_CHAT_ID // empty)' ;;
+        TELEGRAM_PROXY_ENABLED) query='(.telegram.proxy.enabled // .env.TELEGRAM_PROXY_ENABLED // empty)' ;;
+        TELEGRAM_PROXY_URL) query='(.telegram.proxy.url // .env.TELEGRAM_PROXY_URL // .env.TELEGRAM_PROXY // empty)' ;;
+        TELEGRAM_PROXY_PROTOCOL) query='(.telegram.proxy.protocol // .env.TELEGRAM_PROXY_PROTOCOL // empty)' ;;
+        TELEGRAM_PROXY_HOST) query='(.telegram.proxy.host // .env.TELEGRAM_PROXY_HOST // empty)' ;;
+        TELEGRAM_PROXY_PORT) query='(.telegram.proxy.port // .env.TELEGRAM_PROXY_PORT // empty)' ;;
+        TELEGRAM_PROXY_USERNAME) query='(.telegram.proxy.username // .env.TELEGRAM_PROXY_USERNAME // empty)' ;;
+        TELEGRAM_PROXY_PASSWORD) query='(.telegram.proxy.password // .env.TELEGRAM_PROXY_PASSWORD // empty)' ;;
+        DINGTALK_PROXY_ENABLED) query='(.dingtalk.proxy.enabled // .env.DINGTALK_PROXY_ENABLED // empty)' ;;
+        DINGTALK_PROXY_URL) query='(.dingtalk.proxy.url // .env.DINGTALK_PROXY_URL // .env.DINGTALK_PROXY // empty)' ;;
+        DINGTALK_PROXY_PROTOCOL) query='(.dingtalk.proxy.protocol // .env.DINGTALK_PROXY_PROTOCOL // empty)' ;;
+        DINGTALK_PROXY_HOST) query='(.dingtalk.proxy.host // .env.DINGTALK_PROXY_HOST // empty)' ;;
+        DINGTALK_PROXY_PORT) query='(.dingtalk.proxy.port // .env.DINGTALK_PROXY_PORT // empty)' ;;
+        DINGTALK_PROXY_USERNAME) query='(.dingtalk.proxy.username // .env.DINGTALK_PROXY_USERNAME // empty)' ;;
+        DINGTALK_PROXY_PASSWORD) query='(.dingtalk.proxy.password // .env.DINGTALK_PROXY_PASSWORD // empty)' ;;
+        FEISHU_PROXY_ENABLED) query='(.feishu.proxy.enabled // .env.FEISHU_PROXY_ENABLED // empty)' ;;
+        FEISHU_PROXY_URL) query='(.feishu.proxy.url // .env.FEISHU_PROXY_URL // .env.FEISHU_PROXY // empty)' ;;
+        FEISHU_PROXY_PROTOCOL) query='(.feishu.proxy.protocol // .env.FEISHU_PROXY_PROTOCOL // empty)' ;;
+        FEISHU_PROXY_HOST) query='(.feishu.proxy.host // .env.FEISHU_PROXY_HOST // empty)' ;;
+        FEISHU_PROXY_PORT) query='(.feishu.proxy.port // .env.FEISHU_PROXY_PORT // empty)' ;;
+        FEISHU_PROXY_USERNAME) query='(.feishu.proxy.username // .env.FEISHU_PROXY_USERNAME // empty)' ;;
+        FEISHU_PROXY_PASSWORD) query='(.feishu.proxy.password // .env.FEISHU_PROXY_PASSWORD // empty)' ;;
+        *) return ;;
+    esac
 
-    for file in "$HOME/.codex/relay-settings.json" "$HOME/.claude/settings.json"; do
+    for file in \
+        "$HOME/.vibelab-tools/agent-skills/relay/config.json" \
+        "$HOME/.codex/relay-settings.json" \
+        "$HOME/.claude/settings.json"; do
+        [ -n "$file" ] || continue
         if [ -f "$file" ]; then
-            value=$(jq -r --arg key "$key" '(.env // .)[$key] // empty' "$file" 2>/dev/null)
+            value=$(jq -r "$query" "$file" 2>/dev/null)
             if [ -n "$value" ]; then
                 printf '%s' "$value"
                 return

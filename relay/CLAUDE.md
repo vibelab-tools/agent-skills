@@ -25,7 +25,7 @@ Three components:
 - `daemon/src/providers/dingtalk.ts` — DingTalk provider via Stream SDK
 - `daemon/src/providers/feishu.ts` — Feishu provider via SDK WSClient, reply_in_thread for topic isolation
 - `scripts/relay-service.mjs` — platform service installer/controller for launchd, systemd user services, and Windows Task Scheduler
-- `scripts/relay-daemon.mjs` — daemon launcher that reads env from Claude/Codex settings
+- `scripts/relay-daemon.mjs` — daemon launcher that reads the service-local relay config
 - `plugins/relay/scripts/ensure-binding.sh` — Auto-creates Telegram topic and binds on first hook trigger
 - `plugins/relay/scripts/hook-stop.sh` — Extracts `last_assistant_message` from Claude/Codex hook input and sends to IM
 - `scripts/codex-tmux.sh` — Codex tmux wrapper, creates `codex-<project>-<hash>` sessions
@@ -34,16 +34,15 @@ Three components:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `TELEGRAM_BOT_TOKEN` | Telegram Bot API token | For Telegram |
-| `TELEGRAM_CHAT_ID` | Telegram group chat ID (`-100xxx`) | For Telegram |
-| `CLAUDE_RELAY_WORKER_URL` | Cloudflare Worker URL | For Telegram |
-| `RELAY_WORKER_URL` | Cloudflare Worker URL alias for non-Claude clients | For Telegram |
-| `DINGTALK_CLIENT_ID` | DingTalk app Client ID (AppKey) | For DingTalk |
-| `DINGTALK_CLIENT_SECRET` | DingTalk app Client Secret (AppSecret) | For DingTalk |
-| `FEISHU_APP_ID` | Feishu app ID (`cli_xxxx`) | For Feishu |
-| `FEISHU_APP_SECRET` | Feishu app secret | For Feishu |
-| `FEISHU_CHAT_ID` | Feishu group chat ID (`oc_xxxx`) | For Feishu |
-| `RELAY_DAEMON_PORT` | Daemon port (default: 3580) | Optional |
+| `telegram.bot_token` | Telegram Bot API token | For Telegram |
+| `telegram.chat_id` | Telegram group chat ID (`-100xxx`) | For Telegram |
+| `worker.url` | Cloudflare Worker URL | For Telegram |
+| `dingtalk.client_id` | DingTalk app Client ID (AppKey) | For DingTalk |
+| `dingtalk.client_secret` | DingTalk app Client Secret (AppSecret) | For DingTalk |
+| `feishu.app_id` | Feishu app ID (`cli_xxxx`) | For Feishu |
+| `feishu.app_secret` | Feishu app secret | For Feishu |
+| `feishu.chat_id` | Feishu group chat ID (`oc_xxxx`) | For Feishu |
+| `daemon.port` | Daemon port (default: 3580) | Optional |
 
 ## Per-Project Config
 
@@ -85,7 +84,7 @@ rsync -avz ./ user@host:~/agent-skills/relay/
 # 2. Install plugin surfaces and platform service
 ssh user@host "cd ~/agent-skills/relay && make install"
 
-# 3. Update settings.json env with RELAY_DAEMON_PORT and IM credentials
+# 3. Update ~/.vibelab-tools/agent-skills/relay/config.json with daemon and IM settings
 
 # 4. Restart Claude Code/Codex sessions
 ```
@@ -97,4 +96,4 @@ ssh user@host "cd ~/agent-skills/relay && make install"
 - DingTalk: `sessionWebhook` expires in ~60s, falls back to OpenAPI
 - Feishu: long connection config requires app published first AND SDK connected before saving
 - Feishu: one WebSocket connection per app (multiple daemons cannot share one app)
-- Daemon must start with proxy env vars cleared (`unset http_proxy https_proxy`)
+- Daemon scrubs ambient proxy variables; use provider-specific `proxy` config instead

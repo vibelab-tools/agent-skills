@@ -18,7 +18,7 @@ FFMPEG ?= ffmpeg
 .DEFAULT_GOAL := build
 .NOTPARALLEL:
 
-.PHONY: build install install-all install-runtime install-codex install-claude validate uninstall uninstall-runtime uninstall-codex uninstall-claude clean help
+.PHONY: build install install-all install-runtime install-codex install-claude validate uninstall uninstall-runtime uninstall-codex uninstall-claude purge clean help
 
 build:
 	@:
@@ -82,10 +82,18 @@ install-claude: validate install-runtime
 uninstall: uninstall-codex uninstall-claude uninstall-runtime
 
 uninstall-runtime:
+	rm -rf "$(TOOL_ROOT)/frames" "$(CONFIG_EXAMPLE)" "$(LEGACY_TOOL_ROOT)/frames" "$(LEGACY_TOOL_ROOT)/config.example.json"
+	@rmdir "$(TOOL_ROOT)" 2>/dev/null || true
+	@rmdir "$(LEGACY_TOOL_ROOT)" 2>/dev/null || true
+	@rmdir "$(LEGACY_TOOL_PARENT)" 2>/dev/null || true
+	@echo "Uninstalled $(SKILL_NAME) runtime from $(TOOL_ROOT); preserved config.json if present"
+	@echo "Removed legacy runtime at $(LEGACY_TOOL_ROOT) if present"
+
+purge: uninstall
+	rm -f "$(CONFIG_FILE)" "$(LEGACY_TOOL_ROOT)/config.json"
 	rm -rf "$(TOOL_ROOT)" "$(LEGACY_TOOL_ROOT)"
 	@rmdir "$(LEGACY_TOOL_PARENT)" 2>/dev/null || true
-	@echo "Uninstalled $(SKILL_NAME) runtime from $(TOOL_ROOT)"
-	@echo "Removed legacy runtime at $(LEGACY_TOOL_ROOT) if present"
+	@echo "Purged $(SKILL_NAME) runtime config from $(CONFIG_FILE)"
 
 uninstall-codex:
 	rm -rf "$(CODEX_INSTALL_DIR)"
@@ -107,8 +115,9 @@ help:
 		"  make install-runtime   Create runtime config directory and check ffmpeg." \
 		"  make install-codex     Install to $(CODEX_INSTALL_DIR)." \
 		"  make install-claude    Install to $(CLAUDE_INSTALL_DIR)." \
-		"  make uninstall         Remove installed copies and runtime." \
-		"  make uninstall-runtime Remove $(TOOL_ROOT)." \
+		"  make uninstall         Remove installed copies and runtime; preserve config.json." \
+		"  make purge             Run uninstall and remove config.json." \
+		"  make uninstall-runtime Remove runtime files under $(TOOL_ROOT); preserve config.json." \
 		"  make uninstall-codex   Remove $(CODEX_INSTALL_DIR)." \
 		"  make uninstall-claude  Remove $(CLAUDE_INSTALL_DIR)." \
 		"" \

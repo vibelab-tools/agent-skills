@@ -20,34 +20,39 @@ project without competing for the same Telegram Topic or Feishu thread.
 
 ## Environment
 
-If relay variables are already configured in `~/.claude/settings.json`, Codex
-can reuse them. For Codex-only setups, create `~/.codex/relay-settings.json`:
+Relay variables are shared by Codex and Claude Code in the service-local config
+file, `~/.vibelab-tools/agent-skills/relay/config.json`:
 
 ```json
 {
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "<token>",
-    "TELEGRAM_CHAT_ID": "<chat-id>",
-    "RELAY_WORKER_URL": "https://<worker-domain>",
-    "DINGTALK_CLIENT_ID": "<client-id>",
-    "DINGTALK_CLIENT_SECRET": "<client-secret>",
-    "FEISHU_APP_ID": "<app-id>",
-    "FEISHU_APP_SECRET": "<app-secret>",
-    "FEISHU_CHAT_ID": "<chat-id>",
-    "TELEGRAM_PROXY_ENABLED": "true",
-    "TELEGRAM_PROXY_PROTOCOL": "http",
-    "TELEGRAM_PROXY_HOST": "127.0.0.1",
-    "TELEGRAM_PROXY_PORT": "50170",
-    "DINGTALK_PROXY_ENABLED": "false",
-    "FEISHU_PROXY_ENABLED": "false",
-    "RELAY_DAEMON_PORT": "3580",
-    "RELAY_HOME": "/Users/you/.vibelab-tools/agent-skills/relay/runtime"
+  "daemon": { "port": 3580 },
+  "worker": { "url": "https://<worker-domain>" },
+  "telegram": {
+    "bot_token": "<token>",
+    "chat_id": "<chat-id>",
+    "proxy": {
+      "enabled": true,
+      "protocol": "http",
+      "host": "127.0.0.1",
+      "port": 50170
+    }
+  },
+  "dingtalk": {
+    "client_id": "<client-id>",
+    "client_secret": "<client-secret>",
+    "proxy": { "enabled": false }
+  },
+  "feishu": {
+    "app_id": "<app-id>",
+    "app_secret": "<app-secret>",
+    "chat_id": "<chat-id>",
+    "proxy": { "enabled": false }
   }
 }
 ```
 
-`CLAUDE_RELAY_WORKER_URL` is still supported for compatibility. Prefer
-`RELAY_WORKER_URL` for new shared Codex and Claude Code setups.
+Legacy env-style config is still migrated for compatibility. Prefer the
+structured fields above for all new Codex and Claude Code setups.
 
 ## Proxy Settings
 
@@ -55,12 +60,14 @@ Proxy settings are configured per IM provider and must be explicitly enabled:
 
 ```json
 {
-  "env": {
-    "TELEGRAM_PROXY_ENABLED": "true",
-    "TELEGRAM_PROXY_URL": "http://127.0.0.1:50170",
-    "DINGTALK_PROXY_ENABLED": "false",
-    "FEISHU_PROXY_ENABLED": "false"
-  }
+  "telegram": {
+    "proxy": {
+      "enabled": true,
+      "url": "http://127.0.0.1:50170"
+    }
+  },
+  "dingtalk": { "proxy": { "enabled": false } },
+  "feishu": { "proxy": { "enabled": false } }
 }
 ```
 
@@ -68,18 +75,19 @@ You can also split a proxy URL into individual fields:
 
 ```json
 {
-  "env": {
-    "TELEGRAM_PROXY_ENABLED": "true",
-    "TELEGRAM_PROXY_PROTOCOL": "socks5",
-    "TELEGRAM_PROXY_HOST": "127.0.0.1",
-    "TELEGRAM_PROXY_PORT": "50170"
+  "telegram": {
+    "proxy": {
+      "enabled": true,
+      "protocol": "socks5",
+      "host": "127.0.0.1",
+      "port": 50170
+    }
   }
 }
 ```
 
-Supported prefixes are `TELEGRAM_`, `DINGTALK_`, and `FEISHU_`. By default no
-provider uses a proxy. A common setup is to proxy Telegram only and keep
-DingTalk and Feishu direct.
+Each provider has its own `proxy` object. By default no provider uses a proxy.
+A common setup is to proxy Telegram only and keep DingTalk and Feishu direct.
 
 ## Install
 
@@ -93,6 +101,7 @@ This installs:
 
 - daemon files: `~/.vibelab-tools/agent-skills/relay/daemon`
 - Codex wrapper: `~/.vibelab-tools/agent-skills/relay/bin/codex-tmux`
+- shared relay config: `~/.vibelab-tools/agent-skills/relay/config.json`
 - runtime state and logs: `~/.vibelab-tools/agent-skills/relay/runtime`
 - Codex plugin marketplace: `~/.vibelab-tools/agent-skills/relay/codex-marketplace`
 - platform user service: launchd on macOS, `systemd --user` on Linux, or Task
@@ -138,7 +147,7 @@ make start
 make stop
 make restart
 make status
-curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status
+curl -s http://127.0.0.1:3580/status
 ```
 
 Uninstall the Codex relay surface:

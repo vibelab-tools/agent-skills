@@ -19,6 +19,9 @@ const darwinBundleId = label;
 const darwinAppName = "VibeLab Relay";
 const darwinIconName = "VibeLabRelay";
 const darwinIconSource = path.join(serviceRoot, "assets", "vibelab-agent-skills-avatar.png");
+const darwinIconCanvasSize = 1024;
+const darwinIconInsetRatio = 0.1;
+const darwinIconCornerRadiusRatio = 0.18;
 
 function ensureDirs() {
   fs.mkdirSync(runtimeDir, { recursive: true });
@@ -62,11 +65,12 @@ function xmlEscape(value) {
 
 function createDarwinIcon(resourcesDir) {
   if (!fs.existsSync(darwinIconSource)) {
-    return false;
+    return "";
   }
 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "vibelab-relay-icon-"));
   const iconsetDir = path.join(tempRoot, `${darwinIconName}.iconset`);
+  const paddedSource = path.join(tempRoot, `${darwinIconName}-padded.png`);
   const icnsPath = path.join(resourcesDir, `${darwinIconName}.icns`);
   const sizes = [
     ["icon_16x16.png", 16],
@@ -82,19 +86,79 @@ function createDarwinIcon(resourcesDir) {
   ];
 
   try {
+    if (!createDarwinPaddedIconSource(darwinIconSource, paddedSource)) {
+      return "";
+    }
     fs.mkdirSync(iconsetDir, { recursive: true });
     for (const [filename, size] of sizes) {
       const output = path.join(iconsetDir, filename);
-      const result = tryRun("sips", ["-z", String(size), String(size), darwinIconSource, "--out", output], { stdio: "ignore" });
+      const result = tryRun("sips", ["-z", String(size), String(size), paddedSource, "--out", output], { stdio: "ignore" });
       if (result.status !== 0) {
-        return false;
+        return "";
       }
     }
     const result = tryRun("iconutil", ["-c", "icns", iconsetDir, "-o", icnsPath], { stdio: "ignore" });
-    return result.status === 0 && fs.existsSync(icnsPath);
+    return result.status === 0 && fs.existsSync(icnsPath) ? icnsPath : "";
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+function createDarwinPaddedIconSource(sourcePath, outputPath) {
+  const inset = Math.round(darwinIconCanvasSize * darwinIconInsetRatio);
+  const contentSize = darwinIconCanvasSize - inset * 2;
+  const cornerRadius = Math.round(contentSize * darwinIconCornerRadiusRatio);
+  const pythonScript = `
+import sys
+from PIL import Image, ImageDraw
+
+source_path, output_path = sys.argv[1], sys.argv[2]
+canvas_size = int(sys.argv[3])
+inset = int(sys.argv[4])
+content_size = int(sys.argv[5])
+corner_radius = int(sys.argv[6])
+
+source = Image.open(source_path).convert("RGBA").resize((content_size, content_size), Image.Resampling.LANCZOS)
+mask = Image.new("L", (content_size, content_size), 0)
+draw = ImageDraw.Draw(mask)
+draw.rounded_rectangle((0, 0, content_size - 1, content_size - 1), radius=corner_radius, fill=255)
+source.putalpha(mask)
+
+canvas = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
+canvas.alpha_composite(source, (inset, inset))
+canvas.save(output_path)
+`;
+  const python = tryRun(
+    "python3",
+    [
+      "-c",
+      pythonScript,
+      sourcePath,
+      outputPath,
+      String(darwinIconCanvasSize),
+      String(inset),
+      String(contentSize),
+      String(cornerRadius),
+    ],
+    { stdio: "ignore" }
+  );
+  if (python.status === 0 && fs.existsSync(outputPath)) {
+    return true;
+  }
+
+  const fallback = tryRun(
+    "sips",
+    [
+      "-z",
+      String(darwinIconCanvasSize),
+      String(darwinIconCanvasSize),
+      sourcePath,
+      "--out",
+      outputPath
+    ],
+    { stdio: "ignore" }
+  );
+  return fallback.status === 0 && fs.existsSync(outputPath);
 }
 
 function registerDarwinAppBundle(appRoot) {
@@ -102,6 +166,29 @@ function registerDarwinAppBundle(appRoot) {
   if (fs.existsSync(lsregister)) {
     tryRun(lsregister, ["-f", appRoot], { stdio: "ignore" });
   }
+}
+
+function setDarwinCustomIcon(targetPath, iconPath) {
+  if (!fs.existsSync(targetPath) || !fs.existsSync(iconPath)) {
+    return false;
+  }
+
+  const script = `
+function run(argv) {
+  ObjC.import("AppKit");
+  const image = $.NSImage.alloc.initWithContentsOfFile(argv[1]);
+  if (!image) {
+    throw new Error("failed to load icon");
+  }
+  const ok = $.NSWorkspace.sharedWorkspace.setIconForFileOptions(image, argv[0], 0);
+  if (!ok) {
+    throw new Error("failed to set icon");
+  }
+  return "ok";
+}
+`;
+  const result = tryRun("osascript", ["-l", "JavaScript", "-e", script, targetPath, iconPath], { stdio: "ignore" });
+  return result.status === 0;
 }
 
 function writeDarwinAppLauncher() {
@@ -112,7 +199,8 @@ function writeDarwinAppLauncher() {
   const executablePath = path.join(macOSDir, darwinAppName);
   fs.mkdirSync(macOSDir, { recursive: true });
   fs.mkdirSync(resourcesDir, { recursive: true });
-  const hasIcon = createDarwinIcon(resourcesDir);
+  const iconPath = createDarwinIcon(resourcesDir);
+  const hasIcon = Boolean(iconPath);
 
   const infoPlist = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -145,6 +233,10 @@ exec ${JSON.stringify(nodePath)} ${JSON.stringify(binPath)}
 `;
   fs.writeFileSync(executablePath, launcher, { mode: 0o755 });
   tryRun("codesign", ["--force", "--deep", "--sign", "-", appRoot], { stdio: "ignore" });
+  if (hasIcon) {
+    setDarwinCustomIcon(appRoot, iconPath);
+    setDarwinCustomIcon(executablePath, iconPath);
+  }
   registerDarwinAppBundle(appRoot);
   return executablePath;
 }

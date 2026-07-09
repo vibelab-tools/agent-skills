@@ -5,7 +5,7 @@ LEGACY_RUNTIME_ROOT ?= $(HOME)/.vibe-coding-skill
 
 .DEFAULT_GOAL := build
 
-.PHONY: build install install-codex install-claude uninstall uninstall-codex uninstall-claude validate clean help $(SKILLS)
+.PHONY: build install install-codex install-claude uninstall uninstall-codex uninstall-claude purge validate clean help $(SKILLS)
 
 build:
 	@for skill in $(SKILLS); do \
@@ -35,6 +35,13 @@ uninstall:
 	@for skill in $(SKILLS); do \
 		echo "==> $$skill: uninstall"; \
 		$(MAKE) -C "$$skill" uninstall; \
+	done
+	@rmdir "$(LEGACY_RUNTIME_ROOT)" 2>/dev/null || true
+
+purge:
+	@for skill in $(SKILLS); do \
+		echo "==> $$skill: purge"; \
+		$(MAKE) -C "$$skill" purge; \
 	done
 	@rmdir "$(LEGACY_RUNTIME_ROOT)" 2>/dev/null || true
 
@@ -69,7 +76,8 @@ help:
 		"  make install          Install every skill for Codex and Claude Code." \
 		"  make install-codex    Install every skill for Codex only." \
 		"  make install-claude   Install every skill for Claude Code only." \
-		"  make uninstall        Remove all installed skill/plugin surfaces." \
+		"  make uninstall        Remove installed skill/plugin surfaces; preserve runtime configs." \
+		"  make purge            Remove installed skill/plugin surfaces and runtime configs." \
 		"  make uninstall-codex  Remove Codex surfaces only." \
 		"  make uninstall-claude Remove Claude Code surfaces only." \
 		"  make validate         Validate skill/plugin structures." \

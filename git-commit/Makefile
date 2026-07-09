@@ -11,7 +11,7 @@ RSYNC ?= rsync
 
 .DEFAULT_GOAL := build
 
-.PHONY: build install install-all install-codex install-claude validate uninstall uninstall-codex uninstall-claude clean help
+.PHONY: build install install-all install-codex install-claude validate uninstall uninstall-codex uninstall-claude purge clean help
 
 build:
 	@:
@@ -47,6 +47,8 @@ install-claude: validate
 
 uninstall: uninstall-codex uninstall-claude
 
+purge: uninstall
+
 uninstall-codex:
 	rm -rf "$(CODEX_INSTALL_DIR)"
 	@echo "Uninstalled $(SKILL_NAME) from $(CODEX_INSTALL_DIR)"
@@ -67,6 +69,7 @@ help:
 		"  make install-codex     Install the skill to $(CODEX_INSTALL_DIR)." \
 		"  make install-claude    Install the skill to $(CLAUDE_INSTALL_DIR)." \
 		"  make uninstall         Remove both installed copies." \
+		"  make purge             Same as uninstall; this skill has no runtime config." \
 		"  make uninstall-codex   Remove $(CODEX_INSTALL_DIR)." \
 		"  make uninstall-claude  Remove $(CLAUDE_INSTALL_DIR)." \
 		"" \

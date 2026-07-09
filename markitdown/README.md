@@ -14,6 +14,29 @@ The skill prefers MarkItDown as the first-pass reader and keeps the converted
 Markdown as the reasoning surface. Plain text, source code, and small Markdown
 files should still be read directly.
 
+## Dependencies
+
+Install-time dependencies:
+
+- Python 3.10+ with working standard-library `venv`, `pip`, and `hashlib`
+  support. The installer checks capabilities instead of assuming a specific
+  Python manager, so pyenv, asdf, uv, Homebrew, system, and manually installed
+  interpreters can all work.
+- Network access to the configured Python package index during
+  `make install-runtime`, unless the required wheels are already cached.
+- `rsync` for copying the skill into Codex and Claude Code skill directories.
+
+Runtime dependencies:
+
+- The managed virtual environment created at
+  `~/.vibelab-tools/agent-skills/markitdown/venv`.
+- `markitdown[all]`, installed by `make install-runtime`.
+- Optional image-extraction helpers used by `markitdown-assets` when available:
+  `pypdfium2` for PDF page rendering, `python-pptx` for PPTX images,
+  `openpyxl` for XLSX images, and `beautifulsoup4` for HTML image rewriting.
+  If one of these libraries is missing, the matching asset extraction path is
+  skipped with a warning instead of failing the whole conversion.
+
 ## Build
 
 No build step is required.
@@ -29,6 +52,8 @@ make install          # install for Codex and Claude Code
 make install-codex    # install for Codex only
 make install-claude   # install for Claude Code only
 make install-runtime  # install only the MarkItDown runtime venv
+make uninstall        # remove installed skill copies and runtime
+make purge            # same as uninstall; this skill has no runtime config
 ```
 
 Installed locations:
@@ -119,5 +144,5 @@ Python is acceptable when it is Python 3.10+ and has working standard-library
 hash support required by packaging tools. Override detection when needed:
 
 ```bash
-make RUNTIME_PYTHON=/path/to/python install-runtime
+make MARKITDOWN_RUNTIME_PYTHON=/path/to/python install-runtime
 ```

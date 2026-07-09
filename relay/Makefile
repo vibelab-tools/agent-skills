@@ -20,7 +20,7 @@ NODE ?= node
 
 .DEFAULT_GOAL := build
 
-.PHONY: all build install install-all install-codex install-claude install-daemon install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service validate clean help
+.PHONY: all build install install-all install-codex install-claude install-daemon install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service purge validate clean help
 
 all: build
 
@@ -100,8 +100,9 @@ install-claude-plugin:
 	claude plugin install "$(PLUGIN_NAME)@$(CLAUDE_MARKETPLACE_NAME)"
 
 install-settings:
-	mkdir -p "$(HOME)/.codex" "$(RUNTIME_DIR)"
-	node scripts/merge-codex-relay-settings.mjs "$(RUNTIME_DIR)"
+	mkdir -p "$(RUNTIME_DIR)"
+	node scripts/merge-relay-config.mjs "$(SERVICE_ROOT)"
+	node scripts/cleanup-legacy-relay-settings.mjs
 
 install-service:
 	$(NODE) "$(BIN_DIR)/relay-service.mjs" install "$(SERVICE_ROOT)"
@@ -125,15 +126,23 @@ uninstall:
 	$(MAKE) uninstall-service
 	$(MAKE) uninstall-codex
 	$(MAKE) uninstall-claude
-	rm -rf "$(SERVICE_ROOT)" "$(LEGACY_SERVICE_ROOT)"
+	rm -rf "$(DAEMON_INSTALL_DIR)" "$(BIN_DIR)" "$(ASSETS_DIR)" "$(RUNTIME_DIR)"
+	rm -rf "$(LEGACY_SERVICE_ROOT)/daemon" "$(LEGACY_SERVICE_ROOT)/bin" "$(LEGACY_SERVICE_ROOT)/assets" "$(LEGACY_RUNTIME_DIR)"
+	rmdir "$(SERVICE_ROOT)" 2>/dev/null || true
+	rmdir "$(LEGACY_SERVICE_ROOT)" 2>/dev/null || true
+	rmdir "$(LEGACY_SERVICE_PARENT)" 2>/dev/null || true
+
+purge: uninstall
+	rm -f "$(SERVICE_ROOT)/config.json" "$(LEGACY_SERVICE_ROOT)/config.json"
+	rm -rf "$(LEGACY_SERVICE_ROOT)"
+	rmdir "$(SERVICE_ROOT)" 2>/dev/null || true
 	rmdir "$(LEGACY_SERVICE_PARENT)" 2>/dev/null || true
 
 uninstall-codex:
 	codex plugin remove "$(PLUGIN_NAME)@$(CODEX_MARKETPLACE_NAME)" 2>/dev/null || true
 	codex plugin marketplace remove "$(CODEX_MARKETPLACE_NAME)" 2>/dev/null || true
 	rm -rf "$(CODEX_MARKETPLACE_ROOT)" "$(LEGACY_CODEX_MARKETPLACE_ROOT)"
-	node scripts/remove-codex-relay-settings.mjs "$(RUNTIME_DIR)"
-	node scripts/remove-codex-relay-settings.mjs "$(LEGACY_RUNTIME_DIR)"
+	node scripts/cleanup-legacy-relay-settings.mjs
 
 uninstall-claude:
 	claude plugin uninstall --scope user "$(PLUGIN_NAME)@$(CLAUDE_MARKETPLACE_NAME)" 2>/dev/null || true
@@ -163,7 +172,8 @@ help:
 		"  make install          Install Codex + Claude plugin surfaces and start service." \
 		"  make install-codex    Install Codex surface and start shared service." \
 		"  make install-claude   Install Claude surface and start shared service." \
-		"  make uninstall        Stop service and remove both plugin surfaces." \
+		"  make uninstall        Stop service and remove plugin/service files; preserve config.json." \
+		"  make purge            Run uninstall and remove config.json." \
 		"  make uninstall-codex  Remove Codex plugin surface only." \
 		"  make uninstall-claude Remove Claude plugin surface only." \
 		"  make start|stop|status|restart  Control the platform service." \

@@ -40,9 +40,39 @@ Bidirectional IM relay for [Claude Code](https://docs.anthropic.com/en/docs/clau
 
 ### Prerequisites
 
-- Node.js 18+
-- [Cloudflare Workers](https://workers.cloudflare.com/) account (for Telegram)
-- Telegram Bot and/or DingTalk enterprise app
+Install-time dependencies:
+
+- Node.js 18+.
+- `pnpm` on `PATH`; the Makefile runs `pnpm install` and `pnpm run build`.
+- `rsync` for installing daemon files and plugin marketplace sources.
+- `jq` for Claude marketplace checks and for runtime hook/command scripts.
+- Codex CLI when running `make install-codex` or `make install`.
+- Claude Code CLI with plugin support when running `make install-claude` or
+  `make install`.
+
+Runtime dependencies:
+
+- `tmux` for bidirectional reply injection. Codex should be launched through
+  `~/.vibelab-tools/agent-skills/relay/bin/codex-tmux`; Claude Code sessions
+  should also run inside tmux.
+- `curl` and `jq` for hook scripts and slash-command helpers.
+- A platform user-service manager:
+  - macOS: `launchctl`
+  - Linux: `systemd --user`
+  - Windows: Task Scheduler through `schtasks.exe`
+- IM credentials for each enabled channel:
+  - Telegram: bot token, group chat ID, and a Cloudflare Worker URL.
+  - DingTalk: enterprise app client ID and client secret.
+  - Feishu: enterprise app ID, app secret, and target chat ID.
+
+Optional dependencies:
+
+- [Cloudflare Workers](https://workers.cloudflare.com/) account and Wrangler for
+  deploying the Telegram Worker. DingTalk and Feishu connect directly and do not
+  require the Worker.
+- Python 3 with Pillow on macOS for polished LaunchAgent app icons with
+  transparent padding and rounded corners. If Pillow is unavailable, service
+  installation still works with a simpler `sips`-generated icon.
 
 ### Setup Guides
 
@@ -55,33 +85,39 @@ Bidirectional IM relay for [Claude Code](https://docs.anthropic.com/en/docs/clau
 
 ### Quick Setup
 
-1. Configure environment in `~/.claude/settings.json` for Claude Code, or
-   `~/.codex/relay-settings.json` for Codex-only setups:
+1. Configure relay environment in the service-local config file:
+   `~/.vibelab-tools/agent-skills/relay/config.json`.
 
 ```json
 {
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "<token>",
-    "TELEGRAM_CHAT_ID": "<chat-id>",
-    "RELAY_WORKER_URL": "https://<worker-domain>",
-    "DINGTALK_CLIENT_ID": "<client-id>",
-    "DINGTALK_CLIENT_SECRET": "<client-secret>",
-    "FEISHU_APP_ID": "<app-id>",
-    "FEISHU_APP_SECRET": "<app-secret>",
-    "FEISHU_CHAT_ID": "<chat-id>",
-    "TELEGRAM_PROXY_ENABLED": "true",
-    "TELEGRAM_PROXY_URL": "http://127.0.0.1:50170",
-    "DINGTALK_PROXY_ENABLED": "false",
-    "FEISHU_PROXY_ENABLED": "false",
-    "RELAY_DAEMON_PORT": "3580"
+  "daemon": { "port": 3580 },
+  "worker": { "url": "https://<worker-domain>" },
+  "telegram": {
+    "bot_token": "<token>",
+    "chat_id": "<chat-id>",
+    "proxy": {
+      "enabled": true,
+      "url": "http://127.0.0.1:50170"
+    }
+  },
+  "dingtalk": {
+    "client_id": "<client-id>",
+    "client_secret": "<client-secret>",
+    "proxy": { "enabled": false }
+  },
+  "feishu": {
+    "app_id": "<app-id>",
+    "app_secret": "<app-secret>",
+    "chat_id": "<chat-id>",
+    "proxy": { "enabled": false }
   }
 }
 ```
 
-`CLAUDE_RELAY_WORKER_URL` is accepted as a compatibility alias for
-`RELAY_WORKER_URL`.
-
-Proxy settings are per IM channel and opt-in. Use `TELEGRAM_PROXY_ENABLED=true` plus either `TELEGRAM_PROXY_URL` or `TELEGRAM_PROXY_PROTOCOL/HOST/PORT`; keep `DINGTALK_PROXY_ENABLED=false` and `FEISHU_PROXY_ENABLED=false` when those services should connect directly.
+Legacy env-style config is migrated during install, but new configuration
+should use the structured fields above. Proxy settings are per IM channel and
+opt-in. Keep `dingtalk.proxy.enabled=false` and `feishu.proxy.enabled=false`
+when those services should connect directly.
 
 2. Install the plugin and start the daemon:
 
@@ -113,8 +149,99 @@ make          # build
 make status   # inspect the platform service
 make restart  # restart the platform service
 make clean    # remove development build outputs
-make uninstall
+make uninstall # stop service and remove installed files; preserve config.json
+make purge     # run uninstall and remove config.json
 ```
+
+## Configuration Reference
+
+Relay runtime configuration lives at:
+
+```text
+~/.vibelab-tools/agent-skills/relay/config.json
+```
+
+`make install` creates the file with restrictive permissions when it does not
+exist and preserves existing values on later installs. Legacy env-style config
+from `~/.codex/relay-settings.json` or `~/.claude/settings.json` is migrated into
+this service-local structured config. New installs should edit only
+`~/.vibelab-tools/agent-skills/relay/config.json`.
+
+### Core Fields
+
+| Field | Required | Default | Description |
+| --- | --- | --- | --- |
+| `daemon.port` | No | `3580` | Local HTTP daemon port bound to `127.0.0.1`. Slash commands and hooks read this value. |
+| `daemon.machine_id` | No | Hash of hostname | Stable machine identifier sent to the Telegram Worker. Set only when several machines must use a controlled ID. |
+| `daemon.poll_interval_ms` | No | `1000` | Telegram Worker polling interval in milliseconds. |
+| `worker.url` | Telegram only | Empty | Base URL of the Cloudflare Worker used for Telegram notification delivery, polling, registration, and topic binding. Do not include a trailing API path. |
+
+Runtime paths such as `runtime/`, `bindings.json`, PID files, and logs are
+derived from the install root. They are not user configuration fields.
+
+### Telegram Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `telegram.bot_token` | Yes, for Telegram | Bot API token from BotFather. Used by the Worker and topic creation helpers. |
+| `telegram.chat_id` | Yes, for Telegram | Telegram group or supergroup chat ID, usually a negative numeric ID. The group must have Topics enabled for per-session isolation. |
+| `telegram.proxy` | No | Per-channel proxy config for Telegram HTTP calls. Useful when Telegram is blocked on the local network. |
+
+Telegram also requires `worker.url`. The local daemon sends notifications through
+the Worker and polls the Worker for replies. Project topic bindings are stored in
+`.claude/relay.json` or `.codex/relay.json`, not in the global runtime config.
+
+### DingTalk Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `dingtalk.client_id` | Yes, for DingTalk | DingTalk enterprise app client ID / app key. Used for Stream API and robot message APIs. |
+| `dingtalk.client_secret` | Yes, for DingTalk | DingTalk enterprise app secret. |
+| `dingtalk.proxy` | No | Per-channel proxy config. Keep disabled when DingTalk should connect directly. |
+
+DingTalk does not use the Cloudflare Worker. It connects through DingTalk Stream
+API and routes replies by conversation binding.
+
+### Feishu Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `feishu.app_id` | Yes, for Feishu | Feishu/Lark app ID. |
+| `feishu.app_secret` | Yes, for Feishu | Feishu/Lark app secret. |
+| `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates root messages and receives thread replies. |
+| `feishu.proxy` | No | Per-channel proxy config. Keep disabled when Feishu should connect directly. |
+
+Feishu does not use the Cloudflare Worker. It connects through Feishu WebSocket
+and uses thread root message IDs for per-session isolation.
+
+### Proxy Fields
+
+Each IM channel supports the same optional proxy object:
+
+```json
+{
+  "proxy": {
+    "enabled": false,
+    "url": "http://127.0.0.1:50170"
+  }
+}
+```
+
+Supported proxy fields:
+
+| Field | Description |
+| --- | --- |
+| `enabled` | Boolean or truthy string. Proxying is disabled unless this is set to `true`, `1`, `yes`, or `on`. |
+| `url` | Full proxy URL such as `http://127.0.0.1:50170`, `socks5://127.0.0.1:1080`, or an authenticated URL. |
+| `protocol` | Optional split-field protocol when `url` is not used. Defaults to `http`. |
+| `host` | Optional split-field proxy host when `url` is not used. |
+| `port` | Optional split-field proxy port when `url` is not used. |
+| `username` | Optional split-field proxy username. |
+| `password` | Optional split-field proxy password. |
+
+Proxy settings are per channel. The daemon clears ambient proxy environment
+variables on startup, so shell-level `HTTP_PROXY`, `HTTPS_PROXY`, or `ALL_PROXY`
+values do not leak into Telegram, DingTalk, or Feishu by accident.
 
 ## Slash Commands
 
@@ -168,6 +295,7 @@ Installed runtime layout:
 ├── daemon/              # compiled daemon and production Node dependencies
 ├── runtime/             # bindings, pid, and logs
 ├── bin/                 # codex-tmux and service controller scripts
+├── config.json          # local daemon configuration and IM credentials
 ├── codex-marketplace/   # Codex marketplace source
 └── claude-marketplace/  # Claude Code marketplace source
 ```

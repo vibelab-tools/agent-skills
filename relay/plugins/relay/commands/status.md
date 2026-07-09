@@ -9,7 +9,7 @@ Check relay daemon status:
 
 1. Run `node ~/.vibelab-tools/agent-skills/relay/bin/relay-service.mjs status ~/.vibelab-tools/agent-skills/relay` to check platform service status.
 2. If not running, report "Daemon is not running. Use `/relay:start` to start."
-3. If running, query daemon: `curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status`
+3. If running, query daemon using `daemon.port` from `~/.vibelab-tools/agent-skills/relay/config.json`, defaulting to `3580`.
 4. Display:
    - service status
    - Active IM providers

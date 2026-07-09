@@ -85,19 +85,20 @@ The daemon can discover the Feishu `chat_id` when the bot receives a message:
 grep "\[feishu\] Message in chat" ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
 ```
 
-The log includes a value like `oc_xxxx`; save it as `FEISHU_CHAT_ID`.
+The log includes a value like `oc_xxxx`; save it as `feishu.chat_id`.
 
 ## Configure The Daemon
 
-Add the required variables to `~/.claude/settings.json` or
-`~/.codex/relay-settings.json`:
+Add the required variables to
+`~/.vibelab-tools/agent-skills/relay/config.json`:
 
 ```json
 {
-  "env": {
-    "FEISHU_APP_ID": "<your-app-id>",
-    "FEISHU_APP_SECRET": "<your-app-secret>",
-    "FEISHU_CHAT_ID": "<your-chat-id>"
+  "feishu": {
+    "app_id": "<your-app-id>",
+    "app_secret": "<your-app-secret>",
+    "chat_id": "<your-chat-id>",
+    "proxy": { "enabled": false }
   }
 }
 ```
@@ -137,7 +138,7 @@ and stores the binding.
 - Long-connection configuration can be saved only after at least one app
   version is published and an SDK connection succeeds.
 - Feishu defaults to direct network access. To use a proxy, set
-  `FEISHU_PROXY_ENABLED=true` with `FEISHU_PROXY_URL` or split proxy fields.
+  `feishu.proxy.enabled=true` with `feishu.proxy.url` or split proxy fields.
 - A Feishu app supports one active WebSocket connection at a time. Multiple
   daemon instances should not share the same app.
 - The bot cannot create a thread without first sending a root message.

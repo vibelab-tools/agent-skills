@@ -20,31 +20,34 @@ project without competing for the same Telegram Topic or Feishu thread.
 
 ## Environment
 
-Configure the IM providers you need in the `env` section of
-`~/.claude/settings.json`:
+Configure the IM providers you need in
+`~/.vibelab-tools/agent-skills/relay/config.json`:
 
 ```json
 {
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "<token>",
-    "TELEGRAM_CHAT_ID": "<chat-id>",
-    "CLAUDE_RELAY_WORKER_URL": "https://<worker-domain>",
-    "DINGTALK_CLIENT_ID": "<client-id>",
-    "DINGTALK_CLIENT_SECRET": "<client-secret>",
-    "FEISHU_APP_ID": "<app-id>",
-    "FEISHU_APP_SECRET": "<app-secret>",
-    "FEISHU_CHAT_ID": "<chat-id>",
-    "TELEGRAM_PROXY_ENABLED": "true",
-    "TELEGRAM_PROXY_URL": "http://127.0.0.1:50170",
-    "DINGTALK_PROXY_ENABLED": "false",
-    "FEISHU_PROXY_ENABLED": "false",
-    "RELAY_DAEMON_PORT": "3580"
+  "daemon": { "port": 3580 },
+  "worker": { "url": "https://<worker-domain>" },
+  "telegram": {
+    "bot_token": "<token>",
+    "chat_id": "<chat-id>",
+    "proxy": { "enabled": true, "url": "http://127.0.0.1:50170" }
+  },
+  "dingtalk": {
+    "client_id": "<client-id>",
+    "client_secret": "<client-secret>",
+    "proxy": { "enabled": false }
+  },
+  "feishu": {
+    "app_id": "<app-id>",
+    "app_secret": "<app-secret>",
+    "chat_id": "<chat-id>",
+    "proxy": { "enabled": false }
   }
 }
 ```
 
-`RELAY_WORKER_URL` is accepted as a provider-neutral alias for
-`CLAUDE_RELAY_WORKER_URL`.
+Legacy env-style config is still migrated for compatibility. Prefer the
+structured fields above for all new installs.
 
 ## Install
 
@@ -57,6 +60,7 @@ make install-claude
 This installs:
 
 - daemon files: `~/.vibelab-tools/agent-skills/relay/daemon`
+- shared relay config: `~/.vibelab-tools/agent-skills/relay/config.json`
 - runtime state and logs: `~/.vibelab-tools/agent-skills/relay/runtime`
 - Claude plugin marketplace: `~/.vibelab-tools/agent-skills/relay/claude-marketplace`
 - platform user service: launchd on macOS, `systemd --user` on Linux, or Task
@@ -85,7 +89,7 @@ make start
 make stop
 make restart
 make status
-curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status
+curl -s http://127.0.0.1:3580/status
 ```
 
 ## Usage

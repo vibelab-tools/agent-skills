@@ -60,6 +60,31 @@ The project produces these user-facing capabilities:
 
 These are refactor signals, not hard build gates.
 
+## Dependencies
+
+Build and validation dependencies:
+
+- JDK 21. The Maven project compiles with `maven.compiler.release=21`.
+- Maven 3.8+ or a compatible `mvn` executable available on `PATH`.
+- Python 3 for regenerating generated reference files with
+  `scripts/generate-smell-refactoring-reference.py`.
+- `rsync` for installing the bundled skill snapshot into Codex and Claude Code
+  skill directories.
+- Network access to Maven repositories on the first build, unless dependencies
+  are already available in the local Maven cache.
+
+Installed skill runtime dependencies:
+
+- A Java 21-compatible runtime available as `java` on `PATH`. The installed
+  wrapper scripts invoke the packaged shaded JAR under
+  `skill/code-refactor/assets/code-refactor-tools.jar`.
+- No Python runtime is required for normal installed-skill execution. The Python
+  script in this repository is only used to regenerate Markdown reference files.
+
+Bundled Java dependencies include Jackson for JSON output and Tree-sitter parser
+packages for the non-Java language adapters. They are packaged into the shaded
+JAR during `make validate` / `make install`.
+
 ## Recommended Stack
 
 - Java as the implementation language.
@@ -124,4 +149,5 @@ make install          # install to $CODEX_HOME/skills and $CLAUDE_HOME/skills
 make install-codex    # install only to $CODEX_HOME/skills/code-refactor
 make install-claude   # install only to $CLAUDE_HOME/skills/code-refactor
 make uninstall        # remove both installed copies
+make purge            # same as uninstall; this skill has no runtime config
 ```

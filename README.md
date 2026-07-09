@@ -17,6 +17,16 @@ removed with the same target names.
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
 
+## Dependency Overview
+
+| Skill | Main dependencies |
+| --- | --- |
+| `markitdown` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `markitdown[all]` into an isolated runtime venv. |
+| `git-commit` | Git CLI in the target repository; no build-time runtime beyond shell tools used by installation. |
+| `code-refactor` | JDK 21 and Maven for build/validation; Java 21-compatible runtime for the packaged JAR. |
+| `video-understanding` | Python 3.10+, `ffmpeg`, and preferably `ffprobe`; provider API credentials only for multimodal mode. |
+| `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
+
 ## Install Layout
 
 Regular skills are installed into the native skill directories for each agent:
@@ -31,8 +41,8 @@ managed executable at `~/.vibelab-tools/agent-skills/markitdown/bin/markitdown`.
 also installs `markitdown-assets`, which writes local image assets and a manifest
 for image-heavy PDF, PPTX, DOCX, XLSX, HTML, EPUB, ZIP, and standalone image
 inputs. The installer accepts any Python 3.10+ runtime that passes capability
-checks, including pyenv-managed interpreters, and supports
-`RUNTIME_PYTHON=/path/to/python` for explicit selection.
+checks, including pyenv-managed interpreters, and supports the make-time
+`MARKITDOWN_RUNTIME_PYTHON=/path/to/python` parameter for explicit selection.
 
 `video-understanding` installs runtime configuration under
 `~/.vibelab-tools/agent-skills/video-understanding`. Its core dependency is `ffmpeg`,
@@ -58,7 +68,8 @@ make                  # build every skill project
 make install          # install for Codex and Claude Code
 make install-codex    # install Codex surfaces only
 make install-claude   # install Claude Code surfaces only
-make uninstall        # remove installed surfaces
+make uninstall        # remove installed surfaces; preserve runtime configs
+make purge            # remove installed surfaces and local runtime configs
 make uninstall-codex  # remove Codex surfaces only
 make uninstall-claude # remove Claude Code surfaces only
 make validate         # validate skill/plugin structures where supported

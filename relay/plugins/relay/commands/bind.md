@@ -24,9 +24,12 @@ Bind the current tmux session to a Telegram topic.
      HOSTNAME=$(hostname -s)
      PROJECT_NAME=$(basename "$PWD")
      TOPIC_NAME="${HOSTNAME}:${PROJECT_NAME}"
-     curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/createForumTopic" \
+     CONFIG="$HOME/.vibelab-tools/agent-skills/relay/config.json"
+     BOT_TOKEN=$(jq -r '.telegram.bot_token // empty' "$CONFIG")
+     CHAT_ID=$(jq -r '.telegram.chat_id // empty' "$CONFIG")
+     curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/createForumTopic" \
        -H "Content-Type: application/json" \
-       -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"name\": \"${TOPIC_NAME}\"}"
+       -d "{\"chat_id\": \"${CHAT_ID}\", \"name\": \"${TOPIC_NAME}\"}"
      ```
      Extract `message_thread_id` from the result.
 
@@ -38,11 +41,12 @@ Bind the current tmux session to a Telegram topic.
 
 4. Call daemon bind API:
    ```bash
-   curl -s -X POST "http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/bind" \
+   PORT=$(jq -r '.daemon.port // 3580' ~/.vibelab-tools/agent-skills/relay/config.json 2>/dev/null)
+   curl -s -X POST "http://127.0.0.1:${PORT:-3580}/bind" \
      -H "Content-Type: application/json" \
      -d '{"tmuxSession": "<session>", "topicId": "<topic_id>"}'
    ```
 
 5. Report: "Bound tmux session `<session>` to Telegram topic `<topic_name>` (ID: `<topic_id>`)"
 
-Note: This command requires `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` when creating a new topic. If Telegram needs a proxy, configure `TELEGRAM_PROXY_ENABLED=true` with `TELEGRAM_PROXY_URL` or `TELEGRAM_PROXY_PROTOCOL/HOST/PORT`.
+Note: This command requires `telegram.bot_token` and `telegram.chat_id` when creating a new topic. If Telegram needs a proxy, configure `telegram.proxy.enabled=true` with `telegram.proxy.url` or split proxy fields.

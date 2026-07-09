@@ -2,10 +2,10 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PYTHON_BIN="${MARKITDOWN_ASSETS_PYTHON:-$SCRIPT_DIR/../venv/bin/python}"
+PYTHON_BIN="$SCRIPT_DIR/../venv/bin/python"
 
 if [ ! -x "$PYTHON_BIN" ]; then
-  PYTHON_BIN="${PYTHON:-python3}"
+  PYTHON_BIN="python3"
 fi
 
 exec "$PYTHON_BIN" "$SCRIPT_DIR/markitdown-assets.py" "$@"

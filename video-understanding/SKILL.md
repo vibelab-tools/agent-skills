@@ -11,9 +11,10 @@ Use `scripts/analyze-video` for local video analysis. The script always
 validates the path, collects metadata when `ffprobe` is available, and samples
 frames with `ffmpeg`.
 
-Do not call `python3 scripts/analyze_video.py` directly unless the user has
-explicitly selected a Python runtime. The `scripts/analyze-video` wrapper
-chooses a healthy Python 3.10+ interpreter and skips broken default shims.
+Use the `scripts/analyze-video` wrapper by default. It chooses a healthy Python
+3.10+ interpreter and skips broken default shims. Call
+`python3 scripts/analyze_video.py` directly only when a specific interpreter is
+required.
 
 Run from any working directory:
 

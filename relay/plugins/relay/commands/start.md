@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(node:*), Bash(curl:*), Bash(test:*)
+allowed-tools: Bash(node:*), Bash(curl:*), Bash(test:*), Bash(jq:*)
 description: Start the relay daemon service
 ---
 
@@ -14,7 +14,8 @@ Start the relay daemon using the platform service controller. Follow these steps
 
 1. Check if daemon is already running:
    ```bash
-   curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status
+   PORT=$(jq -r '.daemon.port // 3580' ~/.vibelab-tools/agent-skills/relay/config.json 2>/dev/null)
+   curl -s "http://127.0.0.1:${PORT:-3580}/status"
    ```
    If it responds, tell the user it is already running.
 
@@ -30,6 +31,7 @@ Start the relay daemon using the platform service controller. Follow these steps
 
 4. Verify:
    ```bash
-   curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status
+   PORT=$(jq -r '.daemon.port // 3580' ~/.vibelab-tools/agent-skills/relay/config.json 2>/dev/null)
+   curl -s "http://127.0.0.1:${PORT:-3580}/status"
    ```
    Report success or failure.

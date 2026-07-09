@@ -80,20 +80,20 @@ curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<WORKER_DOMAIN>
 
 ## Configure The Daemon
 
-Add the required variables to `~/.claude/settings.json` or
-`~/.codex/relay-settings.json`:
+Add the required variables to
+`~/.vibelab-tools/agent-skills/relay/config.json`:
 
 ```json
 {
-  "env": {
-    "TELEGRAM_BOT_TOKEN": "<your-bot-token>",
-    "TELEGRAM_CHAT_ID": "<your-group-chat-id>",
-    "RELAY_WORKER_URL": "https://<worker-domain>"
+  "worker": { "url": "https://<worker-domain>" },
+  "telegram": {
+    "bot_token": "<your-bot-token>",
+    "chat_id": "<your-group-chat-id>"
   }
 }
 ```
 
-Use `TELEGRAM_PROXY_ENABLED=true` with `TELEGRAM_PROXY_URL` or split proxy
+Use `telegram.proxy.enabled=true` with `telegram.proxy.url` or split proxy
 fields when Telegram needs a proxy.
 
 ## How It Works

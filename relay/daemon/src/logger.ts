@@ -5,13 +5,14 @@
 import pino from "pino";
 
 const rootLogger = pino({
-  level: process.env.LOG_LEVEL || "info",
+  level: "info",
   redact: {
     paths: [
       "*.appSecret",
       "*.app_secret",
       "*.clientSecret",
       "*.client_secret",
+      "*.bot_token",
       "*.botToken",
       "*.token",
       "*.accessToken",

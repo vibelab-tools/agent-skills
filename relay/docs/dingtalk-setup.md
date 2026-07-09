@@ -49,14 +49,15 @@ group settings. Stream Mode may not receive messages otherwise.
 
 ## Configure The Daemon
 
-Add the required variables to `~/.claude/settings.json` or
-`~/.codex/relay-settings.json`:
+Add the required variables to
+`~/.vibelab-tools/agent-skills/relay/config.json`:
 
 ```json
 {
-  "env": {
-    "DINGTALK_CLIENT_ID": "<your-client-id>",
-    "DINGTALK_CLIENT_SECRET": "<your-client-secret>"
+  "dingtalk": {
+    "client_id": "<your-client-id>",
+    "client_secret": "<your-client-secret>",
+    "proxy": { "enabled": false }
   }
 }
 ```
@@ -132,4 +133,4 @@ Example project binding:
 - `sessionWebhook` expires quickly, so the daemon falls back to OpenAPI when
   needed.
 - DingTalk defaults to direct network access. To use a proxy, set
-  `DINGTALK_PROXY_ENABLED=true` with `DINGTALK_PROXY_URL` or split proxy fields.
+  `dingtalk.proxy.enabled=true` with `dingtalk.proxy.url` or split proxy fields.

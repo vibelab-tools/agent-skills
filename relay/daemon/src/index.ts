@@ -8,7 +8,7 @@ import * as dns from "dns";
 dns.setDefaultResultOrder("ipv4first");
 
 // 2026-04-21: Scrub ambient proxy env vars in-process. Providers may still use
-// their own explicit *_PROXY_* config, but shell proxy state must not leak into
+// their own explicit provider proxy config, but shell proxy state must not leak into
 // Feishu/DingTalk/Telegram by accident.
 for (const key of ["http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "all_proxy"]) {
   delete process.env[key];

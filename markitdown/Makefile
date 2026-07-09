@@ -16,7 +16,7 @@ CLAUDE_INSTALL_DIR := $(CLAUDE_HOME)/skills/$(SKILL_NAME)
 VALIDATOR := $(CODEX_HOME)/skills/.system/skill-creator/scripts/quick_validate.py
 PYTHON ?= python3
 PYTHON_CANDIDATES ?= python3 python python3.14 python3.13 python3.12 python3.11 python3.10 /opt/homebrew/bin/python3.14 /opt/homebrew/bin/python3.13 /opt/homebrew/bin/python3.12 /opt/homebrew/bin/python3.11 /opt/homebrew/bin/python3 /usr/local/bin/python3.14 /usr/local/bin/python3.13 /usr/local/bin/python3.12 /usr/local/bin/python3.11 /usr/local/bin/python3 /usr/bin/python3
-RUNTIME_PYTHON ?= $(shell for py in $(PYTHON_CANDIDATES); do \
+DETECTED_RUNTIME_PYTHON := $(shell for py in $(PYTHON_CANDIDATES); do \
 	if command -v "$$py" >/dev/null 2>&1; then \
 		resolved=$$(command -v "$$py"); \
 	elif [ -x "$$py" ]; then \
@@ -28,6 +28,7 @@ RUNTIME_PYTHON ?= $(shell for py in $(PYTHON_CANDIDATES); do \
 		printf '%s\n' "$$resolved"; exit 0; \
 	fi; \
 done)
+MARKITDOWN_RUNTIME_PYTHON ?= $(DETECTED_RUNTIME_PYTHON)
 RSYNC ?= rsync
 
 ifeq ($(OS),Windows_NT)
@@ -43,7 +44,7 @@ endif
 .DEFAULT_GOAL := build
 .NOTPARALLEL:
 
-.PHONY: build install install-all install-runtime install-codex install-claude validate uninstall uninstall-runtime uninstall-codex uninstall-claude clean help
+.PHONY: build install install-all install-runtime install-codex install-claude validate uninstall uninstall-runtime uninstall-codex uninstall-claude purge clean help
 
 build:
 	@:
@@ -64,12 +65,12 @@ install-all: install-runtime install-codex install-claude
 
 install-runtime:
 	@mkdir -p "$(TOOL_ROOT)" "$(BIN_DIR)"
-	@if [ -z "$(RUNTIME_PYTHON)" ]; then \
-		echo "No suitable Python runtime found. Install Python 3.10+ or run make RUNTIME_PYTHON=/path/to/python install-runtime"; \
+	@if [ -z "$(MARKITDOWN_RUNTIME_PYTHON)" ]; then \
+		echo "No suitable Python runtime found. Install Python 3.10+ or run make MARKITDOWN_RUNTIME_PYTHON=/path/to/python install-runtime"; \
 		exit 1; \
 	fi
-	@if ! "$(RUNTIME_PYTHON)" -c 'import sys, hashlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then \
-		echo "RUNTIME_PYTHON=$(RUNTIME_PYTHON) is not suitable. It must be Python 3.10+ with working hashlib.blake2b."; \
+	@if ! "$(MARKITDOWN_RUNTIME_PYTHON)" -c 'import sys, hashlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then \
+		echo "MARKITDOWN_RUNTIME_PYTHON=$(MARKITDOWN_RUNTIME_PYTHON) is not suitable. It must be Python 3.10+ with working hashlib.blake2b."; \
 		exit 1; \
 	fi
 	@if [ -x "$(VENV_PYTHON)" ] && ! "$(VENV_PYTHON)" -c 'import sys, hashlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then \
@@ -77,7 +78,7 @@ install-runtime:
 		rm -rf "$(VENV_DIR)"; \
 	fi
 	@if [ ! -x "$(VENV_PYTHON)" ]; then \
-		$(RUNTIME_PYTHON) -m venv "$(VENV_DIR)"; \
+		$(MARKITDOWN_RUNTIME_PYTHON) -m venv "$(VENV_DIR)"; \
 	fi
 	"$(VENV_PYTHON)" -m pip install -U pip
 	"$(VENV_PYTHON)" -m pip install -U "$(MARKITDOWN_PACKAGE)"
@@ -111,6 +112,8 @@ install-claude: validate install-runtime
 
 uninstall: uninstall-codex uninstall-claude uninstall-runtime
 
+purge: uninstall
+
 uninstall-runtime:
 	rm -rf "$(TOOL_ROOT)" "$(LEGACY_TOOL_ROOT)"
 	@rmdir "$(LEGACY_TOOL_PARENT)" 2>/dev/null || true
@@ -139,6 +142,7 @@ help:
 		"  make install-codex     Install the skill to $(CODEX_INSTALL_DIR)." \
 		"  make install-claude    Install the skill to $(CLAUDE_INSTALL_DIR)." \
 		"  make uninstall         Remove both installed copies and the runtime." \
+		"  make purge             Same as uninstall; this skill has no runtime config." \
 		"  make uninstall-runtime Remove $(TOOL_ROOT)." \
 		"  make uninstall-codex   Remove $(CODEX_INSTALL_DIR)." \
 		"  make uninstall-claude  Remove $(CLAUDE_INSTALL_DIR)." \
@@ -147,5 +151,5 @@ help:
 		"  CODEX_HOME=$(CODEX_HOME)" \
 		"  CLAUDE_HOME=$(CLAUDE_HOME)" \
 		"  TOOL_ROOT=$(TOOL_ROOT)" \
-		"  RUNTIME_PYTHON=$(RUNTIME_PYTHON)" \
+		"  MARKITDOWN_RUNTIME_PYTHON=$(MARKITDOWN_RUNTIME_PYTHON)" \
 		"  MARKITDOWN_PACKAGE=$(MARKITDOWN_PACKAGE)"

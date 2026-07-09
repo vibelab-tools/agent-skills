@@ -3,7 +3,7 @@
 
 // 2026-03-17: Define core types for relay daemon
 
-/** Daemon configuration loaded from environment variables */
+/** Daemon configuration loaded from the service-local structured config */
 export interface ProxyConfig {
   enabled: boolean;
   url: string;

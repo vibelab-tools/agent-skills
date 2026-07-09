@@ -61,7 +61,7 @@ Show daemon status and active bindings:
 
 ```bash
 make status
-curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status
+curl -s http://127.0.0.1:3580/status
 ```
 
 Unbind the current session:
@@ -118,6 +118,7 @@ is not designed for multiple consumers sharing one app.
 | --- | --- | --- |
 | `relay.json` | `<project>/.claude/relay.json` | Claude Code project binding |
 | `relay.json` | `<project>/.codex/relay.json` | Codex project binding |
+| `config.json` | `~/.vibelab-tools/agent-skills/relay/config.json` | Shared daemon configuration and IM credentials |
 | `bindings.json` | `~/.vibelab-tools/agent-skills/relay/runtime/bindings.json` | Runtime binding state |
 | `relay-service.mjs` | `~/.vibelab-tools/agent-skills/relay/bin/relay-service.mjs` | Service controller |
 | `daemon.log` | `~/.vibelab-tools/agent-skills/relay/runtime/daemon.log` | Daemon log |
@@ -126,8 +127,8 @@ is not designed for multiple consumers sharing one app.
 
 1. Copy the repository to the target server.
 2. Run `make install` on the server.
-3. Configure `RELAY_DAEMON_PORT` and IM credentials in
-   `~/.claude/settings.json` or `~/.codex/relay-settings.json`.
+3. Configure `daemon.port` and IM credentials in
+   `~/.vibelab-tools/agent-skills/relay/config.json`.
 4. Confirm service status with `make status`.
 5. Restart Claude Code or Codex sessions on the server.
 
@@ -138,20 +139,20 @@ is not designed for multiple consumers sharing one app.
 ```bash
 make -C /path/to/agent-skills/relay status
 tail -n 30 ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
-lsof -i :${RELAY_DAEMON_PORT:-3580}
+lsof -i :3580
 ```
 
 ### Messages Are Not Sent
 
 ```bash
-curl -s http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/status | jq
-curl -s -X POST http://127.0.0.1:${RELAY_DAEMON_PORT:-3580}/send \
+curl -s http://127.0.0.1:3580/status | jq
+curl -s -X POST http://127.0.0.1:3580/send \
   -H 'content-type: application/json' \
   -d '{"text":"relay test"}'
 ```
 
 Check that the relevant provider credentials are set. Telegram also requires a
-configured `RELAY_WORKER_URL` or `CLAUDE_RELAY_WORKER_URL`.
+configured `worker.url`.
 
 ### DingTalk Does Not Receive Mentions
 
@@ -165,4 +166,4 @@ configured `RELAY_WORKER_URL` or `CLAUDE_RELAY_WORKER_URL`.
 1. Confirm the bot is a group admin.
 2. Confirm the bot has the "Manage Topics" permission.
 3. Confirm Topics are enabled for the group.
-4. Confirm `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, and Worker URL settings.
+4. Confirm `telegram.bot_token`, `telegram.chat_id`, and `worker.url` settings.

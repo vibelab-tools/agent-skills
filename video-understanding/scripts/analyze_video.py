@@ -82,7 +82,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "gemini": {
             "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
             "api_key": "",
-            "api_key_env": "GEMINI_API_KEY",
+            "api_key_env": "GOOGLE_AI_API_KEY",
             "model": "",
             "temperature": 0.2,
             "max_output_tokens": 2048,
@@ -105,7 +105,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--question", default=DEFAULT_QUESTION, help="Question about the video.")
     parser.add_argument(
         "--config",
-        default=os.environ.get("VIDEO_UNDERSTANDING_CONFIG", str(DEFAULT_CONFIG_PATH)),
+        default=str(DEFAULT_CONFIG_PATH),
         help="JSON config path. Default: ~/.vibelab-tools/agent-skills/video-understanding/config.json.",
     )
     parser.add_argument(
@@ -170,12 +170,6 @@ def read_json_file(path: Path) -> dict[str, Any]:
 def load_config(args: argparse.Namespace) -> dict[str, Any]:
     config = deep_merge(DEFAULT_CONFIG, read_json_file(Path(args.config).expanduser()))
 
-    env_mode = os.environ.get("VIDEO_UNDERSTANDING_MODE", "")
-    env_provider = os.environ.get("VIDEO_UNDERSTANDING_PROVIDER", "")
-    if env_mode:
-        config["mode"] = env_mode
-    if env_provider:
-        config["provider"] = env_provider
     if args.mode:
         config["mode"] = args.mode
     if args.provider:

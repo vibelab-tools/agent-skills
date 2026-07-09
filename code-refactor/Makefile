@@ -16,7 +16,7 @@ SKILL_VALIDATOR := $(CODEX_HOME)/skills/.system/skill-creator/scripts/quick_vali
 
 .DEFAULT_GOAL := build
 
-.PHONY: build all compile package references bundle validate install install-all install-codex install-claude uninstall uninstall-codex uninstall-claude clean help
+.PHONY: build all compile package references bundle validate install install-all install-codex install-claude uninstall uninstall-codex uninstall-claude purge clean help
 
 build: compile
 
@@ -59,6 +59,8 @@ install-claude: validate
 
 uninstall: uninstall-codex uninstall-claude
 
+purge: uninstall
+
 uninstall-codex:
 	rm -rf "$(CODEX_SKILL_DEST)"
 	@echo "Uninstalled $(SKILL_NAME) from $(CODEX_SKILL_DEST)"
@@ -71,11 +73,11 @@ clean:
 	$(MVN) -q clean
 
 help:
-	@printf '%s\n' \
-		"Targets:" \
-		"  make             Build the Maven package." \
-		"  make build       Build the Maven package." \
-		"  make compile     Build the Maven package." \
+		@printf '%s\n' \
+			"Targets:" \
+			"  make             Build the Maven package." \
+			"  make build       Build the Maven package." \
+			"  make compile     Build the Maven package." \
 			"  make references  Regenerate generated skill reference files." \
 			"  make bundle      Build and copy the jar into $(SKILL_SRC)/assets." \
 			"  make validate    Build, bundle, and validate the skill." \
@@ -83,6 +85,7 @@ help:
 			"  make install-codex     Install the skill to $(CODEX_SKILL_DEST)." \
 			"  make install-claude    Install the skill to $(CLAUDE_SKILL_DEST)." \
 			"  make uninstall         Remove both installed copies." \
+			"  make purge             Same as uninstall; this skill has no runtime config." \
 			"  make uninstall-codex   Remove $(CODEX_SKILL_DEST)." \
 			"  make uninstall-claude  Remove $(CLAUDE_SKILL_DEST)." \
 			"  make clean       Remove Maven build output." \

@@ -7,7 +7,6 @@
     "max_frames": 240,
     "max_side": 720,
     "jpeg_quality": 3,
-    "output_root": "~/.vibelab-tools/agent-skills/video-understanding/frames",
     "keep_frames": true,
     "ffmpeg": "ffmpeg",
     "ffprobe": "ffprobe",
@@ -31,7 +30,7 @@
     "gemini": {
       "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
       "api_key": "",
-      "api_key_env": "GEMINI_API_KEY",
+      "api_key_env": "GOOGLE_AI_API_KEY",
       "model": "",
       "temperature": 0.2,
       "max_output_tokens": 2048,
