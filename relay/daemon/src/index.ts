@@ -23,7 +23,6 @@ import { Poller } from "./poller";
 import { TelegramProvider } from "./providers/telegram";
 import { DingTalkProvider } from "./providers/dingtalk";
 import { FeishuProvider } from "./providers/feishu";
-import { IMProvider } from "./providers/base";
 import { injectText, sessionExists } from "./tmux-injector";
 import { requestJson } from "./http";
 import { summarizeError } from "./proxy";
@@ -50,11 +49,18 @@ async function main(): Promise<void> {
   const sessionManager = new SessionManager(config);
 
   // 2026-03-17: Initialize all configured IM providers
-  const providers: IMProvider[] = [];
+  const enabledProviders: string[] = [];
 
   // Telegram provider (via Worker relay)
-  const telegramProvider = new TelegramProvider(config);
-  providers.push(telegramProvider);
+  let telegramProvider: TelegramProvider | null = null;
+  let poller: Poller | null = null;
+  if (telegramIsConfigured(config)) {
+    telegramProvider = new TelegramProvider(config);
+    poller = new Poller(config, sessionManager);
+    enabledProviders.push(telegramProvider.name);
+  } else {
+    log.info("Telegram provider disabled; worker URL, bot token, and chat ID are required");
+  }
 
   // DingTalk provider (via Stream API, direct connection)
   let dingtalkProvider: DingTalkProvider | null = null;
@@ -75,7 +81,7 @@ async function main(): Promise<void> {
       injectText(binding.tmuxSession, msg.text);
     });
     await dingtalkProvider.connect();
-    providers.push(dingtalkProvider);
+    enabledProviders.push(dingtalkProvider.name);
   }
 
   // 2026-03-18: Feishu provider (via WebSocket, thread-based topic isolation)
@@ -98,26 +104,31 @@ async function main(): Promise<void> {
       injectText(binding.tmuxSession, injectionText);
     });
     await feishuProvider.connect();
-    providers.push(feishuProvider);
+    enabledProviders.push(feishuProvider.name);
   }
 
   // Initialize server with all providers
   const server = new Server(config, sessionManager, telegramProvider, dingtalkProvider, feishuProvider);
-  const poller = new Poller(config, sessionManager);
 
   // Start server and poller
   await server.start();
-  poller.start();
+  if (poller) {
+    poller.start();
+  }
 
   // Register with Worker
-  registerWithWorker(config).catch((err) => {
-    log.error({ err: summarizeError(err) }, "Worker registration failed");
-  });
+  if (telegramProvider) {
+    registerWithWorker(config).catch((err) => {
+      log.error({ err: summarizeError(err) }, "Worker registration failed");
+    });
+  }
 
   // Graceful shutdown
   const shutdown = (): void => {
     log.info("Shutting down...");
-    poller.stop();
+    if (poller) {
+      poller.stop();
+    }
     server.stop();
     if (dingtalkProvider) {
       dingtalkProvider.disconnect();
@@ -132,7 +143,7 @@ async function main(): Promise<void> {
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
 
-  log.info("Ready");
+  log.info({ providers: enabledProviders }, "Ready");
 }
 
 // 2026-03-20: Build tmux injection text that includes file paths for attachments
@@ -149,6 +160,10 @@ function buildInjectionText(text: string, attachments?: Attachment[]): string {
     parts.push(`[Attached files: ${fileList}]`);
   }
   return parts.join(" ") || "";
+}
+
+function telegramIsConfigured(config: ReturnType<typeof loadConfig>): boolean {
+  return Boolean(config.workerUrl && config.telegramBotToken && config.telegramChatId);
 }
 
 /** Register this machine with the Worker for heartbeat tracking */

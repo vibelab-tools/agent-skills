@@ -18,7 +18,7 @@ const log = createLogger("server");
 export class Server {
   private config: DaemonConfig;
   private sessionManager: SessionManager;
-  private telegramProvider: IMProvider;
+  private telegramProvider: IMProvider | null;
   // 2026-03-17: Add DingTalk provider for dual-platform notification
   private dingtalkProvider: IMProvider | null;
   // 2026-03-18: Feishu provider with thread-based topic isolation
@@ -29,7 +29,7 @@ export class Server {
   constructor(
     config: DaemonConfig,
     sessionManager: SessionManager,
-    telegramProvider: IMProvider,
+    telegramProvider: IMProvider | null,
     dingtalkProvider?: IMProvider | null,
     feishuProvider?: FeishuProvider | null
   ) {
@@ -153,7 +153,7 @@ export class Server {
 
     // 2026-03-18: Send to all configured providers with their respective IDs
     const results: boolean[] = [];
-    if (binding.topicId) {
+    if (this.telegramProvider && binding.topicId) {
       results.push(await this.telegramProvider.send({ topicId: binding.topicId, text }));
     }
     if (this.dingtalkProvider && binding.dingtalkConversationId) {
@@ -204,7 +204,7 @@ export class Server {
     }
 
     // Register Telegram binding with Worker (only if topicId present)
-    if (body.topicId) {
+    if (body.topicId && this.telegramProvider) {
       try {
         await requestJson(`${this.config.workerUrl}/api/bind`, {
           method: "POST",
@@ -238,7 +238,7 @@ export class Server {
     const removed = this.sessionManager.unbind(session);
 
     // Clean up Worker binding
-    if (binding) {
+    if (binding && binding.topicId && this.telegramProvider) {
       requestJson(`${this.config.workerUrl}/api/bind/${binding.topicId}`, {
         method: "DELETE",
         proxy: this.config.telegramProxy,
@@ -261,7 +261,11 @@ export class Server {
         machineId: this.config.machineId,
         hostname: this.config.hostname,
         port: this.config.port,
-        providers: [this.telegramProvider.name, ...(this.dingtalkProvider ? [this.dingtalkProvider.name] : []), ...(this.feishuProvider ? [this.feishuProvider.name] : [])],
+        providers: [
+          ...(this.telegramProvider ? [this.telegramProvider.name] : []),
+          ...(this.dingtalkProvider ? [this.dingtalkProvider.name] : []),
+          ...(this.feishuProvider ? [this.feishuProvider.name] : []),
+        ],
         bindings,
       })
     );
