@@ -1,0 +1,20 @@
+{
+  "active_host": "s3",
+  "image_hosts": {
+    "s3": {
+      "type": "s3-compatible",
+      "endpoint_url": "https://s3.example.com",
+      "bucket": "documentation-images",
+      "region": "auto",
+      "access_key_id": "",
+      "secret_access_key": "",
+      "access_key_id_env": "IMAGE_HOSTING_ACCESS_KEY_ID",
+      "secret_access_key_env": "IMAGE_HOSTING_SECRET_ACCESS_KEY",
+      "public_base_url": "https://images.example.com",
+      "prefix": "docs/{year}/{month}/{day}",
+      "force_path_style": true,
+      "acl": "",
+      "extra_args": {}
+    }
+  }
+}

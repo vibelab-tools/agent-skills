@@ -17,6 +17,7 @@ removed with the same target names.
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
 | `osint-person-investigation` | Guides lawful public-source person research with mandatory general search, exhaustive multilingual search planning, optional search APIs and local OSINT tools, identity disambiguation, trace capture, and cited reporting. | [osint-person-investigation/README.md](osint-person-investigation/README.md) |
+| `markdown-image-hosting` | Uploads local Markdown image references to a configured image host and rewrites them to hosted URLs. | [markdown-image-hosting/SKILL.md](markdown-image-hosting/SKILL.md) |
 
 ## Dependency Overview
 
@@ -28,6 +29,7 @@ removed with the same target names.
 | `video-understanding` | Python 3.10+, `ffmpeg`, and preferably `ffprobe`; provider API credentials only for multimodal mode. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
 | `osint-person-investigation` | Host-agent search and browsing capabilities, Python 3.12.x with `venv`/`pip`, `git`, optional Brave, Google CSE, Serper.dev, Gemini, Kimi, DeepSeek, or Qwen credentials, no-key public data providers, and managed Sherlock, Maigret, theHarvester, and Photon runtime tools. |
+| `markdown-image-hosting` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `boto3` into an isolated runtime venv for S3-compatible image hosting. |
 
 ## Install Layout
 

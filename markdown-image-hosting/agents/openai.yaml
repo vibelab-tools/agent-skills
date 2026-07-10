@@ -1,0 +1,4 @@
+interface:
+  display_name: "Markdown Image Hosting"
+  short_description: "Upload Markdown images to an image host"
+  default_prompt: "Use $markdown-image-hosting to upload local Markdown images and rewrite them to hosted URLs."

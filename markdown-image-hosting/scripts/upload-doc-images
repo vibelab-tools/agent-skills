@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+VENV_PYTHON="$SCRIPT_DIR/../venv/bin/python"
+if [ -x "$VENV_PYTHON" ]; then
+  exec "$VENV_PYTHON" "$SCRIPT_DIR/upload_doc_images.py" "$@"
+fi
+exec "${PYTHON:-python3}" "$SCRIPT_DIR/upload_doc_images.py" "$@"
