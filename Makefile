@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-SKILLS := markitdown git-commit code-refactor video-understanding relay
+SKILLS := markitdown git-commit code-refactor video-understanding relay osint-person-investigation
 LEGACY_RUNTIME_ROOT ?= $(HOME)/.vibe-coding-skill
 
 .DEFAULT_GOAL := build

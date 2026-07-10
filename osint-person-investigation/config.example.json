@@ -1,0 +1,223 @@
+{
+  "search": {
+    "max_pages_per_query": 10,
+    "stop_when_page_has_no_new_urls": true,
+    "timeout_seconds": 20,
+    "user_agent": "vibelab-agent-skills-osint/1.0",
+    "trace": {
+      "enabled": true,
+      "output_dir": "~/.vibelab-tools/agent-skills/osint-person-investigation/traces",
+      "include_result_snippets": false
+    },
+    "providers": {
+      "brave": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://api.search.brave.com/res/v1/web/search",
+        "count": 20,
+        "country": "US",
+        "search_lang": "en",
+        "ui_lang": "en-US",
+        "safesearch": "moderate",
+        "extra_snippets": true
+      },
+      "google_cse": {
+        "enabled": false,
+        "endpoint": "https://customsearch.googleapis.com/customsearch/v1",
+        "keys": [
+          {
+            "api_key": "",
+            "cx": ""
+          }
+        ],
+        "num": 10,
+        "safe": "off",
+        "hl": "en",
+        "gl": "us"
+      },
+      "serper": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://google.serper.dev/search",
+        "num": 10,
+        "gl": "us",
+        "hl": "en"
+      },
+      "gemini": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+        "models": [
+          "gemini-3.1-pro-preview",
+          "gemini-3-flash-preview",
+          "gemini-2.5-pro",
+          "gemini-2.5-flash",
+          "gemini-3.5-flash",
+          "gemini-2.5-flash-lite"
+        ],
+        "temperature": 0.2,
+        "max_output_tokens": 4096,
+        "google_search": true
+      },
+      "kimi": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://api.moonshot.cn/v1/chat/completions",
+        "model": "moonshot-v1-auto",
+        "temperature": 0.2,
+        "max_tokens": 4096,
+        "web_search": true,
+        "max_tool_rounds": 3,
+        "extra_body": {}
+      },
+      "deepseek": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://api.deepseek.com/chat/completions",
+        "model": "deepseek-v4-pro",
+        "temperature": 0.2,
+        "max_tokens": 4096,
+        "extra_body": {}
+      },
+      "qwen": {
+        "enabled": false,
+        "api_key": "",
+        "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+        "model": "qwen-plus-latest",
+        "temperature": 0.2,
+        "max_tokens": 4096,
+        "enable_search": true,
+        "search_options": {
+          "search_strategy": "max"
+        }
+      },
+      "source_catalog": {
+        "enabled": true,
+        "max_results": 260,
+        "include_osint_directories": true,
+        "include_news": true,
+        "include_government": true,
+        "include_public_records": true,
+        "include_company": true,
+        "include_professional": true,
+        "include_social": true,
+        "include_academic": true,
+        "include_think_tanks": true,
+        "include_maps_images": true,
+        "include_short_video_images": true,
+        "include_domestic_cn": true
+      },
+      "sherlock": {
+        "enabled": false,
+        "command": "sherlock",
+        "timeout_seconds": 240,
+        "request_timeout_seconds": 15,
+        "include_nsfw": false,
+        "ignore_exclusions": false,
+        "sites": []
+      },
+      "maigret": {
+        "enabled": false,
+        "command": "maigret",
+        "timeout_seconds": 300,
+        "request_timeout_seconds": 10,
+        "top_sites": 200,
+        "sites": [],
+        "max_results": 100
+      },
+      "the_harvester": {
+        "enabled": false,
+        "command": "theHarvester",
+        "sources": "all",
+        "timeout_seconds": 300,
+        "include_emails": false,
+        "domain": ""
+      },
+      "photon": {
+        "enabled": false,
+        "command": "photon",
+        "target": "",
+        "args": [],
+        "timeout_seconds": 300,
+        "max_results": 200
+      },
+      "hackernews": {
+        "enabled": true,
+        "endpoint": "https://hn.algolia.com/api/v1/search",
+        "hits_per_page": 20,
+        "tags": ""
+      },
+      "internet_archive": {
+        "enabled": true,
+        "endpoint": "https://archive.org/advancedsearch.php",
+        "rows": 50,
+        "fields": ["identifier", "title", "creator", "date", "mediatype", "collection", "description"]
+      },
+      "common_crawl": {
+        "enabled": false,
+        "collinfo_endpoint": "https://index.commoncrawl.org/collinfo.json",
+        "limit": 50
+      },
+      "wikipedia": {
+        "enabled": true,
+        "languages": ["en", "zh"],
+        "limit": 10
+      },
+      "wikidata": {
+        "enabled": true,
+        "endpoint": "https://www.wikidata.org/w/api.php",
+        "languages": ["en", "zh"],
+        "limit": 10
+      },
+      "openalex": {
+        "enabled": true,
+        "endpoint": "https://api.openalex.org/works",
+        "per_page": 25,
+        "mailto": ""
+      },
+      "dblp": {
+        "enabled": true,
+        "endpoint": "https://dblp.org/search/publ/api",
+        "per_page": 20
+      },
+      "europe_pmc": {
+        "enabled": true,
+        "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+        "page_size": 25
+      },
+      "orcid": {
+        "enabled": true,
+        "endpoint": "https://pub.orcid.org/v3.0/search/",
+        "rows": 20
+      },
+      "crossref": {
+        "enabled": true,
+        "endpoint": "https://api.crossref.org/works",
+        "rows": 20,
+        "mailto": ""
+      },
+      "arxiv": {
+        "enabled": true,
+        "endpoint": "https://export.arxiv.org/api/query",
+        "max_results": 20,
+        "sort_by": "relevance",
+        "sort_order": "descending"
+      },
+      "pubmed": {
+        "enabled": true,
+        "endpoint": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+        "retmax": 20,
+        "tool": "vibelab-agent-skills-osint",
+        "email": ""
+      },
+      "github": {
+        "enabled": true,
+        "endpoint": "https://api.github.com",
+        "per_page": 20,
+        "search_users": true,
+        "search_repositories": true,
+        "token": ""
+      }
+    }
+  }
+}

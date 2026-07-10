@@ -1,0 +1,4 @@
+interface:
+  display_name: "OSINT Person Investigation"
+  short_description: "Cited public-source person research with exhaustive search"
+  default_prompt: "Use $osint-person-investigation to conduct a comprehensive public-source investigation of this person."
