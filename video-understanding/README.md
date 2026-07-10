@@ -44,7 +44,7 @@ Top-level fields:
 | --- | --- | --- |
 | `mode` | `auto`, `frames`, `vision-frames`, `video-native` | `frames` extracts local frames for agent inspection. `vision-frames` sends sampled frames to the selected provider. `video-native` sends the video or video URL to the selected provider. `multimodal` is still accepted as a legacy alias for `vision-frames`. |
 | `provider` | `openai-compatible`, `gemini` | Selects which provider block is used. Only the selected provider must be configured. |
-| `clear_proxy_env` | `true`, `false` | Removes ambient proxy environment variables before provider calls. Keep this enabled unless the provider must be reached through the shell proxy. |
+| `clear_proxy_env` | `true`, `false` | Removes ambient proxy environment variables before provider calls. Keep this enabled unless the provider must be reached through the shell proxy. Domestic OSS/S3 upload endpoints and domestic OpenAI-compatible endpoints are still forced to bypass ambient proxy variables. |
 
 Frame sampling fields:
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+from contextlib import contextmanager
 import datetime as dt
 import hashlib
 import json
@@ -48,6 +49,33 @@ PROXY_ENV_VARS = (
     "HTTP_PROXY",
     "HTTPS_PROXY",
     "ALL_PROXY",
+)
+DOMESTIC_LLM_ENDPOINT_MARKERS = (
+    ".aliyuncs.com",
+    ".maas.aliyuncs.com",
+    "dashscope.aliyuncs.com",
+    "moonshot.cn",
+    "siliconflow.cn",
+    "deepseek.com",
+    "bigmodel.cn",
+    "qianfan.baidubce.com",
+    "hunyuan.cloud.tencent.com",
+    "tencentcloudapi.com",
+    "volces.com",
+    "minimax.chat",
+    "lingyiwanwu.com",
+    "baichuan-ai.com",
+    "stepfun.com",
+    "modelscope.cn",
+)
+DOMESTIC_STORAGE_ENDPOINT_MARKERS = (
+    ".aliyuncs.com",
+    ".myqcloud.com",
+    ".volces.com",
+    ".ksyuncs.com",
+    ".ucloud.cn",
+    ".huaweicloud.com",
+    ".baidubce.com",
 )
 MODE_ALIASES = {
     "multimodal": "vision-frames",
@@ -309,6 +337,36 @@ def clear_proxy_env() -> list[str]:
             os.environ.pop(name, None)
             removed.append(name)
     return removed
+
+
+@contextmanager
+def without_proxy_env() -> Any:
+    saved = {name: os.environ[name] for name in PROXY_ENV_VARS if name in os.environ}
+    clear_proxy_env()
+    try:
+        yield
+    finally:
+        for name in PROXY_ENV_VARS:
+            os.environ.pop(name, None)
+        os.environ.update(saved)
+
+
+def url_matches_marker(url: str, markers: tuple[str, ...]) -> bool:
+    lowered = url.lower()
+    return any(marker in lowered for marker in markers)
+
+
+def should_clear_proxy_for_openai_endpoint(endpoint: str) -> bool:
+    return url_matches_marker(endpoint, DOMESTIC_LLM_ENDPOINT_MARKERS)
+
+
+def should_clear_proxy_for_storage_host(host: dict[str, Any]) -> bool:
+    endpoint_url = str(host.get("endpoint_url") or "")
+    public_base_url = str(host.get("public_base_url") or "")
+    return url_matches_marker(endpoint_url, DOMESTIC_STORAGE_ENDPOINT_MARKERS) or url_matches_marker(
+        public_base_url,
+        DOMESTIC_STORAGE_ENDPOINT_MARKERS,
+    )
 
 
 def fail(message: str, details: dict[str, Any] | None = None, code: int = 1) -> None:
@@ -701,8 +759,13 @@ def upload_video(video_path: Path, metadata: dict[str, Any], config: dict[str, A
     extra_args = dict(host.get("extra_args") or {})
     extra_args.setdefault("ContentType", mime_type)
 
-    client = boto3.client("s3", **client_kwargs)
-    client.upload_file(str(video_path), bucket, key, ExtraArgs=extra_args)
+    if should_clear_proxy_for_storage_host(host):
+        with without_proxy_env():
+            client = boto3.client("s3", **client_kwargs)
+            client.upload_file(str(video_path), bucket, key, ExtraArgs=extra_args)
+    else:
+        client = boto3.client("s3", **client_kwargs)
+        client.upload_file(str(video_path), bucket, key, ExtraArgs=extra_args)
     public_url = f"{public_base_url.rstrip('/')}/{quote(key)}"
     return {
         "backend": "s3-compatible",
@@ -801,7 +864,11 @@ def call_openai_compatible(
         "Authorization": f"Bearer {api_key}",
     }
     headers.update({str(k): str(v) for k, v in dict(provider_config.get("headers") or {}).items()})
-    data = http_json(endpoint, payload, headers, timeout)
+    if should_clear_proxy_for_openai_endpoint(endpoint):
+        with without_proxy_env():
+            data = http_json(endpoint, payload, headers, timeout)
+    else:
+        data = http_json(endpoint, payload, headers, timeout)
     choices = data.get("choices") or []
     if not choices:
         raise VideoError("OpenAI-compatible response has no choices", {"response": data})
@@ -973,7 +1040,11 @@ def call_openai_compatible_video_native(
         "Authorization": f"Bearer {api_key}",
     }
     headers.update({str(k): str(v) for k, v in dict(provider_config.get("headers") or {}).items()})
-    data = http_json(endpoint, payload, headers, timeout)
+    if should_clear_proxy_for_openai_endpoint(endpoint):
+        with without_proxy_env():
+            data = http_json(endpoint, payload, headers, timeout)
+    else:
+        data = http_json(endpoint, payload, headers, timeout)
     choices = data.get("choices") or []
     if not choices:
         raise VideoError("OpenAI-compatible response has no choices", {"response": data})
