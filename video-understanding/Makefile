@@ -8,12 +8,20 @@ LEGACY_TOOL_PARENT ?= $(HOME)/.vibe-coding-skill
 LEGACY_TOOL_ROOT ?= $(HOME)/.vibe-coding-skill/$(SKILL_NAME)
 CONFIG_FILE := $(TOOL_ROOT)/config.json
 CONFIG_EXAMPLE := $(TOOL_ROOT)/config.example.json
+VENV_DIR ?= $(TOOL_ROOT)/venv
 CODEX_INSTALL_DIR := $(CODEX_HOME)/skills/$(SKILL_NAME)
 CLAUDE_INSTALL_DIR := $(CLAUDE_HOME)/skills/$(SKILL_NAME)
 VALIDATOR := $(CODEX_HOME)/skills/.system/skill-creator/scripts/quick_validate.py
 PYTHON ?= python3
 RSYNC ?= rsync
 FFMPEG ?= ffmpeg
+BOTO3_PACKAGE ?= boto3
+
+ifeq ($(OS),Windows_NT)
+VENV_PYTHON := $(VENV_DIR)/Scripts/python.exe
+else
+VENV_PYTHON := $(VENV_DIR)/bin/python
+endif
 
 .DEFAULT_GOAL := build
 .NOTPARALLEL:
@@ -40,6 +48,11 @@ install-all: install-runtime install-codex install-claude
 
 install-runtime:
 	@mkdir -p "$(TOOL_ROOT)" "$(TOOL_ROOT)/frames"
+	@if [ ! -x "$(VENV_PYTHON)" ]; then \
+		$(PYTHON) -m venv "$(VENV_DIR)"; \
+	fi
+	"$(VENV_PYTHON)" -m pip install -U pip
+	"$(VENV_PYTHON)" -m pip install -U "$(BOTO3_PACKAGE)"
 	cp config.example.json "$(CONFIG_EXAMPLE)"
 	@if [ ! -f "$(CONFIG_FILE)" ]; then \
 		cp config.example.json "$(CONFIG_FILE)"; \
@@ -82,7 +95,7 @@ install-claude: validate install-runtime
 uninstall: uninstall-codex uninstall-claude uninstall-runtime
 
 uninstall-runtime:
-	rm -rf "$(TOOL_ROOT)/frames" "$(CONFIG_EXAMPLE)" "$(LEGACY_TOOL_ROOT)/frames" "$(LEGACY_TOOL_ROOT)/config.example.json"
+	rm -rf "$(TOOL_ROOT)/frames" "$(CONFIG_EXAMPLE)" "$(VENV_DIR)" "$(LEGACY_TOOL_ROOT)/frames" "$(LEGACY_TOOL_ROOT)/config.example.json"
 	@rmdir "$(TOOL_ROOT)" 2>/dev/null || true
 	@rmdir "$(LEGACY_TOOL_ROOT)" 2>/dev/null || true
 	@rmdir "$(LEGACY_TOOL_PARENT)" 2>/dev/null || true

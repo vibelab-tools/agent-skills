@@ -3,6 +3,11 @@ set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 SCRIPT="$SCRIPT_DIR/analyze_video.py"
+RUNTIME_PYTHON=${VIDEO_UNDERSTANDING_PYTHON:-"$HOME/.vibelab-tools/agent-skills/video-understanding/venv/bin/python"}
+
+if [ -x "$RUNTIME_PYTHON" ] && "$RUNTIME_PYTHON" -c 'import sys, argparse, hashlib, json, mimetypes, urllib.request, zlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then
+  exec "$RUNTIME_PYTHON" "$SCRIPT" "$@"
+fi
 
 for candidate in python3 python python3.14 python3.13 python3.12 python3.11 python3.10 \
   /opt/homebrew/bin/python3.14 /opt/homebrew/bin/python3.13 /opt/homebrew/bin/python3.12 \

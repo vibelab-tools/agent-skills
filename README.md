@@ -26,7 +26,7 @@ removed with the same target names.
 | `markitdown` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `markitdown[all]` into an isolated runtime venv. |
 | `git-commit` | Git CLI in the target repository; no build-time runtime beyond shell tools used by installation. |
 | `code-refactor` | JDK 21 and Maven for build/validation; Java 21-compatible runtime for the packaged JAR. |
-| `video-understanding` | Python 3.10+, `ffmpeg`, and preferably `ffprobe`; provider API credentials only for multimodal mode. |
+| `video-understanding` | Python 3.10+, `ffmpeg`, preferably `ffprobe`, provider API credentials for provider-backed modes, and `boto3` in the isolated runtime venv when OSS/S3-compatible video upload is enabled. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
 | `osint-person-investigation` | Host-agent search and browsing capabilities, Python 3.12.x with `venv`/`pip`, `git`, optional Brave, Google CSE, Serper.dev, Gemini, Kimi, DeepSeek, or Qwen credentials, no-key public data providers, and managed Sherlock, Maigret, theHarvester, and Photon runtime tools. |
 | `markdown-image-hosting` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `boto3` into an isolated runtime venv for S3-compatible image hosting. |
