@@ -1,4 +1,4 @@
 interface:
   display_name: "Video Understanding"
-  short_description: "Analyze local videos through sampled frames or configured vision APIs."
-  default_prompt: "Use video-understanding to analyze a local video file."
+  short_description: "Analyze videos locally with frames and subtitles."
+  default_prompt: "Use $video-understanding to analyze this local video or video URL."

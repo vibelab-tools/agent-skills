@@ -5,7 +5,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 SCRIPT="$SCRIPT_DIR/analyze_video.py"
 RUNTIME_PYTHON=${VIDEO_UNDERSTANDING_PYTHON:-"$HOME/.vibelab-tools/agent-skills/video-understanding/venv/bin/python"}
 
-if [ -x "$RUNTIME_PYTHON" ] && "$RUNTIME_PYTHON" -c 'import sys, argparse, hashlib, json, mimetypes, urllib.request, zlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then
+if [ -x "$RUNTIME_PYTHON" ] && "$RUNTIME_PYTHON" -c 'import sys, argparse, json, subprocess, urllib.parse; assert sys.version_info >= (3, 10)' >/dev/null 2>&1; then
   exec "$RUNTIME_PYTHON" "$SCRIPT" "$@"
 fi
 
@@ -23,7 +23,7 @@ do
     continue
   fi
 
-  if "$resolved" -c 'import sys, argparse, hashlib, json, mimetypes, tempfile, urllib.request, zlib; assert sys.version_info >= (3, 10); hashlib.blake2b(b"x")' >/dev/null 2>&1; then
+  if "$resolved" -c 'import sys, argparse, json, subprocess, urllib.parse; assert sys.version_info >= (3, 10)' >/dev/null 2>&1; then
     exec "$resolved" "$SCRIPT" "$@"
   fi
 done

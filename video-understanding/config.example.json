@@ -1,85 +1,20 @@
 {
-  "mode": "auto",
-  "provider": "openai-compatible",
-  "clear_proxy_env": true,
   "frame": {
     "interval_seconds": 1.0,
-    "max_frames": 240,
+    "max_frames": 0,
     "max_side": 720,
     "jpeg_quality": 3,
-    "keep_frames": true,
+    "output_root": "",
     "ffmpeg": "ffmpeg",
     "ffprobe": "ffprobe",
     "timeout_seconds": 1800
   },
-  "vision_frames": {
-    "fallback_to_frames": true,
-    "batch_size": 8,
-    "request_timeout_seconds": 180,
-    "openai_compatible": {
-      "endpoint": "https://api.openai.com/v1/chat/completions",
-      "api_key": "",
-      "api_key_env": "OPENAI_API_KEY",
-      "model": "",
-      "temperature": 0.2,
-      "max_tokens": 2048,
-      "max_tokens_field": "max_tokens",
-      "headers": {},
-      "image_detail": "low"
-    },
-    "gemini": {
-      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-      "api_key": "",
-      "api_key_env": "GOOGLE_AI_API_KEY",
-      "model": "",
-      "temperature": 0.2,
-      "max_output_tokens": 2048,
-      "headers": {}
-    }
-  },
-  "video_native": {
-    "fallback_to_vision_frames": true,
-    "request_timeout_seconds": 600,
-    "openai_compatible": {
-      "enabled": true,
-      "input_method": "auto",
-      "video_url": "",
-      "fps": 2.0,
-      "max_inline_bytes": 7340032,
-      "min_pixels": null,
-      "max_pixels": null,
-      "total_pixels": null
-    },
-    "gemini": {
-      "enabled": true,
-      "input_method": "file-api",
-      "upload_endpoint": "https://generativelanguage.googleapis.com/upload/v1beta/files",
-      "generate_endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-      "files_endpoint": "https://generativelanguage.googleapis.com/v1beta",
-      "poll_interval_seconds": 2,
-      "poll_timeout_seconds": 600,
-      "delete_uploaded_file": true,
-      "max_inline_bytes": 104857600
-    }
-  },
-  "video_upload": {
-    "enabled": false,
-    "active_host": "oss",
-    "hosts": {
-      "oss": {
-        "type": "s3-compatible",
-        "endpoint_url": "",
-        "bucket": "",
-        "region": "auto",
-        "access_key_id": "",
-        "secret_access_key": "",
-        "access_key_id_env": "",
-        "secret_access_key_env": "",
-        "public_base_url": "",
-        "prefix": "videos/{year}/{month}/{day}",
-        "force_path_style": false,
-        "extra_args": {}
-      }
-    }
+  "download": {
+    "yt_dlp": "auto",
+    "format_selector": "bv[height=720]+ba/b[height=720]/bv[height<=540][height>360]+ba/b[height<=540][height>360]/bv[height=1080]+ba/b[height=1080]/bv[height>=1440]+ba/b[height>=1440]/bv[height<=360]+ba/b[height<=360]/bv*+ba/b",
+    "cookies_from_browser": "auto",
+    "proxy": "auto",
+    "socket_timeout_seconds": 30,
+    "timeout_seconds": 3600
   }
 }
