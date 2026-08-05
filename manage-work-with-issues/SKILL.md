@@ -1,6 +1,6 @@
 ---
 name: manage-work-with-issues
-description: Manage repository requirements, defects, and execution plans through GitHub or GitLab issues so scope, dependencies, decisions, verification, and completion survive context compaction. Use whenever Codex is analyzing, planning, implementing, fixing, refactoring, documenting, testing, configuring, building, or releasing work in a Git repository whose authoritative remote is GitHub or GitLab; record concrete requirements and defects, turn each independently completable execution-plan task into an issue before coding, use `gh` for GitHub and `glab` for GitLab, require issue-linked commits, and close each issue only after verified completion is visible remotely.
+description: Manage repository requirements, defects, and execution plans through GitHub or GitLab issues so scope, visual evidence, dependencies, decisions, verification, and completion survive context compaction. Use whenever Codex or Claude Code is analyzing, planning, implementing, fixing, refactoring, documenting, testing, configuring, building, or releasing work in a Git repository whose authoritative remote is GitHub or GitLab; record concrete requirements and defects, attach safe and relevant screenshots supplied with requests especially for defects, turn each independently completable execution-plan task into an issue before coding, use `gh` for GitHub and `glab` for GitLab, require issue-linked commits, and close each issue only after verified completion is visible remotely.
 ---
 
 # Manage Work With Issues
@@ -20,7 +20,9 @@ GitHub or GitLab.
 6. Keep each issue open while its work or verification remains.
 7. Make the commit visible on the hosted repository before closing the issue.
 8. Write issue content in the target project's working language.
-9. Never place credentials, tokens, private customer data, or sensitive logs in
+9. Attach relevant and safe screenshots supplied with the request, especially
+   for defects, and explain what each image proves.
+10. Never place credentials, tokens, private customer data, or sensitive logs in
    an issue or commit message.
 
 ## 1. Identify the Repository and Provider
@@ -154,6 +156,82 @@ Write an issue body with only durable task context:
 - Source: <requirement, defect, or tracking issue URL when applicable>
 - Depends on: <issue URLs or "None">
 ```
+
+### Attach Screenshot Evidence
+
+Treat screenshots supplied in Codex or Claude Code requests as potential issue
+evidence. Prefer attaching them for defects, visual regressions, UI requirements,
+and environment-specific behavior when they materially clarify the report.
+Do not attach decorative, redundant, or unrelated images.
+
+Before uploading:
+
+1. Confirm the image is the screenshot the user intended to associate with the
+   task and record what it demonstrates.
+2. Require an accessible local file or durable existing URL. If the image is
+   visible in chat but no file or export mechanism is available, do not invent
+   a path or claim an upload; ask for a saved file or add it later.
+3. Inspect for tokens, credentials, session cookies, personal information,
+   customer data, private source code, internal hostnames, and unrelated screen
+   content. Ask for a redacted copy or omit the image when disclosure is unsafe.
+4. Check project visibility and attachment policy. Assume an attachment to a
+   public issue is public. Do not send an image to a third-party host unless the
+   project explicitly approves that host.
+5. Keep text legible and preserve the original aspect ratio. Add concise alt
+   text and a caption describing the observed behavior, expected behavior, and
+   relevant environment or build when known.
+
+For multiple defect screenshots, place them in reproduction order and label
+each step. Use this optional issue section:
+
+```markdown
+## Visual evidence
+
+![Descriptive alt text](<durable-image-url>)
+
+- Shows: <specific symptom or requirement>
+- Expected: <expected visual behavior when applicable>
+- Environment: <platform, build, or configuration when relevant>
+```
+
+#### GitLab Uploads
+
+Use `glab` for both the project upload and issue update. From the target GitLab
+repository, upload a local screenshot through the Markdown uploads API:
+
+```bash
+glab api --method POST projects/:fullpath/uploads \
+  --form "file=@/absolute/path/to/screenshot.png"
+```
+
+Read the returned JSON and insert its `markdown` value into the issue
+description or a `glab issue note`. Keep the returned upload URL with the issue;
+do not substitute a local path.
+
+#### GitHub Uploads
+
+Use `gh` for every GitHub issue operation. `gh issue create`, `gh issue edit`,
+and `gh issue comment` do not accept a local attachment flag. Use one of these
+paths without pretending that a local file was uploaded:
+
+1. If the screenshot already has a project-approved durable URL, embed it as
+   Markdown through `gh issue create`, `gh issue edit`, or `gh issue comment`.
+2. If interactive browser upload is available, create or open the issue with
+   `gh`, then attach the local image through GitHub's native issue UI.
+3. If the project has an approved image host, upload there through its approved
+   workflow and add the resulting URL with `gh`.
+4. Otherwise, create the issue with complete textual evidence and explicitly
+   note that the screenshot still needs attachment. Do not block urgent defect
+   tracking on an unavailable image upload.
+
+Do not create a release, gist, repository commit, or unapproved public upload
+solely to host an issue screenshot.
+
+After updating the issue, view it and verify that the Markdown contains the
+durable attachment URL. Open or fetch the image through the appropriate
+authenticated context when practical. Report the screenshot as attached only
+after the issue reference is present and accessible; otherwise leave a clear
+follow-up note.
 
 Use explicit repository selection to avoid writing to the wrong project:
 
