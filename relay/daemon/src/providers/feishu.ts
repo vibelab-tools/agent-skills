@@ -1,5 +1,5 @@
 // ABOUTME: Feishu IM provider using WebSocket for bidirectional messaging.
-// ABOUTME: Uses per-session root replies for project isolation within a single group.
+// ABOUTME: Uses fresh topic roots for visible, reply-routable notifications.
 
 // 2026-03-18: Implement Feishu provider with root-message-based session isolation
 
@@ -286,7 +286,7 @@ export class FeishuProvider implements IMProvider {
   }
 
   /**
-   * Send a message. topicId is the root message ID for session replies.
+   * Send a message. topicId is the root message ID for topic replies.
    * If topicId is empty or starts with "new:", send a new group message.
    */
   async send(options: SendOptions): Promise<boolean> {
@@ -298,8 +298,7 @@ export class FeishuProvider implements IMProvider {
 
     try {
       if (topicId && !topicId.startsWith("new:")) {
-        // Reply in the main chat so group members receive a normal notification.
-        return await this.replyInChat(topicId, text);
+        return await this.replyInThread(topicId, text);
       } else {
         // Send new message to group (will become the session root)
         return await this.sendToGroup(chatId, text);
@@ -333,8 +332,8 @@ export class FeishuProvider implements IMProvider {
     }
   }
 
-  /** Reply to the session root in the main chat instead of a topic thread. */
-  private async replyInChat(rootMessageId: string, text: string): Promise<boolean> {
+  /** Reply to the session root inside its topic. */
+  private async replyInThread(rootMessageId: string, text: string): Promise<boolean> {
     if (!this.client) return false;
     try {
       await this.client.im.message.reply({
@@ -342,12 +341,12 @@ export class FeishuProvider implements IMProvider {
         data: {
           content: JSON.stringify({ text }),
           msg_type: "text",
-          reply_in_thread: false,
+          reply_in_thread: true,
         },
       });
       return true;
     } catch (err) {
-      log.error({ err: summarizeError(err) }, "Reply in chat error");
+      log.error({ err: summarizeError(err) }, "Reply in thread error");
       return false;
     }
   }

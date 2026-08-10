@@ -16,7 +16,7 @@ Codex uses three relay surfaces:
 
 Codex project bindings are stored in `.codex/relay.json`. Claude Code project
 bindings stay in `.claude/relay.json`, so both agents can run in the same
-project without competing for the same Telegram Topic or Feishu root message.
+project without competing for the same Telegram Topic or Feishu topic binding.
 
 ## Environment
 
@@ -168,8 +168,8 @@ make clean
 2. When you submit a prompt, the `UserPromptSubmit` hook syncs the local input
    to the configured IM channels.
 3. When a Codex turn ends, the `Stop` hook sends the final assistant reply.
-4. Replies in a Telegram Topic, DingTalk group, or to a Feishu relay message
-   are injected back into the matching `codex-...` tmux session.
+4. Replies in a Telegram Topic, DingTalk group, or the latest Feishu relay
+   Topic are injected back into the matching `codex-...` tmux session.
 
 Telegram Topic names use `<hostname>:codex:<project>`. Claude Code keeps
 `<hostname>:<project>`.

@@ -106,29 +106,27 @@ Add the required variables to
 ## How It Works
 
 ```text
-Agent notification -> daemon -> Feishu provider -> root message -> main-chat reply
-User replies to a relay message -> Feishu WebSocket -> daemon -> tmux
+Agent notification -> daemon -> fresh root in main chat -> threaded completion
+User replies in the new topic -> Feishu WebSocket -> daemon -> tmux
 ```
 
 ## Session Isolation
 
-Feishu uses a root message to identify each project session:
+Feishu uses fresh topic roots to keep notifications visible and routable:
 
-1. On first notification, the daemon sends a root message to the group.
-2. Later notifications reply to that root in the main chat so they remain
-   visible.
-3. User replies to those messages are routed back to the matching tmux session.
-4. `feishuRootMessageId` is stored in the relay runtime bindings.
+1. For every notification, the daemon sends a fresh root message to the group.
+2. The completion is sent as a threaded reply under that root.
+3. The new root becomes the active `feishuRootMessageId` for the tmux session.
+4. User replies in that topic are routed back to the matching tmux session.
 
-No manual root-message creation is required. When Claude Code or Codex triggers
-the first relay hook in a new project, the daemon creates the Feishu root
-message and stores the binding.
+No manual topic creation is required. Each Claude Code or Codex notification
+creates a visible topic and updates the session binding automatically.
 
 ## Platform Comparison
 
 | Feature | Telegram | DingTalk | Feishu |
 | --- | --- | --- | --- |
-| Isolation | Forum Topic | Group | Root message |
+| Isolation | Forum Topic | Group | Fresh Topic |
 | Worker required | Yes | No | No |
 | Connection | Webhook -> Worker -> Poll | Stream SDK | SDK WSClient |
 | Bot mention required | No | Yes | Depends on permissions |
@@ -142,5 +140,5 @@ message and stores the binding.
   `feishu.proxy.enabled=true` with `feishu.proxy.url` or split proxy fields.
 - A Feishu app supports one active WebSocket connection at a time. Multiple
   daemon instances should not share the same app.
-- Users must use Feishu's Reply action on a relay message so the daemon can
-  identify the matching root message.
+- Users must reply inside the latest Feishu Topic so the daemon can identify
+  the matching root message.

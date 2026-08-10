@@ -5,7 +5,7 @@ Bidirectional IM relay for [Claude Code](https://docs.anthropic.com/en/docs/clau
 ## Features
 
 - **Bidirectional communication**: agent → IM notifications, IM → tmux input injection
-- **Multi-platform**: Telegram (Topics), DingTalk (Stream API), and Feishu (WebSocket + Replies) supported simultaneously
+- **Multi-platform**: Telegram (Topics), DingTalk (Stream API), and Feishu (WebSocket + Topics) supported simultaneously
 - **Auto-binding**: Telegram Topics are created and bound automatically on first use
 - **Unified daemon**: Single background process manages all sessions and IM connections
 - **Claude + Codex support**: Claude Code plugin hooks and Codex lifecycle hooks reuse the same daemon
@@ -26,7 +26,7 @@ Bidirectional IM relay for [Claude Code](https://docs.anthropic.com/en/docs/clau
                                                                     │              │
 ┌─────────────┐   SDK WSClient (WebSocket)                         │              │
 │   Feishu    │ ←─────────────────────────────────────────────────→│              │
-│  (Replies)  │                                                    └──────┬───────┘
+│  (Topics)   │                                                    └──────┬───────┘
 └─────────────┘                                                           │
                                                                tmux send-keys
                                                                           │
@@ -78,7 +78,7 @@ Optional dependencies:
 
 - **[Telegram Setup](docs/telegram-setup.md)** — Bot creation, Topics, Worker deployment
 - **[DingTalk Setup](docs/dingtalk-setup.md)** — Enterprise app, Stream API, group binding
-- **[Feishu Setup](docs/feishu-setup.md)** — Enterprise app, WebSocket, reply-based isolation
+- **[Feishu Setup](docs/feishu-setup.md)** — Enterprise app, WebSocket, topic-based isolation
 - **[Claude Setup](docs/claude-setup.md)** — Claude Code plugin marketplace and hooks
 - **[Codex Setup](docs/codex-setup.md)** — Codex tmux wrapper, hooks, and plugin install
 - **[Usage Manual](docs/usage.md)** — Daily usage, multi-project, troubleshooting
@@ -208,12 +208,12 @@ API and routes replies by conversation binding.
 | --- | --- | --- |
 | `feishu.app_id` | Yes, for Feishu | Feishu/Lark app ID. |
 | `feishu.app_secret` | Yes, for Feishu | Feishu/Lark app secret. |
-| `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates root messages and receives replies. |
+| `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates fresh topic roots and receives topic replies. |
 | `feishu.proxy` | No | Per-channel proxy config. Keep disabled when Feishu should connect directly. |
 
 Feishu does not use the Cloudflare Worker. It connects through Feishu WebSocket
-and replies to per-session root messages in the main chat so notifications stay
-visible.
+and creates a fresh root in the main chat for each notification. The completion
+is posted inside that root's topic and bound back to the originating session.
 
 ### Proxy Fields
 
@@ -315,10 +315,10 @@ Installed runtime layout:
 
 | Feature | Telegram | DingTalk | Feishu |
 |---------|----------|----------|--------|
-| Session isolation | Topic per project | Group per project | Root message per project |
+| Session isolation | Topic per project | Group per project | Fresh topic per notification |
 | Message relay | Via Cloudflare Worker | Direct Stream API | Direct WebSocket |
-| Auto-create channel | Yes (Topic) | No (manual group) | Yes (Root message) |
-| Reply method | Direct message in Topic | @mention bot in group | Reply to relay message |
+| Auto-create channel | Yes (Topic) | No (manual group) | Yes (Topic) |
+| Reply method | Direct message in Topic | @mention bot in group | Reply in latest Topic |
 | Requires Worker | Yes | No | No |
 
 ## License

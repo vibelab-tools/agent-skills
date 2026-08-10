@@ -16,7 +16,7 @@ Claude Code uses three relay surfaces:
 
 Claude Code project bindings are stored in `.claude/relay.json`. Codex project
 bindings are stored in `.codex/relay.json`, so both agents can run in the same
-project without competing for the same Telegram Topic or Feishu root message.
+project without competing for the same Telegram Topic or Feishu topic binding.
 
 ## Environment
 
@@ -101,5 +101,5 @@ curl -s http://127.0.0.1:3580/status
    question to IM.
 4. When a Claude Code turn ends, the `Stop` hook sends the final assistant
    reply.
-5. Replies in a Telegram Topic, DingTalk group, or to a Feishu relay message
-   are injected into the matching `claude-...` tmux session.
+5. Replies in a Telegram Topic, DingTalk group, or the latest Feishu relay
+   Topic are injected into the matching `claude-...` tmux session.

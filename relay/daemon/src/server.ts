@@ -126,26 +126,14 @@ export class Server {
       return;
     }
 
-    // Find binding for this tmux session, auto-create if Feishu is configured
+    const feishuEnabled = Boolean(this.feishuProvider && this.config.feishuChatId);
     let binding = this.sessionManager.findByTmuxSession(tmuxSession);
-    if (!binding) {
-      // 2026-03-18: Auto-create a Feishu root binding for unbound sessions
-      if (this.feishuProvider && this.config.feishuChatId) {
-        const title = formatSessionTitle(this.config, tmuxSession);
-        const rootMsgId = await this.feishuProvider.sendNewRootMessage(this.config.feishuChatId, title);
-        if (rootMsgId) {
-          this.sessionManager.bindFeishu(tmuxSession, rootMsgId);
-          binding = this.sessionManager.findByTmuxSession(tmuxSession);
-          log.info({ tmuxSession }, "Auto-created Feishu binding");
-        }
-      }
-      if (!binding) {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end(
-          JSON.stringify({ error: `no binding for tmux session: ${tmuxSession}` })
-        );
-        return;
-      }
+    if (!binding && !feishuEnabled) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({ error: `no binding for tmux session: ${tmuxSession}` })
+      );
+      return;
     }
 
     // 2026-03-18: Send message content directly without type prefix
@@ -153,30 +141,30 @@ export class Server {
 
     // 2026-03-18: Send to all configured providers with their respective IDs
     const results: boolean[] = [];
-    if (this.telegramProvider && binding.topicId) {
+    if (this.telegramProvider && binding?.topicId) {
       results.push(await this.telegramProvider.send({ topicId: binding.topicId, text }));
     }
-    if (this.dingtalkProvider && binding.dingtalkConversationId) {
+    if (this.dingtalkProvider && binding?.dingtalkConversationId) {
       results.push(await this.dingtalkProvider.send({ topicId: binding.dingtalkConversationId, text }));
     }
-    // 2026-03-18: Feishu root-based send; auto-create root message if needed
+    // A fresh root surfaces the notification in the main chat. The threaded
+    // reply preserves topic-based routing back to this tmux session.
     if (this.feishuProvider && this.config.feishuChatId) {
-      if (binding.feishuRootMessageId) {
-        results.push(await this.feishuProvider.send({ topicId: binding.feishuRootMessageId, text }));
-      } else {
-        // First message: create a session root, then reply to it
-        const title = formatSessionTitle(this.config, tmuxSession);
-        const rootMsgId = await this.feishuProvider.sendNewRootMessage(this.config.feishuChatId, title);
-        if (rootMsgId) {
-          this.sessionManager.bindFeishu(tmuxSession, rootMsgId);
-          results.push(await this.feishuProvider.send({ topicId: rootMsgId, text }));
-        }
+      const title = formatSessionTitle(this.config, tmuxSession);
+      const rootMsgId = await this.feishuProvider.sendNewRootMessage(
+        this.config.feishuChatId,
+        title
+      );
+      if (rootMsgId) {
+        this.sessionManager.bindFeishu(tmuxSession, rootMsgId);
+        binding = this.sessionManager.findByTmuxSession(tmuxSession);
+        results.push(await this.feishuProvider.send({ topicId: rootMsgId, text }));
       }
     }
     const success = results.some((r) => r);
 
     res.writeHead(success ? 200 : 502, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ ok: success, tmuxSession, topicId: binding.topicId }));
+    res.end(JSON.stringify({ ok: success, tmuxSession, topicId: binding?.topicId || "" }));
   }
 
   /** Handle POST /bind */
