@@ -1,5 +1,5 @@
 // ABOUTME: Regression tests for relay notification routing.
-// ABOUTME: Verifies each Feishu notification rotates to a fresh visible topic.
+// ABOUTME: Verifies Feishu notifications reuse one session topic with selective alerts.
 
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -11,7 +11,7 @@ import { SessionManager } from "./session-manager";
 import { Server } from "./server";
 import { DaemonConfig } from "./types";
 
-test("creates a fresh Feishu topic for every notification", async () => {
+test("reuses one Feishu topic and alerts only attention events", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-server-test-"));
   const config = {
     port: 0,
@@ -20,16 +20,15 @@ test("creates a fresh Feishu topic for every notification", async () => {
     bindingsPath: join(testDir, "bindings.json"),
   } as DaemonConfig;
   const sessionManager = new SessionManager(config);
-  const roots = ["om_new_1", "om_new_2"];
   const created: Array<{ chatId: string; title: string }> = [];
-  const sent: Array<{ topicId?: string; text: string }> = [];
+  const sent: Array<{ topicId?: string; text: string; mentionAll?: boolean }> = [];
   const feishuProvider = {
     name: "feishu",
     sendNewRootMessage: async (chatId: string, title: string) => {
       created.push({ chatId, title });
-      return roots[created.length - 1];
+      return "om_session";
     },
-    send: async (options: { topicId?: string; text: string }) => {
+    send: async (options: { topicId?: string; text: string; mentionAll?: boolean }) => {
       sent.push(options);
       return true;
     },
@@ -42,20 +41,22 @@ test("creates a fresh Feishu topic for every notification", async () => {
     feishuProvider as any
   );
 
-  sessionManager.bindFeishu("codex-demo-abc123", "om_old");
-
   try {
     await server.start();
     const address = (server as any).httpServer.address() as AddressInfo;
 
-    for (const text of ["first completion", "second completion"]) {
+    for (const notification of [
+      { type: "stop", text: "first completion" },
+      { type: "user_prompt", text: "continue" },
+      { type: "ask_user", text: "need input" },
+    ]) {
       const response = await fetch(`http://127.0.0.1:${address.port}/notify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: "stop",
+          type: notification.type,
           tmuxSession: "codex-demo-abc123",
-          text,
+          text: notification.text,
         }),
       });
       assert.equal(response.status, 200);
@@ -63,15 +64,15 @@ test("creates a fresh Feishu topic for every notification", async () => {
 
     assert.deepEqual(created, [
       { chatId: "oc_test", title: "🔗 gpu:codex:demo" },
-      { chatId: "oc_test", title: "🔗 gpu:codex:demo" },
     ]);
     assert.deepEqual(sent, [
-      { topicId: "om_new_1", text: "first completion" },
-      { topicId: "om_new_2", text: "second completion" },
+      { topicId: "om_session", text: "first completion", mentionAll: true },
+      { topicId: "om_session", text: "continue", mentionAll: false },
+      { topicId: "om_session", text: "need input", mentionAll: true },
     ]);
     assert.equal(
       sessionManager.findByTmuxSession("codex-demo-abc123")?.feishuRootMessageId,
-      "om_new_2"
+      "om_session"
     );
   } finally {
     server.stop();

@@ -1,5 +1,5 @@
 // ABOUTME: Feishu IM provider using WebSocket for bidirectional messaging.
-// ABOUTME: Uses fresh topic roots for visible, reply-routable notifications.
+// ABOUTME: Uses one topic root per session for grouped, reply-routable notifications.
 
 // 2026-03-18: Implement Feishu provider with root-message-based session isolation
 
@@ -18,6 +18,10 @@ const log = createLogger("feishu");
 
 /** Callback for incoming messages from Feishu */
 export type FeishuMessageHandler = (msg: PollMessage, rootMessageId: string) => void;
+
+interface FeishuSendOptions extends SendOptions {
+  mentionAll?: boolean;
+}
 
 export class FeishuProvider implements IMProvider {
   readonly name = "feishu";
@@ -289,16 +293,16 @@ export class FeishuProvider implements IMProvider {
    * Send a message. topicId is the root message ID for topic replies.
    * If topicId is empty or starts with "new:", send a new group message.
    */
-  async send(options: SendOptions): Promise<boolean> {
+  async send(options: FeishuSendOptions): Promise<boolean> {
     if (!this.client) return false;
 
-    const { topicId, text } = options;
+    const { topicId, text, mentionAll } = options;
     const chatId = this.config.feishuChatId;
     if (!chatId) return false;
 
     try {
       if (topicId && !topicId.startsWith("new:")) {
-        return await this.replyInThread(topicId, text);
+        return await this.replyInThread(topicId, text, mentionAll);
       } else {
         // Send new message to group (will become the session root)
         return await this.sendToGroup(chatId, text);
@@ -333,13 +337,19 @@ export class FeishuProvider implements IMProvider {
   }
 
   /** Reply to the session root inside its topic. */
-  private async replyInThread(rootMessageId: string, text: string): Promise<boolean> {
+  private async replyInThread(
+    rootMessageId: string,
+    text: string,
+    mentionAll = false
+  ): Promise<boolean> {
     if (!this.client) return false;
     try {
       await this.client.im.message.reply({
         path: { message_id: rootMessageId },
         data: {
-          content: JSON.stringify({ text }),
+          content: JSON.stringify({
+            text: mentionAll ? `<at user_id="all">所有人</at> ${text}` : text,
+          }),
           msg_type: "text",
           reply_in_thread: true,
         },

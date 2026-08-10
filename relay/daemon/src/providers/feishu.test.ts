@@ -32,3 +32,31 @@ test("replies to a session root inside a topic", async () => {
     },
   });
 });
+
+test("mentions everyone for an attention reply", async () => {
+  const provider = new FeishuProvider({ feishuChatId: "oc_test" } as DaemonConfig);
+  let request: any;
+
+  (provider as any).client = {
+    im: {
+      message: {
+        reply: async (value: unknown) => {
+          request = value;
+        },
+      },
+    },
+  };
+
+  const sent = await provider.send({
+    topicId: "om_root",
+    text: "done",
+    mentionAll: true,
+  });
+
+  assert.equal(sent, true);
+  assert.equal(
+    request.data.content,
+    JSON.stringify({ text: '<at user_id="all">所有人</at> done' })
+  );
+  assert.equal(request.data.reply_in_thread, true);
+});

@@ -147,18 +147,29 @@ export class Server {
     if (this.dingtalkProvider && binding?.dingtalkConversationId) {
       results.push(await this.dingtalkProvider.send({ topicId: binding.dingtalkConversationId, text }));
     }
-    // A fresh root surfaces the notification in the main chat. The threaded
-    // reply preserves topic-based routing back to this tmux session.
+    // Keep one Feishu topic per tmux session so replies remain grouped and
+    // route back through a stable root message.
     if (this.feishuProvider && this.config.feishuChatId) {
-      const title = formatSessionTitle(this.config, tmuxSession);
-      const rootMsgId = await this.feishuProvider.sendNewRootMessage(
-        this.config.feishuChatId,
-        title
-      );
+      let rootMsgId = binding?.feishuRootMessageId;
+      if (!rootMsgId) {
+        const title = formatSessionTitle(this.config, tmuxSession);
+        rootMsgId = await this.feishuProvider.sendNewRootMessage(
+          this.config.feishuChatId,
+          title
+        ) || undefined;
+        if (rootMsgId) {
+          this.sessionManager.bindFeishu(tmuxSession, rootMsgId);
+          binding = this.sessionManager.findByTmuxSession(tmuxSession);
+          log.info({ tmuxSession }, "Auto-created Feishu binding");
+        }
+      }
       if (rootMsgId) {
-        this.sessionManager.bindFeishu(tmuxSession, rootMsgId);
         binding = this.sessionManager.findByTmuxSession(tmuxSession);
-        results.push(await this.feishuProvider.send({ topicId: rootMsgId, text }));
+        results.push(await this.feishuProvider.send({
+          topicId: rootMsgId,
+          text,
+          mentionAll: body.type === "stop" || body.type === "ask_user",
+        }));
       }
     }
     const success = results.some((r) => r);

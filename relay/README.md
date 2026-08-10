@@ -208,12 +208,12 @@ API and routes replies by conversation binding.
 | --- | --- | --- |
 | `feishu.app_id` | Yes, for Feishu | Feishu/Lark app ID. |
 | `feishu.app_secret` | Yes, for Feishu | Feishu/Lark app secret. |
-| `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates fresh topic roots and receives topic replies. |
+| `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates session topic roots and receives topic replies. |
 | `feishu.proxy` | No | Per-channel proxy config. Keep disabled when Feishu should connect directly. |
 
 Feishu does not use the Cloudflare Worker. It connects through Feishu WebSocket
-and creates a fresh root in the main chat for each notification. The completion
-is posted inside that root's topic and bound back to the originating session.
+and creates one root topic for each session. Later messages stay in that topic;
+completion and ask-user events mention the group so they remain noticeable.
 
 ### Proxy Fields
 
@@ -315,10 +315,10 @@ Installed runtime layout:
 
 | Feature | Telegram | DingTalk | Feishu |
 |---------|----------|----------|--------|
-| Session isolation | Topic per project | Group per project | Fresh topic per notification |
+| Session isolation | Topic per project | Group per project | Topic per session |
 | Message relay | Via Cloudflare Worker | Direct Stream API | Direct WebSocket |
 | Auto-create channel | Yes (Topic) | No (manual group) | Yes (Topic) |
-| Reply method | Direct message in Topic | @mention bot in group | Reply in latest Topic |
+| Reply method | Direct message in Topic | @mention bot in group | Reply in session Topic |
 | Requires Worker | Yes | No | No |
 
 ## License

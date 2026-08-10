@@ -89,7 +89,7 @@ For DingTalk, mention the bot in the bound group:
 DingTalk group messages must mention the bot; otherwise relay will ignore the
 message.
 
-For Feishu, reply inside the latest Topic created by relay.
+For Feishu, reply inside the session Topic created by relay.
 
 ## Multiple Projects
 

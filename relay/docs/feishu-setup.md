@@ -106,27 +106,28 @@ Add the required variables to
 ## How It Works
 
 ```text
-Agent notification -> daemon -> fresh root in main chat -> threaded completion
-User replies in the new topic -> Feishu WebSocket -> daemon -> tmux
+Agent notification -> daemon -> session topic -> threaded notification
+User replies in the session topic -> Feishu WebSocket -> daemon -> tmux
 ```
 
 ## Session Isolation
 
-Feishu uses fresh topic roots to keep notifications visible and routable:
+Feishu uses one stable topic root per session to keep messages grouped and routable:
 
-1. For every notification, the daemon sends a fresh root message to the group.
-2. The completion is sent as a threaded reply under that root.
-3. The new root becomes the active `feishuRootMessageId` for the tmux session.
-4. User replies in that topic are routed back to the matching tmux session.
+1. On the first notification, the daemon sends a root message to the group.
+2. The root becomes the `feishuRootMessageId` for the tmux session.
+3. Later notifications are sent as threaded replies under that same root.
+4. Completion and ask-user replies mention the group to trigger attention.
+5. User replies in that topic are routed back to the matching tmux session.
 
-No manual topic creation is required. Each Claude Code or Codex notification
-creates a visible topic and updates the session binding automatically.
+No manual topic creation is required. Each Claude Code or Codex session creates
+its topic automatically and keeps using that binding.
 
 ## Platform Comparison
 
 | Feature | Telegram | DingTalk | Feishu |
 | --- | --- | --- | --- |
-| Isolation | Forum Topic | Group | Fresh Topic |
+| Isolation | Forum Topic | Group | Session Topic |
 | Worker required | Yes | No | No |
 | Connection | Webhook -> Worker -> Poll | Stream SDK | SDK WSClient |
 | Bot mention required | No | Yes | Depends on permissions |
