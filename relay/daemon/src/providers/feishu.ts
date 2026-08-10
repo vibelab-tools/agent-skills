@@ -29,6 +29,12 @@ export class FeishuProvider implements IMProvider {
   private client: lark.Client | null = null;
   private wsClient: lark.WSClient | null = null;
   private messageHandler: FeishuMessageHandler | null = null;
+  private pollTimer: NodeJS.Timeout | null = null;
+  private pollStartedAt = 0;
+  private pollInProgress = false;
+  private threadIds = new Map<string, string>();
+  private handledMessageIds = new Set<string>();
+  private handledMessageOrder: string[] = [];
   // 2026-03-20: Temp directory for downloaded Feishu attachments
   private tmpDir: string;
 
@@ -43,6 +49,29 @@ export class FeishuProvider implements IMProvider {
   /** Register a handler for incoming messages */
   onMessage(handler: FeishuMessageHandler): void {
     this.messageHandler = handler;
+  }
+
+  /** Poll bound topics as a fallback when Feishu misses a WebSocket event. */
+  startPolling(getRootMessageIds: () => string[]): void {
+    if (this.pollTimer) return;
+
+    this.pollStartedAt = Date.now();
+    const poll = () => {
+      if (this.pollInProgress) return;
+      this.pollInProgress = true;
+      this.pollTopicRepliesOnce(getRootMessageIds())
+        .catch((err) => {
+          log.warn({ err: summarizeError(err) }, "Topic reply poll failed");
+        })
+        .finally(() => {
+          this.pollInProgress = false;
+        });
+    };
+
+    poll();
+    this.pollTimer = setInterval(poll, 5000);
+    this.pollTimer.unref();
+    log.info("Topic reply fallback polling started");
   }
 
   /** Start the WebSocket connection */
@@ -81,7 +110,7 @@ export class FeishuProvider implements IMProvider {
     const eventDispatcher = new lark.EventDispatcher({}).register({
       "im.message.receive_v1": async (data: any) => {
         try {
-          await this.handleIncomingMessage(data);
+          await this.handleIncomingMessage(data, "websocket");
         } catch (err) {
           log.error({ err: summarizeError(err) }, "Message handling error");
         }
@@ -93,7 +122,10 @@ export class FeishuProvider implements IMProvider {
   }
 
   /** Handle an incoming message event */
-  private async handleIncomingMessage(data: any): Promise<void> {
+  private async handleIncomingMessage(
+    data: any,
+    source: "websocket" | "poll"
+  ): Promise<void> {
     const message = data?.message;
     if (!message) return;
 
@@ -105,10 +137,12 @@ export class FeishuProvider implements IMProvider {
       content,
       root_id,
       thread_id,
+      create_time,
     } = message;
 
     // Only handle group messages
     if (chat_type !== "group") return;
+    if (!this.rememberMessage(message_id)) return;
 
     const sender = data?.sender;
     const senderName = sender?.sender_id?.open_id || "Unknown";
@@ -196,6 +230,7 @@ export class FeishuProvider implements IMProvider {
         threadId: effectiveRootId,
         textPreview: text ? text.substring(0, 50) : null,
         attachmentCount: attachments.length,
+        source,
       },
       "Received message"
     );
@@ -211,9 +246,74 @@ export class FeishuProvider implements IMProvider {
           is_bot: false,
           first_name: senderName,
         },
-        timestamp: Math.floor(Date.now() / 1000),
+        timestamp: create_time
+          ? Math.floor(Number(create_time) / 1000)
+          : Math.floor(Date.now() / 1000),
       };
       this.messageHandler(msg, effectiveRootId);
+    }
+  }
+
+  private rememberMessage(messageId: string): boolean {
+    if (!messageId || this.handledMessageIds.has(messageId)) return false;
+
+    this.handledMessageIds.add(messageId);
+    this.handledMessageOrder.push(messageId);
+    if (this.handledMessageOrder.length > 1000) {
+      const oldest = this.handledMessageOrder.shift();
+      if (oldest) this.handledMessageIds.delete(oldest);
+    }
+    return true;
+  }
+
+  private async pollTopicRepliesOnce(rootMessageIds: string[]): Promise<void> {
+    if (!this.client) return;
+
+    for (const rootMessageId of new Set(rootMessageIds.filter(Boolean))) {
+      let threadId = this.threadIds.get(rootMessageId);
+      if (!threadId) {
+        const rootResponse = await this.client.im.message.get({
+          path: { message_id: rootMessageId },
+        });
+        threadId = (rootResponse as any)?.data?.items?.[0]?.thread_id;
+        if (!threadId) continue;
+        this.threadIds.set(rootMessageId, threadId);
+      }
+
+      const response = await this.client.im.message.list({
+        params: {
+          container_id_type: "thread",
+          container_id: threadId,
+          page_size: 50,
+          sort_type: "ByCreateTimeDesc",
+        },
+      });
+      const items = ((response as any)?.data?.items || [])
+        .filter(
+          (item: any) =>
+            item.sender?.sender_type === "user" &&
+            Number(item.create_time) >= this.pollStartedAt
+        )
+        .sort((a: any, b: any) => Number(a.create_time) - Number(b.create_time));
+
+      for (const item of items) {
+        await this.handleIncomingMessage(
+          {
+            sender: { sender_id: { open_id: item.sender?.id } },
+            message: {
+              message_id: item.message_id,
+              chat_id: item.chat_id,
+              chat_type: "group",
+              message_type: item.msg_type,
+              content: item.body?.content,
+              root_id: item.root_id || rootMessageId,
+              thread_id: item.thread_id || threadId,
+              create_time: item.create_time,
+            },
+          },
+          "poll"
+        );
+      }
     }
   }
 
@@ -382,6 +482,10 @@ export class FeishuProvider implements IMProvider {
 
   /** Disconnect WebSocket */
   disconnect(): void {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
     // SDK doesn't expose a clean disconnect method
     this.wsClient = null;
     this.client = null;

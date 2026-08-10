@@ -104,6 +104,11 @@ async function main(): Promise<void> {
       injectText(binding.tmuxSession, injectionText);
     });
     await feishuProvider.connect();
+    feishuProvider.startPolling(() =>
+      sessionManager
+        .getAll()
+        .flatMap((binding) => binding.feishuRootMessageId || [])
+    );
     enabledProviders.push(feishuProvider.name);
   }
 
