@@ -10,7 +10,7 @@ sessions and IM platforms.
 - **IM to Agent**: replies sent from IM are injected into the matching tmux
   session.
 - **Project isolation**: each project can bind to its own Telegram Topic,
-  DingTalk group, or Feishu thread.
+  DingTalk group, or Feishu root message.
 
 ## First Use
 
@@ -89,7 +89,7 @@ For DingTalk, mention the bot in the bound group:
 DingTalk group messages must mention the bot; otherwise relay will ignore the
 message.
 
-For Feishu, reply in the thread created by relay.
+For Feishu, use the Reply action on a relay message in the main chat.
 
 ## Multiple Projects
 
@@ -100,8 +100,8 @@ Each project stores its binding in a project-local file:
 
 Switching directories creates or reuses a separate binding. Telegram creates a
 new Topic automatically. DingTalk requires a preconfigured
-`dingtalkConversationId`. Feishu creates a root message and uses replies in
-thread for isolation.
+`dingtalkConversationId`. Feishu creates a root message and uses reply metadata
+for isolation while keeping notifications in the main chat.
 
 ## Multiple Machines
 

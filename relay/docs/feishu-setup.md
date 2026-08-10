@@ -106,28 +106,29 @@ Add the required variables to
 ## How It Works
 
 ```text
-Agent notification -> daemon -> Feishu provider -> root message on first use -> reply_in_thread
-User replies in thread -> Feishu WebSocket -> daemon -> tmux
+Agent notification -> daemon -> Feishu provider -> root message -> main-chat reply
+User replies to a relay message -> Feishu WebSocket -> daemon -> tmux
 ```
 
-## Thread Isolation
+## Session Isolation
 
-Feishu uses `reply_in_thread` to isolate project sessions:
+Feishu uses a root message to identify each project session:
 
 1. On first notification, the daemon sends a root message to the group.
-2. Later notifications are sent as threaded replies to that root message.
-3. Replies in that thread are routed back to the matching tmux session.
+2. Later notifications reply to that root in the main chat so they remain
+   visible.
+3. User replies to those messages are routed back to the matching tmux session.
 4. `feishuRootMessageId` is stored in the relay runtime bindings.
 
-No manual thread creation is required. When Claude Code or Codex triggers the
-first relay hook in a new project, the daemon creates the Feishu root message
-and stores the binding.
+No manual root-message creation is required. When Claude Code or Codex triggers
+the first relay hook in a new project, the daemon creates the Feishu root
+message and stores the binding.
 
 ## Platform Comparison
 
 | Feature | Telegram | DingTalk | Feishu |
 | --- | --- | --- | --- |
-| Isolation | Forum Topic | Group | Thread |
+| Isolation | Forum Topic | Group | Root message |
 | Worker required | Yes | No | No |
 | Connection | Webhook -> Worker -> Poll | Stream SDK | SDK WSClient |
 | Bot mention required | No | Yes | Depends on permissions |
@@ -141,4 +142,5 @@ and stores the binding.
   `feishu.proxy.enabled=true` with `feishu.proxy.url` or split proxy fields.
 - A Feishu app supports one active WebSocket connection at a time. Multiple
   daemon instances should not share the same app.
-- The bot cannot create a thread without first sending a root message.
+- Users must use Feishu's Reply action on a relay message so the daemon can
+  identify the matching root message.

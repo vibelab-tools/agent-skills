@@ -99,7 +99,7 @@ export class SessionManager {
     return this.bindings.find((b) => b.dingtalkConversationId === conversationId);
   }
 
-  // 2026-03-18: Feishu thread binding
+  // 2026-03-18: Feishu root-message binding
   /** Bind a Feishu root message ID to a tmux session */
   bindFeishu(tmuxSession: string, rootMessageId: string): void {
     // Clear this rootMessageId from other bindings

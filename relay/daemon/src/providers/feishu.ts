@@ -1,7 +1,7 @@
 // ABOUTME: Feishu IM provider using WebSocket for bidirectional messaging.
-// ABOUTME: Uses reply_in_thread for per-project topic isolation within a single group.
+// ABOUTME: Uses per-session root replies for project isolation within a single group.
 
-// 2026-03-18: Implement Feishu provider with thread-based topic isolation
+// 2026-03-18: Implement Feishu provider with root-message-based session isolation
 
 import * as lark from "@larksuiteoapi/node-sdk";
 // 2026-03-20: Add fs, path, os for downloading user-uploaded files and images
@@ -109,7 +109,7 @@ export class FeishuProvider implements IMProvider {
     const sender = data?.sender;
     const senderName = sender?.sender_id?.open_id || "Unknown";
 
-    // 2026-03-18: Use root_id to identify which project thread this belongs to
+    // 2026-03-18: Use root_id to identify which project session this belongs to
     const effectiveRootId = root_id || message_id;
 
     // 2026-03-20: Parse message content based on type, supporting images and files
@@ -286,8 +286,8 @@ export class FeishuProvider implements IMProvider {
   }
 
   /**
-   * Send a message. topicId is the root message ID for thread replies.
-   * If topicId is empty or starts with "new:", create a new thread.
+   * Send a message. topicId is the root message ID for session replies.
+   * If topicId is empty or starts with "new:", send a new group message.
    */
   async send(options: SendOptions): Promise<boolean> {
     if (!this.client) return false;
@@ -298,10 +298,10 @@ export class FeishuProvider implements IMProvider {
 
     try {
       if (topicId && !topicId.startsWith("new:")) {
-        // Reply in existing thread
-        return await this.replyInThread(topicId, text);
+        // Reply in the main chat so group members receive a normal notification.
+        return await this.replyInChat(topicId, text);
       } else {
-        // Send new message to group (will become thread root)
+        // Send new message to group (will become the session root)
         return await this.sendToGroup(chatId, text);
       }
     } catch (err) {
@@ -333,8 +333,8 @@ export class FeishuProvider implements IMProvider {
     }
   }
 
-  /** Reply in an existing thread */
-  private async replyInThread(rootMessageId: string, text: string): Promise<boolean> {
+  /** Reply to the session root in the main chat instead of a topic thread. */
+  private async replyInChat(rootMessageId: string, text: string): Promise<boolean> {
     if (!this.client) return false;
     try {
       await this.client.im.message.reply({
@@ -342,17 +342,17 @@ export class FeishuProvider implements IMProvider {
         data: {
           content: JSON.stringify({ text }),
           msg_type: "text",
-          reply_in_thread: true,
+          reply_in_thread: false,
         },
       });
       return true;
     } catch (err) {
-      log.error({ err: summarizeError(err) }, "Reply in thread error");
+      log.error({ err: summarizeError(err) }, "Reply in chat error");
       return false;
     }
   }
 
-  /** Send a new message to a group (not in thread) */
+  /** Send a new root message to a group. */
   private async sendToGroup(chatId: string, text: string): Promise<boolean> {
     if (!this.client) return false;
     try {

@@ -129,7 +129,7 @@ export class Server {
     // Find binding for this tmux session, auto-create if Feishu is configured
     let binding = this.sessionManager.findByTmuxSession(tmuxSession);
     if (!binding) {
-      // 2026-03-18: Auto-create Feishu thread binding for unbound sessions
+      // 2026-03-18: Auto-create a Feishu root binding for unbound sessions
       if (this.feishuProvider && this.config.feishuChatId) {
         const title = formatSessionTitle(this.config, tmuxSession);
         const rootMsgId = await this.feishuProvider.sendNewRootMessage(this.config.feishuChatId, title);
@@ -159,12 +159,12 @@ export class Server {
     if (this.dingtalkProvider && binding.dingtalkConversationId) {
       results.push(await this.dingtalkProvider.send({ topicId: binding.dingtalkConversationId, text }));
     }
-    // 2026-03-18: Feishu thread-based send; auto-create root message if needed
+    // 2026-03-18: Feishu root-based send; auto-create root message if needed
     if (this.feishuProvider && this.config.feishuChatId) {
       if (binding.feishuRootMessageId) {
         results.push(await this.feishuProvider.send({ topicId: binding.feishuRootMessageId, text }));
       } else {
-        // First message: create thread root, then reply in it
+        // First message: create a session root, then reply to it
         const title = formatSessionTitle(this.config, tmuxSession);
         const rootMsgId = await this.feishuProvider.sendNewRootMessage(this.config.feishuChatId, title);
         if (rootMsgId) {

@@ -91,7 +91,7 @@ async function main(): Promise<void> {
     feishuProvider.onMessage((msg, rootMessageId) => {
       const binding = sessionManager.findByFeishuRootMessage(rootMessageId);
       if (!binding) {
-        log.warn({ rootMessageId }, "No binding for Feishu thread");
+        log.warn({ rootMessageId }, "No binding for Feishu root message");
         return;
       }
       if (!sessionExists(binding.tmuxSession)) {

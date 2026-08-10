@@ -39,7 +39,7 @@ export interface SessionBinding {
   topicId: string;
   // 2026-03-18: Add DingTalk conversation ID for dual-platform binding
   dingtalkConversationId?: string;
-  // 2026-03-18: Feishu thread root message ID for topic isolation
+  // 2026-03-18: Feishu root message ID for session isolation
   feishuRootMessageId?: string;
   createdAt: number;
 }
