@@ -245,6 +245,38 @@ Use explicit repository selection to avoid writing to the wrong project:
 When a source issue expands into multiple execution issues, add their URLs to
 the source issue so the complete plan remains recoverable after compaction.
 
+### Build Version-Compatible GitLab Web URLs
+
+Do not assume a self-managed GitLab instance uses the current GitLab.com URL
+layout or that its API reports the public-facing scheme correctly. Prefer a
+non-empty URL returned by `glab` or an API `web_url` field, but pass it through
+the bundled helper. Resolve the helper path relative to this `SKILL.md`, not
+relative to the target repository:
+
+```bash
+python3 <skill-directory>/scripts/gitlab_web_url.py \
+  --project-url "$(git remote get-url origin)" \
+  --kind commit \
+  --id "$(git rev-parse HEAD)"
+```
+
+The helper accepts HTTP(S), SSH, and scp-style Git remotes. It queries
+`glab api --hostname <host> version` and applies the project route used by that
+GitLab release:
+
+| GitLab version | Commit path | Issue path |
+| --- | --- | --- |
+| Before 12 | `/commit/<sha>` | `/issues/<iid>` |
+| 12 and newer | `/-/commit/<sha>` | `/-/issues/<iid>` |
+
+If version detection fails and no provider URL is available, the helper uses
+the legacy route. Current GitLab redirects legacy project routes, making that a
+safer cross-version fallback than assuming the newer `/-/` scope. It also uses
+the host's `glab` `api_protocol` setting for the public web scheme when the Git
+remote or provider response is not already HTTPS. Use `--web-scheme` only when
+that setting is unavailable or intentionally different. Never expose the token
+used by `glab` while detecting the version.
+
 ## 3. Keep the Issue Useful as Durable Context
 
 Add concise comments only when information would be costly to lose:

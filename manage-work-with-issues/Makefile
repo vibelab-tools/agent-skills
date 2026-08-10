@@ -17,6 +17,7 @@ build:
 	@:
 
 validate:
+	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
 	@if [ -f "$(VALIDATOR)" ]; then \
 		$(PYTHON) "$(VALIDATOR)" "$(CURDIR)"; \
 	else \
