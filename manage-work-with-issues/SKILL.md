@@ -157,6 +157,52 @@ Write an issue body with only durable task context:
 - Depends on: <issue URLs or "None">
 ```
 
+### Preserve Multiline Markdown
+
+Never represent Markdown formatting with literal `\n` text inside a normal
+quoted CLI argument. Shell quoting does not convert those characters into line
+breaks, so providers store and render them verbatim.
+
+For multiline issue descriptions and comments, write actual line breaks in a
+single-quoted heredoc and pipe them through the bundled validator. Resolve the
+script path relative to this `SKILL.md`. For GitHub, send the validated text
+through the CLI's body-file input:
+
+```bash
+python3 <skill-directory>/scripts/issue_markdown.py <<'MARKDOWN' \
+  | gh issue comment <id> --repo <owner/repo> --body-file -
+Summary
+
+- First result
+- Second result
+MARKDOWN
+```
+
+For GitLab, run from the target repository and send the validated text through
+the API field's standard-input support, because `glab issue note --message`
+does not provide a message-file option:
+
+```bash
+python3 <skill-directory>/scripts/issue_markdown.py <<'MARKDOWN' \
+  | glab api --hostname <host> --method POST \
+      projects/:fullpath/issues/<id>/notes --field body=@-
+Summary
+
+- First result
+- Second result
+MARKDOWN
+```
+
+Use the same pattern with `gh issue create --body-file -` or GitLab's
+`projects/:fullpath/issues` API and `--field description=@-` for multiline
+issue descriptions. The validator rejects literal `\n` by default. Use
+`--allow-literal-newlines` only when the two characters are intentional issue
+content rather than formatting.
+
+After every create or comment operation, read the stored issue or note through
+the matching provider CLI. Confirm that headings, paragraphs, and lists contain
+real line breaks and that the raw body has no unintended literal `\n` text.
+
 ### Attach Screenshot Evidence
 
 Treat screenshots supplied in Codex or Claude Code requests as potential issue
@@ -238,8 +284,8 @@ Use explicit repository selection to avoid writing to the wrong project:
 | Operation | GitHub | GitLab |
 | --- | --- | --- |
 | View | `gh issue view <id> --repo <owner/repo>` | `glab issue view <id> --repo <group/project>` |
-| Create | `gh issue create --repo <owner/repo> --title <title> --body <body>` | `glab issue create --repo <group/project> --title <title> --description <body> --yes` |
-| Comment | `gh issue comment <id> --repo <owner/repo> --body <text>` | `glab issue note <id> --repo <group/project> --message <text>` |
+| Create | For one line, `gh issue create --repo <owner/repo> --title <title> --body <body>` | For one line, `glab issue create --repo <group/project> --title <title> --description <body> --yes` |
+| Comment | For one line, `gh issue comment <id> --repo <owner/repo> --body <text>` | For one line, `glab issue note <id> --repo <group/project> --message <text>` |
 | Close | `gh issue close <id> --repo <owner/repo> --reason completed` | `glab issue close <id> --repo <group/project>` |
 
 When a source issue expands into multiple execution issues, add their URLs to
