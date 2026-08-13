@@ -24,6 +24,13 @@ GitHub or GitLab.
    for defects, and explain what each image proves.
 10. Never place credentials, tokens, private customer data, or sensitive logs in
    an issue or commit message.
+11. For every multiline create, edit, or comment, use the bundled
+    `issue_markdown.py` provider mode. Do not construct `--raw-field` or normal
+    quoted arguments containing `\n`.
+
+Long-running sessions can outlive a Skill installation. Before each provider
+mutation, read the current installed copy of this Skill section instead of
+relying on an earlier in-context copy.
 
 ## 1. Identify the Repository and Provider
 
@@ -164,13 +171,14 @@ quoted CLI argument. Shell quoting does not convert those characters into line
 breaks, so providers store and render them verbatim.
 
 For multiline issue descriptions and comments, write actual line breaks in a
-single-quoted heredoc and pipe them through the bundled validator. Resolve the
-script path relative to this `SKILL.md`. For GitHub, send the validated text
-through the CLI's body-file input:
+single-quoted heredoc and let the bundled helper perform the provider mutation
+and immediate read-back verification. Resolve the script path relative to this
+`SKILL.md`. For GitHub:
 
 ```bash
-python3 <skill-directory>/scripts/issue_markdown.py <<'MARKDOWN' \
-  | gh issue comment <id> --repo <owner/repo> --body-file -
+python3 <skill-directory>/scripts/issue_markdown.py \
+  --provider github --action comment \
+  --repo <owner/repo> --issue <id> <<'MARKDOWN'
 Summary
 
 - First result
@@ -178,14 +186,12 @@ Summary
 MARKDOWN
 ```
 
-For GitLab, run from the target repository and send the validated text through
-the API field's standard-input support, because `glab issue note --message`
-does not provide a message-file option:
+For GitLab:
 
 ```bash
-python3 <skill-directory>/scripts/issue_markdown.py <<'MARKDOWN' \
-  | glab api --hostname <host> --method POST \
-      projects/:fullpath/issues/<id>/notes --field body=@-
+python3 <skill-directory>/scripts/issue_markdown.py \
+  --provider gitlab --action comment --hostname <host> \
+  --repo <group/project> --issue <id> <<'MARKDOWN'
 Summary
 
 - First result
@@ -193,15 +199,16 @@ Summary
 MARKDOWN
 ```
 
-Use the same pattern with `gh issue create --body-file -` or GitLab's
-`projects/:fullpath/issues` API and `--field description=@-` for multiline
-issue descriptions. The validator rejects literal `\n` by default. Use
+Use `--action create --title <title>` for creation and use
+`--action edit --issue <id>` for description edits. The helper passes Markdown
+through standard input, rejects literal `\n` by default, then reads the new
+provider object back and requires its stored Markdown to match. Use
 `--allow-literal-newlines` only when the two characters are intentional issue
 content rather than formatting.
 
-After every create or comment operation, read the stored issue or note through
-the matching provider CLI. Confirm that headings, paragraphs, and lists contain
-real line breaks and that the raw body has no unintended literal `\n` text.
+Never bypass provider mode with `glab api --raw-field 'description=...\n...'`,
+`glab issue note --message '...\n...'`, or equivalent normal quoted arguments.
+The helper's successful exit is the required stored-output verification.
 
 ### Attach Screenshot Evidence
 
