@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vibelab-weixin-article-reader"
+version = "0.1.0"
+description = "Read public WeChat Official Account articles as Markdown and image evidence."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "beautifulsoup4>=4.12,<5",
+  "httpx[socks]>=0.28,<1",
+  "lxml>=5,<7",
+  "markdownify>=1,<2",
+  "mcp>=2,<3",
+]
+
+[project.scripts]
+weixin-article = "weixin_article_reader.cli:main"
+weixin-article-mcp = "weixin_article_reader.mcp_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/weixin_article_reader"]

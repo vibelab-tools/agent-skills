@@ -1,0 +1,4 @@
+interface:
+  display_name: "Weixin Article Reader"
+  short_description: "Read public WeChat articles with images"
+  default_prompt: "Use $weixin-article-reader to read this public WeChat Official Account article and inspect its text and images."

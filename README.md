@@ -19,6 +19,7 @@ removed with the same target names.
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
 | `osint-person-investigation` | Guides lawful public-source person research with mandatory general search, exhaustive multilingual search planning, optional search APIs and local OSINT tools, identity disambiguation, trace capture, and cited reporting. | [osint-person-investigation/README.md](osint-person-investigation/README.md) |
 | `markdown-image-hosting` | Uploads local Markdown image references to a configured image host and rewrites them to hosted URLs. | [markdown-image-hosting/SKILL.md](markdown-image-hosting/SKILL.md) |
+| `weixin-article-reader` | Reads public WeChat Official Account articles as Markdown plus locally inspectable or MCP-native image evidence. | [weixin-article-reader/SKILL.md](weixin-article-reader/SKILL.md) |
 
 ## Dependency Overview
 
@@ -32,6 +33,7 @@ removed with the same target names.
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
 | `osint-person-investigation` | Host-agent search and browsing capabilities, Python 3.12.x with `venv`/`pip`, `git`, optional Brave, Google CSE, Serper.dev, Gemini, Kimi, DeepSeek, or Qwen credentials, no-key public data providers, and managed Sherlock, Maigret, theHarvester, and Photon runtime tools. |
 | `markdown-image-hosting` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `boto3` into an isolated runtime venv for S3-compatible image hosting. |
+| `weixin-article-reader` | Python 3.10+ with working `venv` and `pip`; the Codex install target also requires the `codex` CLI to register its stdio MCP server. |
 
 ## Install Layout
 
@@ -54,6 +56,20 @@ checks, including pyenv-managed interpreters, and supports the make-time
 `~/.vibelab-tools/agent-skills/video-understanding`. Its core dependency is `ffmpeg`,
 which is used to extract timestamped frames for both local frame fallback and
 provider-backed multimodal analysis.
+
+`weixin-article-reader` installs the `weixin-article` CLI and
+`weixin-article-mcp` stdio server under
+`~/.vibelab-tools/agent-skills/weixin-article-reader/bin`. Its Codex target
+installs the Skill and automatically registers the managed MCP server:
+
+```bash
+make -C weixin-article-reader install-codex
+```
+
+Repeated installs refresh the registration. `make -C weixin-article-reader
+uninstall-codex` removes both the Codex Skill and its MCP registration, while
+the aggregate `uninstall` target also removes the shared runtime. Claude Code
+installation keeps using the managed CLI and does not change Codex settings.
 
 `relay` is different because it is a long-running service. Its daemon, runtime
 files, service controller, and plugin marketplaces are installed under:

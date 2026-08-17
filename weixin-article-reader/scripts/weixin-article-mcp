@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+server_bin="${WEIXIN_ARTICLE_MCP_BIN:-$HOME/.vibelab-tools/agent-skills/weixin-article-reader/bin/weixin-article-mcp}"
+if [ ! -x "$server_bin" ]; then
+    printf '%s\n' "weixin-article MCP runtime not found: run make -C weixin-article-reader install-runtime" >&2
+    exit 1
+fi
+exec "$server_bin" "$@"
