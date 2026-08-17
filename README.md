@@ -17,7 +17,6 @@ removed with the same target names.
 | `code-refactor` | Provides parser-backed code complexity, smell detection, and bounded refactoring planning through a packaged Java CLI. | [code-refactor/README.md](code-refactor/README.md) |
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
-| `osint-person-investigation` | Guides lawful public-source person research with mandatory general search, exhaustive multilingual search planning, optional search APIs and local OSINT tools, identity disambiguation, trace capture, and cited reporting. | [osint-person-investigation/README.md](osint-person-investigation/README.md) |
 | `markdown-image-hosting` | Uploads local Markdown image references to a configured image host and rewrites them to hosted URLs. | [markdown-image-hosting/SKILL.md](markdown-image-hosting/SKILL.md) |
 | `weixin-article-reader` | Reads public WeChat Official Account articles as Markdown plus locally inspectable or MCP-native image evidence. | [weixin-article-reader/SKILL.md](weixin-article-reader/SKILL.md) |
 
@@ -31,7 +30,6 @@ removed with the same target names.
 | `code-refactor` | JDK 21 and Maven for build/validation; Java 21-compatible runtime for the packaged JAR. |
 | `video-understanding` | Python 3.10+, `ffmpeg`, preferably `ffprobe`, provider API credentials for provider-backed modes, and `boto3` in the isolated runtime venv when OSS/S3-compatible video upload is enabled. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
-| `osint-person-investigation` | Host-agent search and browsing capabilities, Python 3.12.x with `venv`/`pip`, `git`, optional Brave, Google CSE, Serper.dev, Gemini, Kimi, DeepSeek, or Qwen credentials, no-key public data providers, and managed Sherlock, Maigret, theHarvester, and Photon runtime tools. |
 | `markdown-image-hosting` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `boto3` into an isolated runtime venv for S3-compatible image hosting. |
 | `weixin-article-reader` | Python 3.10+ with working `venv` and `pip`; the Codex install target also requires the `codex` CLI to register its stdio MCP server. |
 
