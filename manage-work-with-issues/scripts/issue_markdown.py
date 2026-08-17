@@ -22,6 +22,20 @@ def validate_markdown(text: str, allow_literal_newlines: bool = False) -> None:
         )
 
 
+def validate_closure_checklist(text: str) -> None:
+    unchecked = re.compile(r"^[ \t]*[-*+][ \t]+\[[ \t]\](?:[ \t]+|$)")
+    lines = [
+        str(number)
+        for number, line in enumerate(text.splitlines(), start=1)
+        if unchecked.match(line)
+    ]
+    if lines:
+        raise ValueError(
+            "issue Markdown contains unchecked task-list item(s) on line(s): "
+            + ", ".join(lines)
+        )
+
+
 def validate_title(title: Optional[str]) -> str:
     if not title or not title.strip():
         raise ValueError("issue title must not be empty")
@@ -204,6 +218,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         action="store_true",
         help=r"Allow literal \n when it is intentional content, not formatting.",
     )
+    parser.add_argument(
+        "--check-closure",
+        action="store_true",
+        help="Reject unchecked task-list items before issue closure.",
+    )
     parser.add_argument("--provider", choices=("github", "gitlab"))
     parser.add_argument("--action", choices=("create", "comment", "edit"))
     parser.add_argument("--repo", help="OWNER/REPO or GROUP/PROJECT")
@@ -222,6 +241,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             else Path(args.file).read_text(encoding="utf-8")
         )
         validate_markdown(text, args.allow_literal_newlines)
+        if args.check_closure:
+            validate_closure_checklist(text)
         if bool(args.provider) != bool(args.action):
             raise ValueError("--provider and --action must be used together")
         if args.provider:

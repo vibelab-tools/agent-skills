@@ -40,6 +40,33 @@ class IssueMarkdownTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "must not be empty"):
             MODULE.validate_markdown(" \n\t")
 
+    def test_closure_check_accepts_completed_and_removed_items(self):
+        markdown = (
+            "## Acceptance criteria\n\n"
+            "- [x] Completed result\n"
+            "- ~~Cancelled result~~ — Removed: no longer required\n"
+        )
+
+        MODULE.validate_closure_checklist(markdown)
+
+    def test_closure_check_rejects_unchecked_items_with_line_numbers(self):
+        markdown = "## Acceptance criteria\n\n- [ ] Still unfinished\n"
+
+        with self.assertRaisesRegex(ValueError, r"line\(s\): 3"):
+            MODULE.validate_closure_checklist(markdown)
+
+    def test_closure_check_ignores_checkbox_text_that_is_not_a_task_item(self):
+        MODULE.validate_closure_checklist("Document the `[ ]` marker.\n")
+
+    def test_closure_check_flag_rejects_unchecked_input(self):
+        markdown = "- [ ] Still unfinished\n"
+        with mock.patch.object(MODULE.sys, "stdin", io.StringIO(markdown)):
+            with mock.patch.object(
+                MODULE.sys, "stderr", new_callable=io.StringIO
+            ) as error:
+                self.assertEqual(MODULE.main(["--check-closure"]), 2)
+                self.assertIn("unchecked task-list", error.getvalue())
+
     @mock.patch.object(MODULE, "run_cli")
     def test_gitlab_create_posts_stdin_and_reads_back(self, run_cli):
         markdown = "## Goal\n\n- done\n"

@@ -27,6 +27,9 @@ GitHub or GitLab.
 11. For every multiline create, edit, or comment, use the bundled
     `issue_markdown.py` provider mode. Do not construct `--raw-field` or normal
     quoted arguments containing `\n`.
+12. Before closure, reconcile every task-list item in the issue body: mark
+    satisfied items `[x]`, preserve removed items as non-checkbox strikethrough
+    bullets with a reason, and leave no unchecked task-list items.
 
 Long-running sessions can outlive a Skill installation. Before each provider
 mutation, read the current installed copy of this Skill section instead of
@@ -342,6 +345,41 @@ Add concise comments only when information would be costly to lose:
 Do not post routine progress, speculative debugging, secrets, or large raw logs.
 Summarize evidence and link to durable artifacts instead.
 
+### Reconcile Checklist Decisions
+
+Treat each task-list item as durable scope, not disposable formatting. Before
+closing an issue:
+
+- Change a satisfied item from `[ ]` to `[x]` only after its evidence passes.
+- For an item that is inapplicable, superseded, or cancelled, remove the
+  checkbox but preserve the original text as a strikethrough bullet with a
+  concise reason in the issue's working language, for example:
+  `- ~~Original criterion~~ — Removed: <reason>`.
+- Do not silently delete a criterion or mark it complete when it was not met.
+- Treat any remaining unchecked task-list item anywhere in the issue body as
+  unfinished work that blocks closure.
+
+Edit the final reconciled body with provider mode and add `--check-closure`.
+The helper rejects the edit when an unchecked task-list item remains and still
+reads the provider body back to verify an exact Markdown match:
+
+```bash
+python3 <skill-directory>/scripts/issue_markdown.py \
+  --check-closure --provider github --action edit \
+  --repo <owner/repo> --issue <id> <<'MARKDOWN'
+<complete reconciled issue body>
+MARKDOWN
+```
+
+Use the same flag with the GitLab edit command. If no body edit is otherwise
+needed, validate the body read from the provider before closing it:
+
+```bash
+gh issue view <id> --repo <owner/repo> --json body --jq .body | \
+  python3 <skill-directory>/scripts/issue_markdown.py \
+    --check-closure >/dev/null
+```
+
 After context compaction or a resumed session, read the issue and its comments,
 then inspect `git status`, the current diff, and recent commits before continuing.
 Do not rely on recalled chat context when it conflicts with those sources.
@@ -397,9 +435,10 @@ request, so the association is visible on GitHub or GitLab.
   issue open, add a concise blocker comment when possible, and report the exact
   remaining action.
 
-After the commit is remotely visible and all acceptance criteria pass, add a
-short final comment containing the commit or review-request URL and the checks
-run. If the provider did not auto-close the issue, close it explicitly with the
+After the commit is remotely visible and all acceptance criteria pass,
+reconcile the issue body and require `--check-closure` to pass. Then add a short
+final comment containing the commit or review-request URL and the checks run.
+If the provider did not auto-close the issue, close it explicitly with the
 correct CLI. For GitLab, add the final note before `glab issue close`; for
 GitHub, `gh issue close --comment <text> --reason completed` may combine them.
 
