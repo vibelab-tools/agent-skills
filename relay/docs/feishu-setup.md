@@ -26,19 +26,25 @@ From **Credentials and Basic Info**, save:
 - **App ID**, such as `cli_xxxx`
 - **App Secret**
 
+Store the secret only in the protected relay configuration (`chmod 600`). Do
+not paste it into shell history, screenshots, issues, or chat messages. If it is
+ever exposed, rotate it before continuing.
+
 ## Configure Permissions
 
 Open **Permissions Management** and enable the required message permissions:
 
 | Permission | Identifier | Purpose |
 | --- | --- | --- |
-| Read and send direct/group messages | `im:message` | Message read/write |
-| Send messages as bot | `im:message:send_as_bot` | Bot replies |
-| Receive group @bot events | `im:message.group_at_msg:readonly` | Group mentions |
-| Receive direct bot messages | `im:message.p2p_msg:readonly` | Direct messages |
+| Receive direct bot messages | `im:message.p2p_msg:readonly` | Direct-chat discovery and testing |
+| Receive all group messages | `im:message.group_msg` | Topic replies without requiring an @mention |
+| Read direct and group messages | `im:message:readonly` | Bounded history recovery and reconciliation |
+| Send messages as bot | `im:message:send_as_bot` | Root notifications and threaded replies |
 
-It is often simpler to enable all needed `im:message.*` permissions during
-initial setup, then narrow them later if required.
+These are the four permissions used by the relay. Keep the permission set
+minimal instead of enabling every `im:message.*` permission.
+
+![Required Feishu permissions](assets/feishu-setup/permissions.jpg)
 
 ## Publish The First Version
 
@@ -50,21 +56,13 @@ You must publish an app version before long-connection settings can be saved:
 
 ## Configure Event Subscription
 
-After publishing, briefly start an SDK WebSocket client. Feishu requires a
-successful connection before saving long-connection event settings.
+After publishing, start the relay daemon on the designated host, or briefly
+start an SDK WebSocket client that reads the credentials from a protected
+configuration file. Feishu requires a successful connection before saving
+long-connection event settings. Do not place the App Secret directly in a
+command line.
 
-Temporary local connection:
-
-```bash
-node - <<'NODE'
-const lark = require('@larksuiteoapi/node-sdk');
-const ws = new lark.WSClient({ appId: '<APP_ID>', appSecret: '<APP_SECRET>' });
-ws.start({ eventDispatcher: new lark.EventDispatcher({}).register({}) });
-console.log('ws client ready');
-NODE
-```
-
-Keep the script running, then:
+While that connection is running:
 
 1. Open **Events and Callbacks** in the Feishu app.
 2. Choose long connection event receiving.
@@ -72,20 +70,53 @@ Keep the script running, then:
 4. Add event `im.message.receive_v1`.
 5. Publish a new app version, for example `1.1.0`.
 
+![Long-connection event subscription](assets/feishu-setup/long-connection-event.jpg)
+
+![Published Feishu app version](assets/feishu-setup/published-version.jpg)
+
+## Add The Bot To A Group
+
+Use a dedicated Feishu group for the production relay target:
+
+1. Open the group in the Feishu desktop client.
+2. Open **More > Settings > Group Bots**.
+3. Click **Add Bot**, search for the app name, and add it.
+
+Feishu currently exposes this application-bot flow in the desktop client; the
+web client may show the group-bot page without the **Add Bot** action. Use a
+group rather than the bot's direct chat so group replies stay on the primary
+WebSocket path and can be routed by topic root.
+
 ## Get The Chat ID
 
-The daemon can discover the Feishu `chat_id` when the bot receives a message:
+The daemon can discover the Feishu `chat_id` when the bot receives a group
+message:
 
-1. Create a Feishu group and add the relay bot.
-2. Start the daemon.
-3. Mention the bot in the group.
-4. Inspect the daemon log:
+1. Start the daemon with the new App ID and App Secret.
+2. Send a message in the dedicated group. An @mention is not required with the
+   permissions above.
+3. Read the latest structured `Received message` record from the daemon log:
 
 ```bash
-grep "\[feishu\] Message in chat" ~/.vibelab-tools/agent-skills/relay/runtime/daemon.log
+node - <<'NODE'
+const fs = require('node:fs');
+const path = `${process.env.HOME}/.vibelab-tools/agent-skills/relay/runtime/daemon.log`;
+const rows = fs.readFileSync(path, 'utf8').trim().split('\n').reverse();
+
+for (const line of rows) {
+  try {
+    const row = JSON.parse(line);
+    if (row.module === 'feishu' && row.msg === 'Received message' && row.source === 'websocket') {
+      console.log(row.chatId);
+      break;
+    }
+  } catch {}
+}
+NODE
 ```
 
-The log includes a value like `oc_xxxx`; save it as `feishu.chat_id`.
+The command prints a value like `oc_xxxx`; save it as `feishu.chat_id`. Treat
+the ID as operational configuration and do not paste it into public issues.
 
 ## Configure The Daemon
 
@@ -103,11 +134,16 @@ Add the required variables to
 }
 ```
 
+Keep this file mode `600`, restart the designated relay daemon, and leave every
+other machine's daemon stopped. One Feishu app should have only one active
+relay WebSocket client.
+
 ## How It Works
 
 ```text
-Agent notification -> daemon -> session topic -> threaded notification
-User replies in the session topic -> Feishu WebSocket -> daemon -> tmux
+Agent notification -> daemon -> group session topic -> threaded notification
+User topic reply -> Feishu WebSocket (primary) -> daemon -> tmux
+Missed/reconnect input -> bounded recovery scan -> daemon -> tmux
 ```
 
 ## Session Isolation
@@ -147,5 +183,7 @@ its topic automatically and keeps using that binding.
   `feishu.proxy.enabled=true` with `feishu.proxy.url` or split proxy fields.
 - A Feishu app supports one active WebSocket connection at a time. Multiple
   daemon instances should not share the same app.
+- Use a group as `feishu.chat_id`. Direct bot chat is useful for discovery and
+  testing, but it is not the production topic-routing target.
 - Users must reply inside the latest Feishu Topic so the daemon can identify
   the matching root message.
