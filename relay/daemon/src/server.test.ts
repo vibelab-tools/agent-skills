@@ -91,6 +91,12 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
       activeBindings: 1,
       requestsSinceStart: 3,
     });
+    assert.equal(status.bindings[0].feishuRootMessageId, "om_session");
+    assert.equal(status.bindings[0].feishuThreadId, undefined);
+    assert.equal(status.bindings[0].feishuLastMessageAt, undefined);
+    assert.equal(status.bindings[0].feishuLastMessageIds, undefined);
+    assert.equal(status.bindings[0].feishuRecentMessageIds, undefined);
+    assert.equal(status.bindings[0].feishuMissingSince, undefined);
   } finally {
     server.stop();
     rmSync(testDir, { recursive: true, force: true });

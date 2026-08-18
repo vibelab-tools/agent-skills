@@ -252,7 +252,17 @@ export class Server {
 
   /** Handle GET /status */
   private handleStatus(res: http.ServerResponse): void {
-    const bindings = this.sessionManager.getAll();
+    const bindings = this.sessionManager.getAll().map((binding) => {
+      const {
+        feishuThreadId,
+        feishuLastMessageAt,
+        feishuLastMessageIds,
+        feishuRecentMessageIds,
+        feishuMissingSince,
+        ...publicBinding
+      } = binding;
+      return publicBinding;
+    });
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(
       JSON.stringify({
