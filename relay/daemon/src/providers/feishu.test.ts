@@ -195,6 +195,18 @@ test("prioritizes a recently notified topic without starving cold topics", async
   assert.deepEqual(listedThreads, ["omt_hot", "omt_cold"]);
 });
 
+test("queues all active topics for catch-up after WebSocket reconnect", () => {
+  const provider = new FeishuProvider({ feishuChatId: "oc_test" } as DaemonConfig);
+  (provider as any).websocketState = "reconnecting";
+  (provider as any).lastRecoveryAt.set("om_one", 15_000);
+  (provider as any).lastRecoveryAt.set("om_two", 30_000);
+
+  (provider as any).handleWebSocketReconnected();
+
+  assert.equal((provider as any).websocketState, "connected");
+  assert.equal((provider as any).lastRecoveryAt.size, 0);
+});
+
 test("paginates thread history to the persisted cursor and skips seen messages", async () => {
   const provider = new FeishuProvider({ feishuChatId: "oc_test" } as DaemonConfig);
   const received: string[] = [];

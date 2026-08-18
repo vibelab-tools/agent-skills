@@ -145,11 +145,7 @@ export class FeishuProvider implements IMProvider {
         this.websocketState = "reconnecting";
         log.warn("Feishu WebSocket reconnecting; bounded recovery remains active");
       },
-      onReconnected: () => {
-        this.websocketState = "connected";
-        this.lastRecoveryAt.clear();
-        log.info("Feishu WebSocket reconnected; active topics queued for recovery");
-      },
+      onReconnected: () => this.handleWebSocketReconnected(),
       onError: (err) => {
         this.websocketState = "failed";
         log.error({ err: summarizeError(err) }, "Feishu WebSocket connection failed");
@@ -347,6 +343,12 @@ export class FeishuProvider implements IMProvider {
     } finally {
       this.recoveryInProgress = false;
     }
+  }
+
+  private handleWebSocketReconnected(): void {
+    this.websocketState = "connected";
+    this.lastRecoveryAt.clear();
+    log.info("Feishu WebSocket reconnected; active topics queued for recovery");
   }
 
   private selectRecoveryTarget(
