@@ -41,7 +41,20 @@ export interface SessionBinding {
   dingtalkConversationId?: string;
   // 2026-03-18: Feishu root message ID for session isolation
   feishuRootMessageId?: string;
+  feishuThreadId?: string;
+  feishuLastMessageAt?: number;
+  feishuLastMessageIds?: string[];
+  feishuRecentMessageIds?: string[];
+  feishuMissingSince?: number;
   createdAt: number;
+}
+
+/** Persisted position for one Feishu topic recovery query. */
+export interface FeishuRecoveryTarget {
+  rootMessageId: string;
+  threadId?: string;
+  lastMessageAt: number;
+  lastMessageIds: string[];
 }
 
 /** Persisted bindings file structure */
@@ -70,6 +83,7 @@ export interface PollMessage {
     username?: string;
   };
   timestamp: number;
+  createdAtMs?: number;
 }
 
 /** POST /notify request from hook scripts */

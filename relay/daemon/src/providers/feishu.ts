@@ -8,7 +8,12 @@ import * as lark from "@larksuiteoapi/node-sdk";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { DaemonConfig, PollMessage, Attachment } from "../types";
+import {
+  DaemonConfig,
+  PollMessage,
+  Attachment,
+  FeishuRecoveryTarget,
+} from "../types";
 import { IMProvider, SendOptions } from "./base";
 import { createProxyAgent, createProxyHttpClient, maskProxyUrl, proxyIsEnabled, summarizeError } from "../proxy";
 import { createLogger } from "../logger";
@@ -17,11 +22,38 @@ import { createLogger } from "../logger";
 const log = createLogger("feishu");
 
 /** Callback for incoming messages from Feishu */
-export type FeishuMessageHandler = (msg: PollMessage, rootMessageId: string) => void;
+export type FeishuMessageHandler = (
+  msg: PollMessage,
+  rootMessageId: string
+) => boolean | void;
 
 interface FeishuSendOptions extends SendOptions {
   mentionAll?: boolean;
 }
+
+interface FeishuRecoverySource {
+  getTargets: () => FeishuRecoveryTarget[];
+  onThreadResolved: (rootMessageId: string, threadId: string) => void;
+  onMessageRecovered: (
+    rootMessageId: string,
+    messageId: string,
+    createdAt: number
+  ) => void;
+}
+
+export interface FeishuRecoveryStatus {
+  websocketState: string;
+  schedulerIntervalMs: number;
+  activeBindings: number;
+  requestsSinceStart: number;
+  lastSuccessAt?: number;
+  backoffUntil?: number;
+}
+
+const RECOVERY_INTERVAL_MS = 15_000;
+const HOT_RECOVERY_WINDOW_MS = 10 * 60 * 1000;
+const INITIAL_BACKOFF_MS = 60_000;
+const MAX_BACKOFF_MS = 60 * 60 * 1000;
 
 export class FeishuProvider implements IMProvider {
   readonly name = "feishu";
@@ -30,8 +62,17 @@ export class FeishuProvider implements IMProvider {
   private wsClient: lark.WSClient | null = null;
   private messageHandler: FeishuMessageHandler | null = null;
   private pollTimer: NodeJS.Timeout | null = null;
-  private pollStartedAt = 0;
-  private pollInProgress = false;
+  private recoverySource: FeishuRecoverySource | null = null;
+  private recoveryInProgress = false;
+  private recoveryBackoffMs = 0;
+  private recoveryBackoffUntil = 0;
+  private recoveryRequestCount = 0;
+  private lastRecoverySuccessAt = 0;
+  private activeRecoveryTargets = 0;
+  private lastRecoveryAt = new Map<string, number>();
+  private hotUntil = new Map<string, number>();
+  private preferHotRecovery = true;
+  private websocketState = "idle";
   private threadIds = new Map<string, string>();
   private handledMessageIds = new Set<string>();
   private handledMessageOrder: string[] = [];
@@ -51,27 +92,20 @@ export class FeishuProvider implements IMProvider {
     this.messageHandler = handler;
   }
 
-  /** Poll bound topics as a fallback when Feishu misses a WebSocket event. */
-  startPolling(getRootMessageIds: () => string[]): void {
+  /** Reconcile one active topic per bounded scheduler tick. */
+  startRecovery(source: FeishuRecoverySource): void {
     if (this.pollTimer) return;
 
-    this.pollStartedAt = Date.now();
-    const poll = () => {
-      if (this.pollInProgress) return;
-      this.pollInProgress = true;
-      this.pollTopicRepliesOnce(getRootMessageIds())
-        .catch((err) => {
-          log.warn({ err: summarizeError(err) }, "Topic reply poll failed");
-        })
-        .finally(() => {
-          this.pollInProgress = false;
-        });
-    };
+    this.recoverySource = source;
+    const poll = () => void this.runRecoveryCycle();
 
     poll();
-    this.pollTimer = setInterval(poll, 5000);
+    this.pollTimer = setInterval(poll, RECOVERY_INTERVAL_MS);
     this.pollTimer.unref();
-    log.info("Topic reply fallback polling started");
+    log.info(
+      { intervalMs: RECOVERY_INTERVAL_MS },
+      "Bounded Feishu reply recovery started"
+    );
   }
 
   /** Start the WebSocket connection */
@@ -103,6 +137,23 @@ export class FeishuProvider implements IMProvider {
       appId: feishuAppId,
       appSecret: feishuAppSecret,
       loggerLevel: lark.LoggerLevel.info,
+      onReady: () => {
+        this.websocketState = "connected";
+        log.info("Feishu WebSocket ready");
+      },
+      onReconnecting: () => {
+        this.websocketState = "reconnecting";
+        log.warn("Feishu WebSocket reconnecting; bounded recovery remains active");
+      },
+      onReconnected: () => {
+        this.websocketState = "connected";
+        this.lastRecoveryAt.clear();
+        log.info("Feishu WebSocket reconnected; active topics queued for recovery");
+      },
+      onError: (err) => {
+        this.websocketState = "failed";
+        log.error({ err: summarizeError(err) }, "Feishu WebSocket connection failed");
+      },
       ...(httpInstance ? { httpInstance: httpInstance as any } : {}),
       ...(agent ? { agent: agent as any } : {}),
     });
@@ -118,16 +169,17 @@ export class FeishuProvider implements IMProvider {
     });
 
     await this.wsClient.start({ eventDispatcher });
-    log.info("WebSocket connected");
+    if (this.websocketState === "idle") this.websocketState = "connecting";
+    log.info("Feishu WebSocket client started");
   }
 
   /** Handle an incoming message event */
   private async handleIncomingMessage(
     data: any,
     source: "websocket" | "poll"
-  ): Promise<void> {
+  ): Promise<boolean> {
     const message = data?.message;
-    if (!message) return;
+    if (!message) return true;
 
     const {
       message_id,
@@ -141,8 +193,8 @@ export class FeishuProvider implements IMProvider {
     } = message;
 
     // Only handle group messages
-    if (chat_type !== "group") return;
-    if (!this.rememberMessage(message_id)) return;
+    if (chat_type !== "group") return true;
+    if (!message_id || this.handledMessageIds.has(message_id)) return true;
 
     const sender = data?.sender;
     const senderName = sender?.sender_id?.open_id || "Unknown";
@@ -210,11 +262,12 @@ export class FeishuProvider implements IMProvider {
 
         default:
           log.info({ messageType: message_type }, "Unsupported message type");
-          return;
+          this.rememberMessage(message_id);
+          return true;
       }
     } catch (err) {
       log.error({ err: summarizeError(err) }, "Failed to parse message content");
-      return;
+      return false;
     }
 
     // 2026-03-20: Remove @mention prefix for text messages
@@ -222,7 +275,10 @@ export class FeishuProvider implements IMProvider {
       text = text.replace(/@\S+\s*/g, "").trim();
     }
 
-    if (!text && attachments.length === 0) return;
+    if (!text && attachments.length === 0) {
+      this.rememberMessage(message_id);
+      return true;
+    }
 
     log.info(
       {
@@ -235,23 +291,26 @@ export class FeishuProvider implements IMProvider {
       "Received message"
     );
 
-    if (this.messageHandler) {
-      const msg: PollMessage = {
-        id: message_id,
-        topicId: effectiveRootId,
-        text: text,
-        attachments: attachments.length > 0 ? attachments : undefined,
-        from: {
-          id: 0,
-          is_bot: false,
-          first_name: senderName,
-        },
-        timestamp: create_time
-          ? Math.floor(Number(create_time) / 1000)
-          : Math.floor(Date.now() / 1000),
-      };
-      this.messageHandler(msg, effectiveRootId);
-    }
+    if (!this.messageHandler) return false;
+
+    const msg: PollMessage = {
+      id: message_id,
+      topicId: effectiveRootId,
+      text: text,
+      attachments: attachments.length > 0 ? attachments : undefined,
+      from: {
+        id: 0,
+        is_bot: false,
+        first_name: senderName,
+      },
+      timestamp: create_time
+        ? Math.floor(Number(create_time) / 1000)
+        : Math.floor(Date.now() / 1000),
+      createdAtMs: create_time ? Number(create_time) : Date.now(),
+    };
+    if (this.messageHandler(msg, effectiveRootId) === false) return false;
+    this.rememberMessage(message_id);
+    return true;
   }
 
   private rememberMessage(messageId: string): boolean {
@@ -266,55 +325,167 @@ export class FeishuProvider implements IMProvider {
     return true;
   }
 
-  private async pollTopicRepliesOnce(rootMessageIds: string[]): Promise<void> {
+  private async runRecoveryCycle(now = Date.now()): Promise<void> {
+    if (!this.client || !this.recoverySource || this.recoveryInProgress) return;
+
+    const targets = uniqueTargets(this.recoverySource.getTargets());
+    this.activeRecoveryTargets = targets.length;
+    this.pruneRecoveryState(targets);
+    if (now < this.recoveryBackoffUntil) return;
+    const target = this.selectRecoveryTarget(targets, now);
+    if (!target) return;
+
+    this.recoveryInProgress = true;
+    this.lastRecoveryAt.set(target.rootMessageId, now);
+    try {
+      await this.pollTopicReplies(target);
+      this.lastRecoverySuccessAt = now;
+      this.recoveryBackoffMs = 0;
+      this.recoveryBackoffUntil = 0;
+    } catch (err) {
+      this.handleRecoveryError(err, now);
+    } finally {
+      this.recoveryInProgress = false;
+    }
+  }
+
+  private selectRecoveryTarget(
+    targets: FeishuRecoveryTarget[],
+    now: number
+  ): FeishuRecoveryTarget | undefined {
+    if (targets.length === 0) return undefined;
+
+    const byOldestRecovery = (a: FeishuRecoveryTarget, b: FeishuRecoveryTarget) =>
+      (this.lastRecoveryAt.get(a.rootMessageId) || 0) -
+      (this.lastRecoveryAt.get(b.rootMessageId) || 0);
+    const hot = targets
+      .filter((target) => (this.hotUntil.get(target.rootMessageId) || 0) > now)
+      .sort(byOldestRecovery);
+    const cold = targets
+      .filter((target) => (this.hotUntil.get(target.rootMessageId) || 0) <= now)
+      .sort(byOldestRecovery);
+
+    if (hot.length > 0 && (this.preferHotRecovery || cold.length === 0)) {
+      this.preferHotRecovery = false;
+      return hot[0];
+    }
+    this.preferHotRecovery = true;
+    return cold[0] || hot[0];
+  }
+
+  private async pollTopicReplies(target: FeishuRecoveryTarget): Promise<void> {
     if (!this.client) return;
 
-    for (const rootMessageId of new Set(rootMessageIds.filter(Boolean))) {
-      let threadId = this.threadIds.get(rootMessageId);
-      if (!threadId) {
-        const rootResponse = await this.client.im.message.get({
-          path: { message_id: rootMessageId },
-        });
-        threadId = (rootResponse as any)?.data?.items?.[0]?.thread_id;
-        if (!threadId) continue;
-        this.threadIds.set(rootMessageId, threadId);
-      }
-
-      const response = await this.client.im.message.list({
-        params: {
-          container_id_type: "thread",
-          container_id: threadId,
-          page_size: 50,
-          sort_type: "ByCreateTimeDesc",
-        },
-      });
-      const items = ((response as any)?.data?.items || [])
-        .filter(
-          (item: any) =>
-            item.sender?.sender_type === "user" &&
-            Number(item.create_time) >= this.pollStartedAt
-        )
-        .sort((a: any, b: any) => Number(a.create_time) - Number(b.create_time));
-
-      for (const item of items) {
-        await this.handleIncomingMessage(
-          {
-            sender: { sender_id: { open_id: item.sender?.id } },
-            message: {
-              message_id: item.message_id,
-              chat_id: item.chat_id,
-              chat_type: "group",
-              message_type: item.msg_type,
-              content: item.body?.content,
-              root_id: item.root_id || rootMessageId,
-              thread_id: item.thread_id || threadId,
-              create_time: item.create_time,
-            },
-          },
-          "poll"
-        );
-      }
+    const rootMessageId = target.rootMessageId;
+    let threadId = target.threadId || this.threadIds.get(rootMessageId);
+    if (!threadId) {
+      const rootResponse = await this.recoveryRequest(() =>
+        this.client!.im.message.get({ path: { message_id: rootMessageId } })
+      );
+      threadId = (rootResponse as any)?.data?.items?.[0]?.thread_id;
+      if (!threadId) return;
+      this.threadIds.set(rootMessageId, threadId);
+      this.recoverySource?.onThreadResolved(rootMessageId, threadId);
     }
+
+    const items: any[] = [];
+    let pageToken: string | undefined;
+    let hasMore = false;
+    do {
+      const response = await this.recoveryRequest(() =>
+        this.client!.im.message.list({
+          params: {
+            container_id_type: "thread",
+            container_id: threadId!,
+            page_size: 50,
+            sort_type: "ByCreateTimeDesc",
+            ...(pageToken ? { page_token: pageToken } : {}),
+          },
+        })
+      );
+      const pageItems = (response as any)?.data?.items || [];
+      items.push(...pageItems);
+      hasMore = Boolean((response as any)?.data?.has_more);
+      pageToken = (response as any)?.data?.page_token;
+      if (pageItems.some((item: any) => isAtOrBeforeCursor(item, target))) {
+        break;
+      }
+    } while (hasMore && pageToken);
+
+    const unseen = items
+      .filter((item: any) => item.sender?.sender_type === "user")
+      .filter((item: any) => isAfterCursor(item, target))
+      .sort((a: any, b: any) => Number(a.create_time) - Number(b.create_time));
+
+    for (const item of unseen) {
+      const handled = await this.handleIncomingMessage(
+        {
+          sender: { sender_id: { open_id: item.sender?.id } },
+          message: {
+            message_id: item.message_id,
+            chat_id: item.chat_id,
+            chat_type: "group",
+            message_type: item.msg_type,
+            content: item.body?.content,
+            root_id: item.root_id || rootMessageId,
+            thread_id: item.thread_id || threadId,
+            create_time: item.create_time,
+          },
+        },
+        "poll"
+      );
+      if (!handled) break;
+      this.recoverySource?.onMessageRecovered(
+        rootMessageId,
+        item.message_id,
+        Number(item.create_time)
+      );
+    }
+  }
+
+  private async recoveryRequest<T>(request: () => Promise<T>): Promise<T> {
+    this.recoveryRequestCount += 1;
+    return request();
+  }
+
+  private handleRecoveryError(err: unknown, now: number): void {
+    if (errorStatus(err) !== 429) {
+      log.warn({ err: summarizeError(err) }, "Feishu reply recovery failed");
+      return;
+    }
+
+    const retryAfterMs = parseRetryAfterMs(err);
+    this.recoveryBackoffMs = retryAfterMs || Math.min(
+      this.recoveryBackoffMs > 0 ? this.recoveryBackoffMs * 2 : INITIAL_BACKOFF_MS,
+      MAX_BACKOFF_MS
+    );
+    this.recoveryBackoffUntil = now + this.recoveryBackoffMs;
+    log.warn(
+      { retryInMs: this.recoveryBackoffMs },
+      "Feishu reply recovery paused after rate limit"
+    );
+  }
+
+  private pruneRecoveryState(targets: FeishuRecoveryTarget[]): void {
+    const active = new Set(targets.map((target) => target.rootMessageId));
+    for (const rootMessageId of this.lastRecoveryAt.keys()) {
+      if (!active.has(rootMessageId)) this.lastRecoveryAt.delete(rootMessageId);
+    }
+    for (const rootMessageId of this.hotUntil.keys()) {
+      if (!active.has(rootMessageId)) this.hotUntil.delete(rootMessageId);
+    }
+  }
+
+  getRecoveryStatus(): FeishuRecoveryStatus {
+    const sdkState = this.wsClient?.getConnectionStatus?.().state;
+    return {
+      websocketState: sdkState || this.websocketState,
+      schedulerIntervalMs: RECOVERY_INTERVAL_MS,
+      activeBindings: this.activeRecoveryTargets,
+      requestsSinceStart: this.recoveryRequestCount,
+      ...(this.lastRecoverySuccessAt ? { lastSuccessAt: this.lastRecoverySuccessAt } : {}),
+      ...(this.recoveryBackoffUntil ? { backoffUntil: this.recoveryBackoffUntil } : {}),
+    };
   }
 
   // 2026-03-20: Extract text and image keys from Feishu post (rich text) content
@@ -402,7 +573,9 @@ export class FeishuProvider implements IMProvider {
 
     try {
       if (topicId && !topicId.startsWith("new:")) {
-        return await this.replyInThread(topicId, text, mentionAll);
+        const sent = await this.replyInThread(topicId, text, mentionAll);
+        if (sent) this.hotUntil.set(topicId, Date.now() + HOT_RECOVERY_WINDOW_MS);
+        return sent;
       } else {
         // Send new message to group (will become the session root)
         return await this.sendToGroup(chatId, text);
@@ -490,6 +663,44 @@ export class FeishuProvider implements IMProvider {
     this.wsClient = null;
     this.client = null;
   }
+}
+
+function uniqueTargets(targets: FeishuRecoveryTarget[]): FeishuRecoveryTarget[] {
+  const seen = new Set<string>();
+  return targets.filter((target) => {
+    if (!target.rootMessageId || seen.has(target.rootMessageId)) return false;
+    seen.add(target.rootMessageId);
+    return true;
+  });
+}
+
+function isAfterCursor(item: any, target: FeishuRecoveryTarget): boolean {
+  const createdAt = Number(item.create_time);
+  if (!Number.isFinite(createdAt) || !item.message_id) return false;
+  if (createdAt > target.lastMessageAt) return true;
+  return createdAt === target.lastMessageAt && !target.lastMessageIds.includes(item.message_id);
+}
+
+function isAtOrBeforeCursor(item: any, target: FeishuRecoveryTarget): boolean {
+  const createdAt = Number(item.create_time);
+  if (!Number.isFinite(createdAt)) return false;
+  if (createdAt < target.lastMessageAt) return true;
+  return createdAt === target.lastMessageAt && target.lastMessageIds.includes(item.message_id);
+}
+
+function errorStatus(err: unknown): number | undefined {
+  const value = err as { status?: number; response?: { status?: number } } | null;
+  return value?.status || value?.response?.status;
+}
+
+function parseRetryAfterMs(err: unknown): number | undefined {
+  const value = err as {
+    response?: { headers?: Record<string, string | number | undefined> };
+  } | null;
+  const raw = value?.response?.headers?.["retry-after"];
+  if (raw === undefined) return undefined;
+  const seconds = Number(raw);
+  return Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined;
 }
 
 function configureLarkHttpInstance(httpInstance: ReturnType<typeof createProxyHttpClient>): void {

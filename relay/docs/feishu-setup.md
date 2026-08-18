@@ -119,8 +119,12 @@ Feishu uses one stable topic root per session to keep messages grouped and routa
 3. Later notifications are sent as threaded replies under that same root.
 4. Completion and ask-user replies mention the group to trigger attention.
 5. User replies in that topic are routed back to the matching tmux session.
-6. A five-second history poll recovers replies missed by the WebSocket and
-   deduplicates messages by their Feishu message ID.
+6. A bounded recovery scheduler checks at most one live session topic every 15
+   seconds and prioritizes topics that recently received a notification.
+7. Recovery positions and message IDs are persisted so daemon restarts and
+   WebSocket reconnects do not replay already handled input.
+8. Bindings for missing tmux sessions are skipped immediately and removed only
+   after they remain absent for 24 hours.
 
 No manual topic creation is required. Each Claude Code or Codex session creates
 its topic automatically and keeps using that binding.

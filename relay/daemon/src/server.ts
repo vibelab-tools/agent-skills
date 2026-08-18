@@ -266,6 +266,12 @@ export class Server {
           ...(this.feishuProvider ? [this.feishuProvider.name] : []),
         ],
         bindings,
+        feishuRecovery: this.feishuProvider
+          ? {
+              ...this.sessionManager.getFeishuBindingSummary(),
+              ...this.feishuProvider.getRecoveryStatus(),
+            }
+          : undefined,
       })
     );
   }

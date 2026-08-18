@@ -66,6 +66,22 @@ export function sessionExists(tmuxSession: string): boolean {
   }
 }
 
+/** List tmux sessions with one subprocess instead of probing every binding. */
+export function listSessions(): Set<string> {
+  try {
+    const output = execFileSync(tmuxCommand, ["list-sessions", "-F", "#{session_name}"], {
+      encoding: "utf8",
+      timeout: 3000,
+    });
+    return new Set(output.split("\n").map((value) => value.trim()).filter(Boolean));
+  } catch (err: any) {
+    if (err?.code === "ENOENT") {
+      log.error({ tmuxCommand }, "tmux executable not found");
+    }
+    return new Set();
+  }
+}
+
 function resolveTmuxCommand(): string {
   const candidates = [
     ...splitPath(process.env.PATH),

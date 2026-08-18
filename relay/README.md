@@ -214,8 +214,9 @@ API and routes replies by conversation binding.
 Feishu does not use the Cloudflare Worker. It connects through Feishu WebSocket
 and creates one root topic for each session. Later messages stay in that topic;
 completion and ask-user events mention the group so they remain noticeable. A
-five-second history poll recovers user replies missed by the WebSocket and
-deduplicates them by Feishu message ID.
+bounded recovery scheduler checks at most one live session topic every 15
+seconds, persists its message position, and recovers replies missed by the
+WebSocket without scanning historical bindings on every tick.
 
 ### Proxy Fields
 

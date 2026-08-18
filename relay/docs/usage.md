@@ -151,6 +151,11 @@ curl -s -X POST http://127.0.0.1:3580/send \
   -d '{"text":"relay test"}'
 ```
 
+The `feishuRecovery` status block reports the WebSocket state, live and missing
+binding counts, 15-second scheduler interval, requests made by the current
+daemon process, last successful recovery, and any active rate-limit backoff.
+These metrics do not include Feishu topic IDs or message content.
+
 Check that the relevant provider credentials are set. Telegram also requires a
 configured `worker.url`.
 

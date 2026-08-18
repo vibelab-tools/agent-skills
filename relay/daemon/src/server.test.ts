@@ -32,6 +32,12 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
       sent.push(options);
       return true;
     },
+    getRecoveryStatus: () => ({
+      websocketState: "connected",
+      schedulerIntervalMs: 15_000,
+      activeBindings: 1,
+      requestsSinceStart: 3,
+    }),
   };
   const server = new Server(
     config,
@@ -74,6 +80,17 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
       sessionManager.findByTmuxSession("codex-demo-abc123")?.feishuRootMessageId,
       "om_session"
     );
+
+    const statusResponse = await fetch(`http://127.0.0.1:${address.port}/status`);
+    const status = await statusResponse.json() as any;
+    assert.deepEqual(status.feishuRecovery, {
+      total: 1,
+      missing: 0,
+      websocketState: "connected",
+      schedulerIntervalMs: 15_000,
+      activeBindings: 1,
+      requestsSinceStart: 3,
+    });
   } finally {
     server.stop();
     rmSync(testDir, { recursive: true, force: true });

@@ -23,7 +23,7 @@ import { Poller } from "./poller";
 import { TelegramProvider } from "./providers/telegram";
 import { DingTalkProvider } from "./providers/dingtalk";
 import { FeishuProvider } from "./providers/feishu";
-import { injectText, sessionExists } from "./tmux-injector";
+import { injectText, listSessions, sessionExists } from "./tmux-injector";
 import { requestJson } from "./http";
 import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
@@ -47,6 +47,7 @@ async function main(): Promise<void> {
 
   // Initialize components
   const sessionManager = new SessionManager(config);
+  sessionManager.initializeFeishuRecovery();
 
   // 2026-03-17: Initialize all configured IM providers
   const enabledProviders: string[] = [];
@@ -92,23 +93,35 @@ async function main(): Promise<void> {
       const binding = sessionManager.findByFeishuRootMessage(rootMessageId);
       if (!binding) {
         log.warn({ rootMessageId }, "No binding for Feishu root message");
-        return;
+        return false;
+      }
+      const createdAt = msg.createdAtMs || msg.timestamp * 1000;
+      if (sessionManager.hasSeenFeishuMessage(rootMessageId, msg.id)) {
+        return true;
       }
       if (!sessionExists(binding.tmuxSession)) {
         log.warn({ tmuxSession: binding.tmuxSession }, "tmux session not found");
-        return;
+        return false;
       }
       // 2026-03-20: Build injection text with attachment file paths for agent sessions
       const injectionText = buildInjectionText(msg.text, msg.attachments);
       log.info({ tmuxSession: binding.tmuxSession }, "Injecting Feishu message");
-      injectText(binding.tmuxSession, injectionText);
+      if (injectText(binding.tmuxSession, injectionText)) {
+        sessionManager.rememberFeishuMessage(rootMessageId, msg.id);
+        return true;
+      }
+      return false;
     });
     await feishuProvider.connect();
-    feishuProvider.startPolling(() =>
-      sessionManager
-        .getAll()
-        .flatMap((binding) => binding.feishuRootMessageId || [])
-    );
+    feishuProvider.startRecovery({
+      getTargets: () => sessionManager.reconcileFeishuBindings(listSessions()),
+      onThreadResolved: (rootMessageId, threadId) => {
+        sessionManager.setFeishuThread(rootMessageId, threadId);
+      },
+      onMessageRecovered: (rootMessageId, messageId, createdAt) => {
+        sessionManager.advanceFeishuCursor(rootMessageId, messageId, createdAt);
+      },
+    });
     enabledProviders.push(feishuProvider.name);
   }
 
