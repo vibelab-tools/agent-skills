@@ -24,6 +24,13 @@ The script prints JSON containing source metadata, video metadata, timestamped
 frame paths, subtitle segments, acquisition decisions, and instructions for the
 agent.
 
+Generated evidence remains available while the agent reads it, then the agent
+must delete the returned `run_dir` before answering unless the user explicitly
+asks to retain it. Preparation failures remove their generated run directory.
+As a recovery measure, a later invocation prunes generated runs older than 24
+hours. Directories supplied with `--output-dir` are caller-managed and are never
+removed automatically.
+
 ## Install
 
 ~~~bash

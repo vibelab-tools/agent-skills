@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from contextlib import redirect_stderr
+import datetime as dt
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -91,11 +94,17 @@ class PromptTests(unittest.TestCase):
         self.assertIn("direct visual observations, transcript claims, and inference", instruction)
         self.assertIn("across multiple timestamps", instruction)
         self.assertIn("without reproducing the full transcript", instruction)
+        self.assertIn("delete run_dir and verify that it no longer exists", instruction)
 
     def test_instruction_does_not_invent_speech_without_subtitles(self):
         instruction = video.agent_instruction(False)
         self.assertIn("do not claim to know what was spoken", instruction)
         self.assertNotIn("transcript.kind and transcript.language", instruction)
+
+    def test_instruction_preserves_caller_managed_output_directory(self):
+        instruction = video.agent_instruction(False, generated_run=False)
+        self.assertIn("do not delete that caller-managed directory automatically", instruction)
+        self.assertNotIn("delete run_dir", instruction)
 
 
 class AnalysisRangeTests(unittest.TestCase):
@@ -169,6 +178,61 @@ class AnalysisRangeTests(unittest.TestCase):
         self.assertEqual(filtered["segment_count"], 1)
         self.assertEqual(filtered["segments"][0]["start_seconds"], 2.0)
         self.assertTrue(filtered["filtered_to_range"])
+
+
+class RunDirectoryLifecycleTests(unittest.TestCase):
+    def test_prune_stale_runs_only_removes_old_generated_directories(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output_root = Path(directory)
+            stale = output_root / "20260801T000000Z-old-video-1234abcd"
+            recent = output_root / "20260825T110000Z-recent-video-1234abcd"
+            unrelated = output_root / "keep-me"
+            stale.mkdir()
+            recent.mkdir()
+            unrelated.mkdir()
+
+            removed = video.prune_stale_runs(
+                output_root,
+                now=dt.datetime(2026, 8, 25, 12, 0, tzinfo=dt.UTC),
+            )
+
+            self.assertEqual(removed, [stale])
+            self.assertFalse(stale.exists())
+            self.assertTrue(recent.exists())
+            self.assertTrue(unrelated.exists())
+
+    def test_failed_preparation_removes_generated_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path = root / "config.json"
+            config = video.merge_known(video.DEFAULT_CONFIG, {"frame": {"output_root": str(root / "runs")}})
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            argv = ["analyze-video", str(root / "missing.mp4"), "--config", str(config_path)]
+
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                video, "resolve_command", return_value="/bin/true"
+            ), redirect_stderr(io.StringIO()):
+                result = video.main()
+
+            self.assertEqual(result, 1)
+            self.assertEqual(list((root / "runs").iterdir()), [])
+
+    def test_failed_preparation_preserves_explicit_output_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "caller-output"
+            output.mkdir()
+            sentinel = output / "keep.txt"
+            sentinel.write_text("keep", encoding="utf-8")
+            argv = ["analyze-video", str(root / "missing.mp4"), "--output-dir", str(output)]
+
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                video, "resolve_command", return_value="/bin/true"
+            ), redirect_stderr(io.StringIO()):
+                result = video.main()
+
+            self.assertEqual(result, 1)
+            self.assertTrue(sentinel.is_file())
 
 
 class SubtitleTests(unittest.TestCase):

@@ -36,6 +36,7 @@ VIDEO_EXTENSIONS = {
 DEFAULT_RUNTIME_ROOT = Path.home() / ".vibelab-tools" / "agent-skills" / "video-understanding"
 DEFAULT_CONFIG_PATH = DEFAULT_RUNTIME_ROOT / "config.json"
 DEFAULT_OUTPUT_ROOT = DEFAULT_RUNTIME_ROOT / "runs"
+STALE_RUN_MAX_AGE = dt.timedelta(hours=24)
 DEFAULT_QUESTION = (
     "Summarize this video. Describe visible scenes, people, objects, on-screen text, "
     "UI, actions, timing, and uncertainty."
@@ -89,6 +90,7 @@ PROXY_ENV_ORDER = (
     "http_proxy",
 )
 BROWSER_PRIORITY = ("chrome", "firefox", "edge", "brave", "chromium", "safari", "vivaldi", "opera")
+GENERATED_RUN_RE = re.compile(r"^(?P<timestamp>\d{8}T\d{6}Z)-.+-[0-9a-f]{8}$")
 
 
 class VideoError(Exception):
@@ -342,12 +344,43 @@ def safe_source_name(source: str) -> str:
     return "".join(ch if ch.isalnum() or ch in ("-", "_") else "-" for ch in raw)[:80] or "video"
 
 
+def generated_output_root(config: dict[str, Any]) -> Path:
+    configured_root = str(config["frame"].get("output_root") or "")
+    return Path(configured_root).expanduser() if configured_root else DEFAULT_OUTPUT_ROOT
+
+
+def prune_stale_runs(output_root: Path, now: dt.datetime | None = None) -> list[Path]:
+    if not output_root.is_dir():
+        return []
+    cutoff = (now or dt.datetime.now(dt.UTC)) - STALE_RUN_MAX_AGE
+    removed: list[Path] = []
+    try:
+        candidates = list(output_root.iterdir())
+    except OSError:
+        return []
+    for path in candidates:
+        match = GENERATED_RUN_RE.fullmatch(path.name)
+        if not match or path.is_symlink() or not path.is_dir():
+            continue
+        try:
+            created_at = dt.datetime.strptime(match.group("timestamp"), "%Y%m%dT%H%M%SZ").replace(tzinfo=dt.UTC)
+        except ValueError:
+            continue
+        if created_at > cutoff:
+            continue
+        try:
+            shutil.rmtree(path)
+        except OSError:
+            continue
+        removed.append(path)
+    return removed
+
+
 def create_run_dir(source: str, config: dict[str, Any], explicit: str | None) -> Path:
     if explicit:
         run_dir = Path(explicit).expanduser().resolve()
     else:
-        configured_root = str(config["frame"].get("output_root") or "")
-        output_root = Path(configured_root).expanduser() if configured_root else DEFAULT_OUTPUT_ROOT
+        output_root = generated_output_root(config)
         timestamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
         digest = f"{zlib.crc32(source.encode('utf-8')) & 0xFFFFFFFF:08x}"
         run_dir = output_root / f"{timestamp}-{safe_source_name(source)}-{digest}"
@@ -935,7 +968,16 @@ def source_metadata(info: dict[str, Any], url: str, video_path: Path) -> dict[st
     }
 
 
-def agent_instruction(has_transcript: bool) -> str:
+def cleanup_instruction(generated_run: bool) -> str:
+    if not generated_run:
+        return "The caller supplied --output-dir; do not delete that caller-managed directory automatically."
+    return (
+        "Before returning the final answer, delete run_dir and verify that it no longer exists unless the user "
+        "explicitly asked to retain the generated evidence."
+    )
+
+
+def agent_instruction(has_transcript: bool, generated_run: bool = True) -> str:
     transcript_text = (
         "Align transcript.segments with frame timestamps. Use transcript.kind and transcript.language to qualify "
         "subtitle reliability, especially for automatic captions, and verify names, numbers, and code against "
@@ -952,7 +994,8 @@ def agent_instruction(has_transcript: bool) -> str:
         + "Distinguish direct visual observations, transcript claims, and inference. Infer actions, motion, or "
         "transitions only from evidence across multiple timestamps. Cite timestamps for important moments. If the "
         "question is broad, summarize the structure, key moments, notable visuals, spoken content, and uncertainty "
-        "without reproducing the full transcript. State sampling gaps instead of inventing unseen motion or audio."
+        "without reproducing the full transcript. State sampling gaps instead of inventing unseen motion or audio. "
+        + cleanup_instruction(generated_run)
     )
 
 
@@ -970,6 +1013,9 @@ def fail(error: VideoError) -> int:
 
 def main() -> int:
     args = parse_args()
+    run_dir: Path | None = None
+    generated_run = False
+    evidence_ready = False
     try:
         config = load_config(args)
         if args.migrate_config:
@@ -984,6 +1030,9 @@ def main() -> int:
             raise VideoError("source is required unless --print-config or --migrate-config is used")
 
         source = args.source
+        generated_run = args.output_dir is None
+        if generated_run:
+            prune_stale_runs(generated_output_root(config))
         run_dir = create_run_dir(source, config, args.output_dir)
         ffmpeg = resolve_command(str(config["frame"]["ffmpeg"]), "ffmpeg")
         ffprobe = resolve_command(str(config["frame"]["ffprobe"]), "ffprobe")
@@ -1057,13 +1106,17 @@ def main() -> int:
             "frame_manifest": frame_manifest,
             "transcript": transcript,
             "run_dir": str(run_dir),
-            "agent_instruction": agent_instruction(bool(transcript.get("available"))),
-            "cleanup_instruction": "Delete run_dir after answering when no follow-up analysis is expected.",
+            "agent_instruction": agent_instruction(bool(transcript.get("available")), generated_run),
+            "cleanup_instruction": cleanup_instruction(generated_run),
         }
         print(json.dumps(payload, ensure_ascii=False, indent=2))
+        evidence_ready = True
         return 0
     except VideoError as exc:
         return fail(exc)
+    finally:
+        if generated_run and run_dir is not None and not evidence_ready:
+            shutil.rmtree(run_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":

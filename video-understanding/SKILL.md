@@ -42,7 +42,13 @@ either bound may be omitted.
    multiple timestamps and cite important moments.
 6. For a broad question, summarize structure, key moments, notable visuals,
    spoken content, and uncertainty without reproducing the full transcript.
-7. Delete run_dir after answering when no follow-up analysis is expected.
+7. Before returning the final answer, delete every generated `run_dir` created
+   by the current request and verify that each no longer exists. Retain
+   generated evidence only when the user explicitly asks; delete it when that
+   follow-up work finishes. Also clean up any reported generated `run_dir`
+   after an interrupted or failed analysis. Do not delete a caller-managed
+   `--output-dir`, and do not defer routine generated-output cleanup to the
+   user.
 
 ## URL Acquisition
 
@@ -63,6 +69,10 @@ For URLs, the script:
   macOS system proxy.
 
 The script never prints cookie values or proxy credentials.
+
+For generated output, each new invocation also removes run directories older
+than 24 hours as a recovery measure if an earlier agent missed cleanup. It does
+not automatically remove a caller-managed `--output-dir`.
 
 ## Evidence Limits
 

@@ -13,6 +13,9 @@ script.
 - Apply optional start/end bounds to frames and subtitles while preserving
   timestamps relative to the original video.
 - Keep downloaded videos, subtitles, and frames under one generated run_dir.
+- Require the agent to remove generated run_dir evidence before its final
+  answer, and prune generated runs older than 24 hours on a later invocation.
+  Never automatically delete a caller-managed --output-dir.
 - Never print cookies, browser data, or proxy credentials.
 - Treat local files as visual-only unless a future requirement explicitly adds
   local transcription.
