@@ -7,12 +7,16 @@ MarkItDown before analysis.
 
 Use this skill when an agent needs to inspect, summarize, extract, or reason
 over files and URLs that are awkward to read directly, such as PDF, Office
-documents, spreadsheets, presentations, images, audio, HTML, CSV, JSON, XML,
-ZIP, EPUB, Outlook messages, YouTube URLs, and other supported formats.
+documents, spreadsheets, presentations, audio, HTML, CSV, JSON, XML, ZIP, EPUB,
+Outlook messages, YouTube URLs, and other supported formats.
 
 The skill prefers MarkItDown as the first-pass reader and keeps the converted
 Markdown as the reasoning surface. Plain text, source code, and small Markdown
-files should still be read directly.
+files should still be read directly. Ordinary standalone screenshots, photos,
+UI captures, and diagrams should be inspected directly by the agent rather than
+converted through MarkItDown. Standalone-image conversion remains available
+when the user explicitly requests a converted Markdown/OCR artifact, batch OCR
+processing, or asset packaging.
 
 ## Dependencies
 
@@ -110,7 +114,7 @@ Supported asset sources:
 | `HTML/HTM` | Copies local image references and saves data-URI images. Remote HTTP images are left unchanged. |
 | `EPUB` | Extracts image files stored in the EPUB archive and rewrites matching local chapter links where possible. |
 | `ZIP` | Extracts image files stored in the archive. |
-| Standalone images | Copies the source image into the assets directory and indexes it. |
+| Standalone images | Copies and indexes the source only for explicit asset-packaging or conversion requests; ordinary viewing should be direct. |
 
 Legacy `.ppt` and `.xls` files remain text/table-only because embedded image
 extraction for those binary Office formats requires separate parsers.

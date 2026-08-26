@@ -1,20 +1,29 @@
 ---
 name: markitdown
-description: Convert documents, media, archives, and supported URLs to Markdown with Microsoft's MarkItDown. Use when an AI coding agent needs to read, inspect, summarize, extract, or analyze PDF, Word/DOCX, PowerPoint/PPTX, Excel/XLS/XLSX, images, audio, HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, YouTube URLs, or other binary/non-plain-text inputs; prefer MarkItDown before ad hoc parsers unless the task needs exact format-specific fidelity.
+description: Convert documents, archives, audio, and supported URLs to Markdown with Microsoft's MarkItDown. Use when an AI coding agent needs to extract or analyze PDF, Word/DOCX, PowerPoint/PPTX, Excel/XLS/XLSX, audio, HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, YouTube URLs, or other non-plain-text inputs, and only for standalone images when the user explicitly requests a converted Markdown/OCR artifact or batch OCR processing. Do not use for ordinary screenshots, photos, UI captures, or diagrams that Codex can inspect directly.
 ---
 
 # MarkItDown
 
 ## Overview
 
-Use Microsoft's MarkItDown to turn supported files and URLs into Markdown before reasoning over their content. Treat it as the first-pass reader for document and media formats that are awkward to inspect directly.
+Use Microsoft's MarkItDown to turn supported files and URLs into Markdown before reasoning over their content. Treat it as the first-pass reader for compound documents and media formats that are awkward to inspect directly, not as an image-viewing layer.
 
 Official source: https://github.com/microsoft/markitdown
 
 ## Workflow
 
 1. Decide whether conversion is useful.
-   - Use MarkItDown for PDF, Office files, spreadsheets, presentations, images, audio, HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, and supported web/video URLs.
+   - Inspect standalone screenshots, photos, UI captures, and diagrams directly
+     with the available image-viewing capability. Do not invoke MarkItDown just
+     to identify a page, read visible text, describe a UI, compare screenshots,
+     or interpret a diagram.
+   - Use MarkItDown for a standalone image only when the user explicitly asks
+     for a converted Markdown/OCR artifact, batch OCR processing, or asset
+     packaging.
+   - Use MarkItDown for PDF, Office files, spreadsheets, presentations, audio,
+     HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, and supported web/video
+     URLs.
    - Read plain text, Markdown, source code, and small structured text files directly when conversion adds no value.
 
 2. Prefer the managed executable installed by this skill, then fall back to an
@@ -72,7 +81,8 @@ Official source: https://github.com/microsoft/markitdown
    - XLSX: worksheet images with sheet/cell metadata when available.
    - HTML/HTM: local and data-URI image references. Remote HTTP images are left unchanged.
    - EPUB and ZIP: image files stored in the archive.
-   - Standalone image files: copied into the assets directory and indexed.
+   - Standalone image files: copied and indexed only when explicit asset
+     packaging is requested; ordinary image inspection does not need this path.
 
    Legacy `.ppt` and `.xls` files still use normal MarkItDown conversion; embedded
    image extraction is not implemented for those binary Office formats.
@@ -104,12 +114,17 @@ Keep plugins disabled unless the user explicitly asks for a plugin-backed format
 
 ## Output Checks
 
+- For a standalone image, prefer direct inspection and skip Markdown conversion
+  unless one of the explicit image-conversion conditions above applies.
 - Confirm the Markdown file exists and is non-empty before relying on it.
 - Skim headings, tables, and extracted text to catch obvious conversion failures.
 - When using `markitdown-assets`, inspect `manifest.json` for exact local image
   paths before claiming image content has been understood.
 - For ZIP files, expect MarkItDown to iterate over contents; inspect the generated section boundaries before summarizing.
-- For scanned PDFs, image-heavy slides, photos, or audio, conversion may be sparse depending on available optional dependencies and local OCR/transcription support. Use `markitdown-assets` to preserve visual evidence locally, then inspect the extracted images directly when visual content matters.
+- For scanned PDFs, image-heavy slides, or audio, conversion may be sparse
+  depending on available optional dependencies and local OCR/transcription
+  support. Use `markitdown-assets` to preserve embedded visual evidence locally,
+  then inspect the extracted images directly when visual content matters.
 
 ## Safety
 
