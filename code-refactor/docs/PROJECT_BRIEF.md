@@ -2,14 +2,14 @@
 
 ## Background
 
-The local `code-refactor` skill originally relied on lightweight heuristic
+The former `code-refactor` Skill relied on lightweight heuristic
 tools for complexity and smell signals. Those predecessors provided useful
 quick feedback, but extension detection, regular expressions, and text
 heuristics were fragile for multi-line constructs, nested syntax, comments,
 strings, language-specific declarations, and modern syntax.
 
 This project now maintains the parser-backed Java/Maven tool suite and the
-installable `skill/code-refactor` snapshot. The skill-facing scripts are
+installable `skill/code-quality-review` snapshot. The skill-facing scripts are
 extensionless wrappers around a packaged JAR:
 
 - `scripts/analyze-complexity`
@@ -19,9 +19,10 @@ extensionless wrappers around a packaged JAR:
 
 ## Primary Goal
 
-Maintain and refine a local CLI tool suite that analyzes source files using AST
-or parse-tree data and emits stable JSON that Codex can use when deciding
-whether and how to refactor code.
+Maintain a local CLI tool suite that gives Codex compact, trustworthy evidence
+during post-change code-quality review. The tools support the decision whether a
+current change warrants a small behavior-preserving refactor; they do not make
+that decision for the agent.
 
 ## Tooling Scope
 
@@ -64,20 +65,21 @@ See `LANGUAGE_SUPPORT.md` for precision levels and known limitations.
 - The CLI analyzes Java through the JDK compiler AST API and the requested
   non-Java language set through Tree-sitter adapters.
 - JSON output is schema-versioned and documented.
-- File, function, method, and class length thresholds from the `code-refactor`
-  skill are represented as configurable refactor signals.
+- File, function, method, and class length thresholds used by the
+  `code-quality-review` Skill are represented as configurable refactor signals.
 - The 24 Chapter 3 bad smells are represented by detector classes named from
   the original English smell names and coordinated by a single dispatcher.
 - Parser errors are included in reports with line and column data when
   available.
-- The implementation is tested with fixtures, including Java per-smell tests
-  and a requested-language x 24-smell matrix.
+- The implementation is tested with focused positive and negative fixtures,
+  including reproduced defects from representative real repositories.
 - The installable skill wrappers can call the packaged CLI without breaking
   existing skill workflows.
 
 ## Non-Goals
 
 - Do not build an automatic refactoring engine.
+- Do not synthesize a smell solely to satisfy language-by-smell coverage.
 - Do not enforce complexity as a hard failure by default.
 - Do not attempt full semantic type checking for every language.
 - Do not claim generic SQL support without naming dialect coverage.
@@ -111,3 +113,6 @@ make it clear:
 - what smells were detected,
 - what confidence level each signal has,
 - what language adapter produced the signal.
+
+A successful report with zero smells is a valid and desirable result when the
+structured evidence does not support a finding.

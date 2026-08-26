@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SMELL_MAP = ROOT / "src/main/resources/com/codex/refactor/refactoring/smell-refactoring-map.json"
 CATALOG = ROOT / "src/main/resources/com/codex/refactor/refactoring/refactorings-catalog.json"
 PLAYBOOKS = ROOT / "src/main/resources/com/codex/refactor/refactoring/refactoring-playbooks.json"
-OUTPUT = ROOT / "skill/code-refactor/references/smell-to-refactoring.md"
-SMELL_DIR = ROOT / "skill/code-refactor/references/smells"
-REFACTORING_DIR = ROOT / "skill/code-refactor/references/refactorings"
+OUTPUT = ROOT / "skill/code-quality-review/references/smell-to-refactoring.md"
+SMELL_DIR = ROOT / "skill/code-quality-review/references/smells"
+REFACTORING_DIR = ROOT / "skill/code-quality-review/references/refactorings"
 
 
 def slug(value: str) -> str:

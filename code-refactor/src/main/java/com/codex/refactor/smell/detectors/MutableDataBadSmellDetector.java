@@ -34,7 +34,7 @@ public final class MutableDataBadSmellDetector extends BookBadSmellDetector {
                         "Reduce mutation scope, encapsulate writes, or replace derived mutable state with queries."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<MutableDataCandidate> candidate(JavaFieldInfo field) {
@@ -47,7 +47,7 @@ public final class MutableDataBadSmellDetector extends BookBadSmellDetector {
         if (field.assignedByMethods().size() >= 2) {
             signals.add("multiple_writers");
         }
-        if (field.publicField() && !field.finalField()) {
+        if (field.publicField() && !field.finalField() && mutableContainer) {
             signals.add(moduleGlobal ? "module_level_mutable_state" : "public_mutable_field");
         }
         if (field.finalField() && field.publicField() && mutableContainer) {

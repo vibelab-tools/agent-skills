@@ -48,7 +48,7 @@ public final class LongParameterListBadSmellDetector extends BookBadSmellDetecto
                         suggestion(method)
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static String severity(JavaMethodInfo method) {

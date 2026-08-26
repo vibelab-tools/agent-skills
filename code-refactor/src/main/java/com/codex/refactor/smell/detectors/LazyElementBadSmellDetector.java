@@ -52,7 +52,7 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
                 && (!context.analysis().classes().isEmpty() || !context.analysis().methods().isEmpty())) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<ClassCandidate> classCandidate(JavaClassInfo classInfo) {
@@ -63,9 +63,6 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
                 .filter(method -> !method.constructor())
                 .toList();
         List<String> signals = new ArrayList<>();
-        if (classInfo.fields().isEmpty() && methods.isEmpty() && classInfo.physicalLines() <= 8) {
-            signals.add("empty_class");
-        }
         if (placeholderName(classInfo.name()) && classInfo.physicalLines() <= 16 && methods.size() <= 1) {
             signals.add("placeholder_named_type");
         }
@@ -136,11 +133,11 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
 
     private record ClassCandidate(JavaClassInfo classInfo, List<String> signals, int methodCount) {
         String severity() {
-            return signals.contains("empty_class") || signals.contains("placeholder_named_type") ? "medium" : "low";
+            return signals.contains("placeholder_named_type") ? "medium" : "low";
         }
 
         String confidence() {
-            return signals.size() >= 2 || signals.contains("empty_class") ? "high" : "medium";
+            return signals.size() >= 2 ? "high" : "medium";
         }
 
         Map<String, Object> evidence() {

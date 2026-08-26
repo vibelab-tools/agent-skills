@@ -1,6 +1,6 @@
-# Code Refactor Tools
+# Code Quality Review Tools
 
-Parser-backed analysis tools for the local `code-refactor` Agent Skill.
+Parser-backed analysis tools for the local `code-quality-review` Agent Skill.
 
 The project provides a versioned Java/Maven CLI, a packaged executable JAR, and
 an installable skill snapshot. The tools analyze source code through AST or
@@ -21,16 +21,19 @@ This project now contains a Maven-based Java CLI implementation with:
   default,
 - a `plan-refactor` command that turns `detect-smells` JSON into a bounded
   refactoring execution plan,
+- a `review-changes` wrapper that restricts complexity and optional smell
+  evidence to current Git diff line ranges,
 - JUnit coverage for CLI behavior, Java smell rules, directory scanning,
-  parser-backed language coverage, and a 15-language x 24-smell matrix for the
-  requested non-Java set.
+  parser-backed language behavior, meaningful negative cases, and reproduced
+  real-repository defects.
 
 Current skill-facing tools:
 
-- `skill/code-refactor/scripts/analyze-complexity`
-- `skill/code-refactor/scripts/detect-smells`
-- `skill/code-refactor/scripts/plan-refactor`
-- `skill/code-refactor/scripts/code-refactor-tools`
+- `skill/code-quality-review/scripts/review-changes`
+- `skill/code-quality-review/scripts/analyze-complexity`
+- `skill/code-quality-review/scripts/detect-smells`
+- `skill/code-quality-review/scripts/plan-refactor`
+- `skill/code-quality-review/scripts/code-refactor-tools`
 
 The installed skill uses the same extensionless wrapper script names when this
 workspace is installed with `make install`. Older Python script names are
@@ -50,11 +53,11 @@ The project produces these user-facing capabilities:
   owners repeatedly change together.
 - Refactoring planning: saved smell reports can be ranked into first safe
   refactoring steps with `plan-refactor`; large reports should be written under
-  `${XDG_CACHE_HOME:-$HOME/.cache}/code-refactor/<run-name>/`.
+  `${XDG_CACHE_HOME:-$HOME/.cache}/code-quality-review/<run-name>/`.
 - Directory scans default to supported source languages, so IDE metadata,
   compiled outputs, docs, and archives are not reported as unsupported unless
   they are passed explicitly.
-- Generated skill references expand the smell-to-refactoring map into
+- Generated Skill references expand the smell-to-refactoring map into
   per-smell and per-refactoring strategy cards, loaded only when a concrete
   refactoring slice needs them.
 
@@ -66,8 +69,7 @@ Build and validation dependencies:
 
 - JDK 21. The Maven project compiles with `maven.compiler.release=21`.
 - Maven 3.8+ or a compatible `mvn` executable available on `PATH`.
-- Python 3 for regenerating generated reference files with
-  `scripts/generate-smell-refactoring-reference.py`.
+- Python 3 for the changed-code review wrapper and regenerating reference files.
 - `rsync` for installing the bundled skill snapshot into Codex and Claude Code
   skill directories.
 - Network access to Maven repositories on the first build, unless dependencies
@@ -77,9 +79,9 @@ Installed skill runtime dependencies:
 
 - A Java 21-compatible runtime available as `java` on `PATH`. The installed
   wrapper scripts invoke the packaged shaded JAR under
-  `skill/code-refactor/assets/code-refactor-tools.jar`.
-- No Python runtime is required for normal installed-skill execution. The Python
-  script in this repository is only used to regenerate Markdown reference files.
+  `skill/code-quality-review/assets/code-refactor-tools.jar`.
+- Python 3 is required by `scripts/review-changes`; the Java wrappers remain
+  available for direct analysis without Python.
 
 Bundled Java dependencies include Jackson for JSON output and Tree-sitter parser
 packages for the non-Java language adapters. They are packaged into the shaded
@@ -102,9 +104,9 @@ When a new agent session starts in this directory, follow the read order in
 `docs/LANGUAGE_SUPPORT.md`; before relying on detector behavior, run
 `mvn test`.
 
-Current refinement work should improve language-specific source-model
-extraction quality without weakening the existing requested-language x
-24-smell coverage matrix.
+Current refinement work should improve real-repository precision. Zero findings
+is valid when structured evidence does not support a smell; do not trade
+precision for language-by-smell count coverage.
 
 ## Documentation Index
 
@@ -120,8 +122,8 @@ extraction quality without weakening the existing requested-language x
 - `docs/IMPLEMENTATION_PLAN.md`: staged implementation plan and acceptance
   criteria.
 - `docs/LANGUAGE_SUPPORT.md`: target language matrix and known risks.
-- `docs/SMELL_MATURITY.md`: current 24-smell maturity matrix and next precision
-  targets.
+- `docs/SMELL_MATURITY.md`: precision levels and promotion rules for smell
+  evidence.
 
 ## Skill Packaging And Installation
 
@@ -137,17 +139,18 @@ Before installing, verify:
 - parser errors are reported cleanly,
 - the live skill can invoke the new tool without breaking existing workflows.
 
-The repository contains the installable skill snapshot under `skill/code-refactor`.
+The repository contains the installable Skill snapshot under
+`skill/code-quality-review`.
 
 Use the Makefile for local packaging and explicit skill installation:
 
 ```bash
 make             # build the Maven package
 make references  # regenerate generated skill reference files
-make validate    # build, refresh skill/code-refactor/assets/code-refactor-tools.jar, and validate the skill
+make validate    # build, refresh skill/code-quality-review/assets/code-refactor-tools.jar, and validate the Skill
 make install          # install to $CODEX_HOME/skills and $CLAUDE_HOME/skills
-make install-codex    # install only to $CODEX_HOME/skills/code-refactor
-make install-claude   # install only to $CLAUDE_HOME/skills/code-refactor
+make install-codex    # install only to $CODEX_HOME/skills/code-quality-review
+make install-claude   # install only to $CLAUDE_HOME/skills/code-quality-review
 make uninstall        # remove both installed copies
 make purge            # same as uninstall; this skill has no runtime config
 ```

@@ -98,7 +98,7 @@ public final class DataClumpsBadSmellDetector extends BookBadSmellDetector {
                 .sorted(Comparator.comparing(DataGroupAccumulator::groupKey))
                 .map(accumulator -> finding(accumulator))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(DataGroupAccumulator accumulator) {

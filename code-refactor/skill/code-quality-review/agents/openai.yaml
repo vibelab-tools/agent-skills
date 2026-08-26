@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Quality Review"
+  short_description: "Review changed code before refactoring"
+  default_prompt: "Use $code-quality-review to inspect my current code changes and decide whether a small refactor is justified."

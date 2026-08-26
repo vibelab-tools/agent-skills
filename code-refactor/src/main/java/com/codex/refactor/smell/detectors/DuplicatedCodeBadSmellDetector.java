@@ -55,7 +55,7 @@ public final class DuplicatedCodeBadSmellDetector extends BookBadSmellDetector {
                 .map(this::finding)
                 .sorted(Comparator.comparing(finding -> (String) finding.location().get("symbol")))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(List<DuplicateCandidate> candidates) {

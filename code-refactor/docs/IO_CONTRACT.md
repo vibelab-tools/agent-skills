@@ -4,7 +4,7 @@
 
 JSON is the primary contract. Human-readable text is secondary.
 
-The JSON schema must be versioned so the `code-refactor` skill can consume it
+The JSON schema must be versioned so the `code-quality-review` Skill can consume it
 without guessing which fields exist.
 
 ## Commands
@@ -119,6 +119,10 @@ code-refactor-tools detect-smells --json --history-analysis git src
 The smell detector uses parser-backed metrics plus threshold rules. It should not
 modify files.
 
+Detectors do not synthesize keyword-only fallback findings. A successful report
+with `total_smells: 0` is valid when structured evidence does not support a
+finding.
+
 Unsupported non-source files are not included in directory scans by default.
 
 History analysis is also opt-in. With `--history-analysis git`, the tool reads
@@ -132,7 +136,7 @@ across several owners become `history_confirmed` evidence.
 Examples:
 
 ```bash
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/code-refactor/my-run"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/code-quality-review/my-run"
 mkdir -p "$CACHE_DIR"
 code-refactor-tools detect-smells --json --min-confidence medium src > "$CACHE_DIR/smells.json"
 code-refactor-tools plan-refactor --json --max-findings 20 "$CACHE_DIR/smells.json"

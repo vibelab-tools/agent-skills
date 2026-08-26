@@ -5,8 +5,8 @@
 Use Java + Maven as the primary implementation stack.
 
 ANTLR is Java-native operationally, Maven can pin the tool/runtime/plugin
-versions, and a single JVM CLI is easier to package into the `code-refactor`
-skill than a large set of generated Python parser modules.
+versions, and a single JVM CLI is easier to package into the
+`code-quality-review` Skill than a large set of generated Python parser modules.
 
 The current implementation also uses Tree-sitter Java bindings for broad
 multi-language parse-tree coverage. This is a pragmatic backend for languages
@@ -30,7 +30,7 @@ code-refactor-tools/
 │       ├── java/
 │       └── resources/fixtures/
 ├── docs/
-└── skill/code-refactor/
+└── skill/code-quality-review/
     ├── assets/code-refactor-tools.jar
     ├── scripts/
     └── references/
@@ -298,11 +298,10 @@ inside `if`/loop bodies are not double-counted. This is covered by a Tree-sitter
 JavaScript regression test and should be preserved when adding new grammar node
 types.
 
-This gives every requested language a parser-backed analysis path and the test
-suite asserts that each requested non-Java language can report every one of the
-24 Chapter 3 smell IDs. The implementation combines source-model findings with
-language-neutral low-confidence fallback evidence when a smell is too semantic
-for the current parse model.
+This gives every requested language a parser-backed analysis path. Detectors
+report only when the neutral model, project index, or Git history contains the
+required evidence. The test suite uses positive and negative behavior fixtures;
+it does not require every smell to appear for every language.
 
 Duplicated Code uses normalized statement-shape fingerprints in addition to
 exact method-body matching. Local names, primitive type tokens, and literals are
@@ -364,18 +363,16 @@ Speculative Generality uses project-level inheritance, implementation, field,
 parameter, return-type, and local-variable references when available. It reports
 unused abstractions, tiny single-implementation abstractions, and
 future/generic/extension-style names only when actual subtype/reference evidence
-is weak. For Java files with the JDK AST class model, low-confidence token
-fallback is suppressed after the AST rule decides there is no finding; fallback
-remains available for Tree-sitter languages whose class extraction is broader and
-less semantic.
+is weak. When that structural evidence is unavailable, the detector reports no
+finding instead of inferring intent from names alone.
 
 Message Chains use a structured chain model when parser evidence is available:
 root, selectors, depth, line, chain text, and chain kind. The detector reports
 object-navigation chains and repeated internal prefixes, including repeated
 medium-depth prefixes on the same expression line, while filtering common
 fluent APIs, static accesses, self accesses, and package-qualified accesses.
-Languages whose generic parse model does not expose chain nodes may still use
-the low-confidence text fallback.
+Languages whose generic parse model does not expose chain nodes report no
+Message Chains finding.
 
 Data Clumps use semantic data-group detection for parser-backed models. The
 detector normalizes parameter, field, and repeated call-argument names,
@@ -411,8 +408,7 @@ switch-like if/else-if chains that compare the same selector against multiple
 literal or enum-like labels. Tree-sitter now records generic switch/match nodes
 and common if/else equality dispatches from condition subtrees. The detector
 then reports repeated selector dispatches and repeated branch-label sets across
-methods, while avoiding the old low-confidence text fallback when structured
-dispatch evidence exists but does not repeat.
+methods. Non-repeating structured dispatch produces no finding.
 
 Middle Man uses structured delegation evidence for Java. The analyzer records
 single-statement methods that directly return or call a field delegate, including
@@ -431,14 +427,12 @@ access counts when available. The detector groups object-navigation chains by
 collaborator root and type, scores deep collaborator structure access,
 multi-collaborator intimate access, and selectors with internal/private/secret
 style names, while filtering mapper/assembler/serializer/adapter style
-projection roles unless they expose internal-named details. For Java sources
-with structured chain evidence, the detector does not fall back to plain text
-tokens after a non-match. When a project index is available, evidence also
+projection roles unless they expose internal-named details. When a project index
+is available, evidence also
 records whether the collaborator type exists in the project, resolved calls to
 that type, and reciprocal deep object-navigation from the collaborator back into
 the current owner. Bidirectional intimate access can raise confidence through
-deterministic evidence. Non-Java adapters may still use low-confidence fallback
-evidence.
+deterministic evidence. Missing relationship evidence yields no finding.
 
 Alternative Classes with Different Interfaces compares semantic class and method
 roles extracted from parser data. Method names are split into action/object
@@ -568,10 +562,11 @@ wrappers if needed.
 
 ## Integration With The Skill
 
-The repository includes an installable skill snapshot under `skill/code-refactor`.
+The repository includes an installable Skill snapshot under
+`skill/code-quality-review`.
 The live skill should be updated from that snapshot with `make validate` and
 `make install`, not by hand-editing
-`${CODEX_HOME:-~/.codex}/skills/code-refactor`.
+`${CODEX_HOME:-~/.codex}/skills/code-quality-review`.
 
 The skill can call this tool in one of two ways:
 
@@ -581,6 +576,7 @@ The skill can call this tool in one of two ways:
    - `java -jar code-refactor-tools.jar plan-refactor --json <smells.json>`
 
 2. Thin wrapper scripts inside the skill:
+   - `scripts/review-changes`
    - `scripts/analyze-complexity`
    - `scripts/detect-smells`
    - `scripts/plan-refactor`
@@ -590,5 +586,5 @@ Wrappers are acceptable if they keep the skill invocation stable while the
 implementation lives in a packaged JAR.
 
 Large generated reports should be written under
-`${XDG_CACHE_HOME:-$HOME/.cache}/code-refactor/<run-name>/`, not into the
+`${XDG_CACHE_HOME:-$HOME/.cache}/code-quality-review/<run-name>/`, not into the
 analyzed repository or the skill development workspace.

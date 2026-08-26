@@ -190,7 +190,7 @@ class RefactoringCatalogTest {
 
     @Test
     void skillReferenceUsesOnlyCatalogBackedRefactoringNames() throws Exception {
-        String reference = Files.readString(Path.of("skill/code-refactor/references/smell-to-refactoring.md"));
+        String reference = Files.readString(Path.of("skill/code-quality-review/references/smell-to-refactoring.md"));
         Map<String, List<String>> referenceBySmell = new LinkedHashMap<>();
 
         for (String line : reference.split("\\R")) {

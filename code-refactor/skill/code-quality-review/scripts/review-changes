@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""Emit a compact complexity/smell review for changed production code."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+SOURCE_SUFFIXES = {
+    ".bash", ".c", ".cc", ".cpp", ".cs", ".css", ".cxx", ".go", ".h", ".hpp",
+    ".html", ".java", ".js", ".jsx", ".mjs", ".py", ".rb", ".rs", ".sh", ".sql",
+    ".ts", ".tsx", ".vue",
+}
+EXCLUDED_PARTS = {
+    ".git", ".next", ".nuxt", "build", "coverage", "dist", "fixtures",
+    "migrations", "node_modules", "snapshots", "target", "test", "tests", "vendor",
+}
+HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=root,
+        check=check,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+
+def repository_root() -> Path:
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return Path(result.stdout.strip()).resolve()
+
+
+def changed_paths(root: Path, base: str) -> tuple[list[Path], set[Path]]:
+    tracked = git(root, "diff", "--name-only", "-z", "--diff-filter=ACMR", base, "--")
+    untracked_result = git(root, "ls-files", "--others", "--exclude-standard", "-z")
+    tracked_paths = [Path(value.decode()) for value in tracked.stdout.split(b"\0") if value]
+    untracked = {Path(value.decode()) for value in untracked_result.stdout.split(b"\0") if value}
+    ordered = list(dict.fromkeys([*tracked_paths, *sorted(untracked)]))
+    return ordered, untracked
+
+
+def reviewable_source(root: Path, relative: Path) -> bool:
+    lower_parts = {part.lower() for part in relative.parts}
+    if lower_parts & EXCLUDED_PARTS:
+        return False
+    name = relative.name.lower()
+    if any(token in name for token in (".generated.", ".min.js", ".spec.", ".test.")):
+        return False
+    if name.startswith("test_") or "_test." in name:
+        return False
+    path = root / relative
+    if relative.suffix.lower() in SOURCE_SUFFIXES:
+        return path.is_file()
+    try:
+        with path.open(encoding="utf-8", errors="ignore") as source:
+            first_line = source.readline().lower()
+    except OSError:
+        return False
+    return first_line.startswith("#!") and any(
+        language in first_line for language in ("python", "ruby", "bash", "/sh", " sh")
+    )
+
+
+def line_ranges(root: Path, base: str, relative: Path, untracked: bool) -> list[list[int]]:
+    if untracked:
+        try:
+            line_count = len((root / relative).read_text(encoding="utf-8", errors="ignore").splitlines())
+        except OSError:
+            return []
+        return [[1, max(1, line_count)]]
+    result = git(root, "diff", "--unified=0", "--no-color", base, "--", str(relative))
+    ranges: list[list[int]] = []
+    for line in result.stdout.decode(errors="replace").splitlines():
+        match = HUNK.match(line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        count = int(match.group(2) or "1")
+        if count > 0:
+            ranges.append([start, start + count - 1])
+    return merge_ranges(ranges)
+
+
+def merge_ranges(ranges: list[list[int]]) -> list[list[int]]:
+    merged: list[list[int]] = []
+    for start, end in sorted(ranges):
+        if merged and start <= merged[-1][1] + 1:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged
+
+
+def overlaps(location: dict[str, object], ranges: list[list[int]]) -> bool:
+    start = int(location.get("start_line") or location.get("line") or 0)
+    end = int(location.get("end_line") or start)
+    return any(start <= range_end and end >= range_start for range_start, range_end in ranges)
+
+
+def function_with_signals(function: dict[str, object]) -> dict[str, object]:
+    result = dict(function)
+    metrics = function.get("metrics") or {}
+    signals = []
+    if int(metrics.get("physical_lines") or 0) >= 50:
+        signals.append("long_function")
+    if int(metrics.get("cyclomatic_complexity") or 0) >= 10:
+        signals.append("high_cyclomatic_complexity")
+    if int(metrics.get("cognitive_complexity") or 0) >= 15:
+        signals.append("high_cognitive_complexity")
+    if int(metrics.get("max_nesting_depth") or 0) >= 4:
+        signals.append("deep_nesting")
+    result["review_signals"] = signals
+    return result
+
+
+def run_tool(tool: Path, root: Path, command: str, paths: list[Path]) -> dict[str, object]:
+    args = [str(tool), command, "--json"]
+    if command == "detect-smells":
+        args.extend(["--min-confidence", "high"])
+    args.extend(str(path) for path in paths)
+    result = subprocess.run(args, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or f"{command} exited with {result.returncode}")
+    return json.loads(result.stdout)
+
+
+def compact_report(
+    root: Path,
+    ranges_by_path: dict[Path, list[list[int]]],
+    complexity: dict[str, object],
+    smells: dict[str, object] | None,
+    base: str,
+) -> dict[str, object]:
+    smells_by_path = {
+        Path(file["path"]): file.get("smells", [])
+        for file in (smells or {}).get("files", [])
+    }
+    files = []
+    hotspot_count = 0
+    smell_count = 0
+    for file in complexity.get("files", []):
+        relative = Path(file["path"])
+        ranges = ranges_by_path.get(relative, [])
+        changed_functions = [
+            function_with_signals(function)
+            for function in file.get("functions", [])
+            if overlaps(function.get("location", {}), ranges)
+        ]
+        changed_classes = [
+            class_info
+            for class_info in file.get("classes", [])
+            if overlaps(class_info.get("location", {}), ranges)
+        ]
+        candidates = [
+            smell
+            for smell in smells_by_path.get(relative, [])
+            if overlaps(smell.get("location", {}), ranges)
+        ]
+        hotspot_count += sum(bool(function["review_signals"]) for function in changed_functions)
+        smell_count += len(candidates)
+        files.append({
+            "path": str(relative),
+            "language": file.get("language"),
+            "status": file.get("status"),
+            "changed_line_ranges": ranges,
+            "file_metrics": file.get("metrics"),
+            "changed_functions": changed_functions,
+            "changed_classes": changed_classes,
+            "smell_candidates": candidates,
+            "parse_errors": file.get("parse_errors", []),
+            "warnings": file.get("warnings", []),
+        })
+    return {
+        "schema_version": "1.0",
+        "tool": "review-changes",
+        "status": "ok",
+        "repository_root": str(root),
+        "base": base,
+        "summary": {
+            "changed_production_files": len(files),
+            "changed_functions": sum(len(file["changed_functions"]) for file in files),
+            "hotspot_functions": hotspot_count,
+            "smell_candidates": smell_count,
+        },
+        "files": files,
+        "warnings": [],
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base", default="HEAD", help="Git base for the working-tree review")
+    parser.add_argument("--smells", action="store_true", help="Include high-confidence smell candidates")
+    args = parser.parse_args()
+
+    try:
+        root = repository_root()
+        paths, untracked = changed_paths(root, args.base)
+        paths = [path for path in paths if reviewable_source(root, path)]
+        ranges = {
+            path: line_ranges(root, args.base, path, path in untracked)
+            for path in paths
+        }
+        ranges = {path: value for path, value in ranges.items() if value}
+        paths = list(ranges)
+        if not paths:
+            print(json.dumps({
+                "schema_version": "1.0",
+                "tool": "review-changes",
+                "status": "ok",
+                "repository_root": str(root),
+                "base": args.base,
+                "summary": {
+                    "changed_production_files": 0,
+                    "changed_functions": 0,
+                    "hotspot_functions": 0,
+                    "smell_candidates": 0,
+                },
+                "files": [],
+                "warnings": ["No changed production source files were found."],
+            }, indent=2))
+            return 0
+        tool = Path(__file__).resolve().with_name("code-refactor-tools")
+        complexity = run_tool(tool, root, "analyze-complexity", paths)
+        smells = run_tool(tool, root, "detect-smells", paths) if args.smells else None
+        print(json.dumps(compact_report(root, ranges, complexity, smells, args.base), indent=2))
+        return 0
+    except (OSError, subprocess.CalledProcessError, RuntimeError, json.JSONDecodeError) as error:
+        print(f"review-changes: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

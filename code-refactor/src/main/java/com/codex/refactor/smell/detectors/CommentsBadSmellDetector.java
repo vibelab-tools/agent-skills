@@ -75,7 +75,7 @@ public final class CommentsBadSmellDetector extends BookBadSmellDetector {
                 .map(this::methodFinding)
                 .forEach(findings::add);
 
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding commentFinding(

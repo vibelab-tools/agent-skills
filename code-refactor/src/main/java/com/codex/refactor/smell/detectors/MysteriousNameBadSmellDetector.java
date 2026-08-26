@@ -66,7 +66,7 @@ public final class MysteriousNameBadSmellDetector extends BookBadSmellDetector {
                 ));
             }
         });
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private List<SmellFinding> parameterFindings(JavaMethodInfo method) {

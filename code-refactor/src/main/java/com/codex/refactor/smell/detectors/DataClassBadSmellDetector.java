@@ -40,7 +40,7 @@ public final class DataClassBadSmellDetector extends BookBadSmellDetector {
                         "Move behavior that uses this data into the class, or make it an explicit immutable value object."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<DataClassCandidate> candidate(JavaClassInfo classInfo) {

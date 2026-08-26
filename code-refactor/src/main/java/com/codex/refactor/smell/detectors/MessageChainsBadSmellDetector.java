@@ -31,7 +31,7 @@ public final class MessageChainsBadSmellDetector extends BookBadSmellDetector {
                 .flatMap(Optional::stream)
                 .toList();
         if (findings.isEmpty() && context.analysis().methods().stream().allMatch(method -> method.messageChains().isEmpty())) {
-            return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+            return findings;
         }
         return findings;
     }
@@ -54,6 +54,9 @@ public final class MessageChainsBadSmellDetector extends BookBadSmellDetector {
 
         String signal = longChain ? "long_object_navigation_chain" : "repeated_chain_prefix";
         int maxDepth = longest.depth();
+        boolean corroboratedAcrossLines = maxDepth >= 5
+                && repeatedPrefix != null
+                && repeatedPrefix.lineCount() >= 2;
         List<Integer> lines = chains.stream()
                 .filter(chain -> longChain ? chain.depth() >= 4 : chain.prefixKey(repeatedPrefix.depth()).equals(repeatedPrefix.prefix()))
                 .map(MessageChainInfo::line)
@@ -76,7 +79,7 @@ public final class MessageChainsBadSmellDetector extends BookBadSmellDetector {
         return Optional.of(DetectorSupport.finding(
                 smell(),
                 maxDepth >= 5 || (repeatedPrefix != null && repeatedPrefix.occurrences() >= 3) ? "high" : "medium",
-                "high",
+                corroboratedAcrossLines ? "high" : "medium",
                 method.name(),
                 method.startLine(),
                 method.endLine(),

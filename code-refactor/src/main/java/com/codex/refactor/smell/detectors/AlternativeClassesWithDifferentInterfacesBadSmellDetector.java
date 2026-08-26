@@ -129,7 +129,7 @@ public final class AlternativeClassesWithDifferentInterfacesBadSmellDetector ext
         if ("java".equals(context.analysis().language()) && !context.analysis().classes().isEmpty()) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static List<ClassProfile> profiles(SmellAnalysisContext context) {

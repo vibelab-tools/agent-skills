@@ -22,7 +22,9 @@ public record MessageChainInfo(
             "stream", "parallelStream", "filter", "map", "flatMap", "collect", "toList", "toSet", "toMap",
             "sorted", "distinct", "limit", "skip", "peek", "forEach", "reduce", "findFirst", "findAny",
             "builder", "build", "with", "then", "thenApply", "thenCompose", "thenAccept", "exceptionally",
-            "catch", "finally", "of", "ofNullable", "orElse", "orElseGet", "orElseThrow", "ifPresent"
+            "catch", "finally", "of", "ofNullable", "orElse", "orElseGet", "orElseThrow", "ifPresent",
+            "and_then", "filter_map", "flat_map", "as_ref", "as_mut", "ok_or", "ok_or_else", "unwrap_or",
+            "unwrap_or_else", "debug_struct", "debug_tuple", "field", "finish", "finish_non_exhaustive"
     );
 
     public static Optional<MessageChainInfo> fromExpression(

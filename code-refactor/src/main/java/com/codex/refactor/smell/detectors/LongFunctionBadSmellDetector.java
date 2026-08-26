@@ -43,7 +43,7 @@ public final class LongFunctionBadSmellDetector extends BookBadSmellDetector {
                         "Extract cohesive chunks into named methods, reduce nesting with guard clauses, and rerun the smell detector."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<LongFunctionCandidate> candidate(JavaMethodInfo method) {

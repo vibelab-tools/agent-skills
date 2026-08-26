@@ -44,7 +44,7 @@ public final class SpeculativeGeneralityBadSmellDetector extends BookBadSmellDet
         if (hasReliableClassModel(context)) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static boolean hasReliableClassModel(SmellAnalysisContext context) {

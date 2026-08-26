@@ -10,14 +10,15 @@ phases 0 through 6:
 - 15 non-Java languages use pinned Tree-sitter grammar artifacts,
 - each of the 24 Chapter 3 smells has a detector class,
 - Java has focused 24-smell detector coverage,
-- the non-Java language set has a CLI-level 24-smell coverage matrix,
+- the non-Java language set has parser and detector behavior coverage,
 - optional Git history analysis can confirm Shotgun Surgery through repeated
   local co-change clusters,
-- the repository contains `skill/code-refactor` wrapper scripts and a bundled
+- the repository contains `skill/code-quality-review` wrapper scripts and a bundled
   JAR path for installation into the live Codex skill directory.
 
-Future work should refine language-specific extraction and semantic precision,
-not remove or weaken the existing baseline coverage.
+Future work should refine language-specific extraction and semantic precision.
+It must allow zero findings and must not restore a language-by-smell matrix that
+rewards false positives.
 
 The phase sections below are historical acceptance records plus refinement
 guidance. They are not a claim that phases 0 through 6 still need baseline
@@ -138,6 +139,8 @@ Acceptance:
 
 - The language has at least one valid fixture and one malformed fixture.
 - Common declarations produce expected source-model nodes.
+- Ordinary valid code has negative fixtures for previously observed false
+  positives.
 - Known grammar limitations are visible in docs.
 
 ANTLR remains a candidate for deeper language-specific adapters where
@@ -174,7 +177,7 @@ Deliverables:
 
 - Packaged CLI/JAR.
 - Thin wrapper scripts for the skill.
-- Updated `code-refactor` skill `SKILL.md` tool commands.
+- Updated `code-quality-review` Skill post-change workflow and tool commands.
 - Report-to-plan workflow for turning smell JSON into bounded refactoring steps.
 - Backward-compatible examples.
 - Makefile targets for bundle, validate, install, and uninstall.
@@ -182,10 +185,10 @@ Deliverables:
 Acceptance:
 
 - Existing skill commands have a working replacement path.
-- `quick_validate.py skill/code-refactor` passes before installation.
+- `quick_validate.py skill/code-quality-review` passes before installation.
 - A real local repo file can be analyzed through the skill workflow.
 - `make install` installs the validated snapshot to
-  `${CODEX_HOME:-~/.codex}/skills/code-refactor` only when live replacement is
+  `${CODEX_HOME:-~/.codex}/skills/code-quality-review` only when live replacement is
   intended.
 
 ## Historical First Commit Guidance

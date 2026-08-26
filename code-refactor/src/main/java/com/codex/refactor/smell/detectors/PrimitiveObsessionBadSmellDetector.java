@@ -77,7 +77,7 @@ public final class PrimitiveObsessionBadSmellDetector extends BookBadSmellDetect
         });
 
         findings.addAll(repeatedDomainPrimitives(context, fieldsByOwner));
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private Optional<SmellFinding> classFieldCluster(JavaClassInfo classInfo, List<PrimitiveSlot> primitiveFields) {

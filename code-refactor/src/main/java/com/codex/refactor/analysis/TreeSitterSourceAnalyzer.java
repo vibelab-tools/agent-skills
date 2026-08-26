@@ -355,7 +355,8 @@ public final class TreeSitterSourceAnalyzer {
 
         private void addModuleField(TSNode node) {
             String nodeText = text(node);
-            if (assignmentWithoutDeclaration(nodeText) || nodeText.contains("=>")) {
+            if ((!analysis.language().equals("python") && assignmentWithoutDeclaration(nodeText))
+                    || nodeText.contains("=>")) {
                 return;
             }
             String name = fieldNameFor(node, nodeText, "field@" + startLine(node));
@@ -368,7 +369,8 @@ public final class TreeSitterSourceAnalyzer {
                     "<module>",
                     true,
                     true,
-                    finalLike(nodeText),
+                    finalLike(nodeText)
+                            || (analysis.language().equals("python") && name.matches("[A-Z][A-Z0-9_]*")),
                     startLine(node),
                     endLine(node)
             );
@@ -377,7 +379,8 @@ public final class TreeSitterSourceAnalyzer {
 
         private void addGenericLocalVariable(TSNode node) {
             String nodeText = text(node);
-            if (assignmentWithoutDeclaration(nodeText) || nodeText.contains("=>")) {
+            if ((!analysis.language().equals("python") && assignmentWithoutDeclaration(nodeText))
+                    || nodeText.contains("=>")) {
                 return;
             }
             String name = fieldNameFor(node, nodeText, "");
@@ -1300,7 +1303,8 @@ public final class TreeSitterSourceAnalyzer {
             return type.equals("source_file")
                     || type.equals("program")
                     || type.equals("translation_unit")
-                    || type.equals("stylesheet");
+                    || type.equals("stylesheet")
+                    || (type.equals("module") && analysis.language().equals("python"));
         }
 
         private static String normalize(String value) {

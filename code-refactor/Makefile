@@ -6,17 +6,20 @@ RSYNC ?= rsync
 
 CODEX_HOME ?= $(HOME)/.codex
 CLAUDE_HOME ?= $(HOME)/.claude
-SKILL_NAME := code-refactor
+SKILL_NAME := code-quality-review
+LEGACY_SKILL_NAME := code-refactor
 SKILL_SRC := skill/$(SKILL_NAME)
 CODEX_SKILL_DEST := $(CODEX_HOME)/skills/$(SKILL_NAME)
 CLAUDE_SKILL_DEST := $(CLAUDE_HOME)/skills/$(SKILL_NAME)
+LEGACY_CODEX_SKILL_DEST := $(CODEX_HOME)/skills/$(LEGACY_SKILL_NAME)
+LEGACY_CLAUDE_SKILL_DEST := $(CLAUDE_HOME)/skills/$(LEGACY_SKILL_NAME)
 TARGET_JAR := target/code-refactor-tools-0.1.0-SNAPSHOT.jar
 SKILL_JAR := $(SKILL_SRC)/assets/code-refactor-tools.jar
 SKILL_VALIDATOR := $(CODEX_HOME)/skills/.system/skill-creator/scripts/quick_validate.py
 
 .DEFAULT_GOAL := build
 
-.PHONY: build all compile package references bundle validate install install-all install-codex install-claude uninstall uninstall-codex uninstall-claude purge clean help
+.PHONY: build all compile package references bundle validate review-smoke install install-all install-codex install-claude uninstall uninstall-codex uninstall-claude purge clean help
 
 build: compile
 
@@ -34,7 +37,10 @@ bundle: compile
 	mkdir -p "$(dir $(SKILL_JAR))"
 	cp "$(TARGET_JAR)" "$(SKILL_JAR)"
 
-validate: bundle
+review-smoke: bundle
+	$(PYTHON) scripts/test-review-changes.py "$(SKILL_SRC)/scripts/review-changes"
+
+validate: bundle review-smoke
 	@if [ -f "$(SKILL_VALIDATOR)" ]; then \
 		$(PYTHON) "$(SKILL_VALIDATOR)" "$(SKILL_SRC)"; \
 	else \
@@ -49,12 +55,20 @@ install-codex: validate
 	mkdir -p "$(dir $(CODEX_SKILL_DEST))"
 	$(RSYNC) -a --delete --exclude='.DS_Store' "$(SKILL_SRC)/" "$(CODEX_SKILL_DEST)/"
 	chmod +x "$(CODEX_SKILL_DEST)"/scripts/*
+	@if [ -d "$(LEGACY_CODEX_SKILL_DEST)" ]; then \
+		case "$(LEGACY_CODEX_SKILL_DEST)" in */skills/$(LEGACY_SKILL_NAME)) rm -rf -- "$(LEGACY_CODEX_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe legacy path: $(LEGACY_CODEX_SKILL_DEST)" >&2; exit 1 ;; esac; \
+	fi
 	@echo "Installed $(SKILL_NAME) to $(CODEX_SKILL_DEST)"
 
 install-claude: validate
 	mkdir -p "$(dir $(CLAUDE_SKILL_DEST))"
 	$(RSYNC) -a --delete --exclude='.DS_Store' "$(SKILL_SRC)/" "$(CLAUDE_SKILL_DEST)/"
 	chmod +x "$(CLAUDE_SKILL_DEST)"/scripts/*
+	@if [ -d "$(LEGACY_CLAUDE_SKILL_DEST)" ]; then \
+		case "$(LEGACY_CLAUDE_SKILL_DEST)" in */skills/$(LEGACY_SKILL_NAME)) rm -rf -- "$(LEGACY_CLAUDE_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe legacy path: $(LEGACY_CLAUDE_SKILL_DEST)" >&2; exit 1 ;; esac; \
+	fi
 	@echo "Installed $(SKILL_NAME) to $(CLAUDE_SKILL_DEST)"
 
 uninstall: uninstall-codex uninstall-claude
@@ -62,11 +76,17 @@ uninstall: uninstall-codex uninstall-claude
 purge: uninstall
 
 uninstall-codex:
-	rm -rf "$(CODEX_SKILL_DEST)"
+	@case "$(CODEX_SKILL_DEST)" in */skills/$(SKILL_NAME)) rm -rf -- "$(CODEX_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe skill path: $(CODEX_SKILL_DEST)" >&2; exit 1 ;; esac
+	@case "$(LEGACY_CODEX_SKILL_DEST)" in */skills/$(LEGACY_SKILL_NAME)) rm -rf -- "$(LEGACY_CODEX_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe legacy path: $(LEGACY_CODEX_SKILL_DEST)" >&2; exit 1 ;; esac
 	@echo "Uninstalled $(SKILL_NAME) from $(CODEX_SKILL_DEST)"
 
 uninstall-claude:
-	rm -rf "$(CLAUDE_SKILL_DEST)"
+	@case "$(CLAUDE_SKILL_DEST)" in */skills/$(SKILL_NAME)) rm -rf -- "$(CLAUDE_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe skill path: $(CLAUDE_SKILL_DEST)" >&2; exit 1 ;; esac
+	@case "$(LEGACY_CLAUDE_SKILL_DEST)" in */skills/$(LEGACY_SKILL_NAME)) rm -rf -- "$(LEGACY_CLAUDE_SKILL_DEST)" ;; \
+		*) echo "Refusing unsafe legacy path: $(LEGACY_CLAUDE_SKILL_DEST)" >&2; exit 1 ;; esac
 	@echo "Uninstalled $(SKILL_NAME) from $(CLAUDE_SKILL_DEST)"
 
 clean:

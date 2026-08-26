@@ -13,7 +13,7 @@ import java.util.Map;
 
 public final class TemporaryFieldBadSmellDetector extends BookBadSmellDetector {
     private static final List<String> TEMPORARY_NAME_TOKENS = List.of(
-            "temp", "tmp", "current", "scratch", "intermediate", "pending", "working", "buffer"
+            "temp", "tmp", "temporary", "current", "scratch", "intermediate", "pending", "working", "buffer"
     );
     private static final List<String> BENIGN_STATE_TOKENS = List.of(
             "logger", "log", "repository", "repo", "client", "service", "dao", "mapper", "factory", "config"
@@ -40,7 +40,7 @@ public final class TemporaryFieldBadSmellDetector extends BookBadSmellDetector {
                         "Move the temporary state into a smaller object or local calculation."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<TemporaryFieldCandidate> candidate(JavaFieldInfo field) {
@@ -51,27 +51,26 @@ public final class TemporaryFieldBadSmellDetector extends BookBadSmellDetector {
         int writeCount = field.assignedByMethods().size();
         int participantCount = readCount + writeCount;
         List<String> signals = new ArrayList<>();
-        if (temporaryName(field.name())) {
-            signals.add("temporary_name");
+        if (!temporaryName(field.name()) || participantCount > 2) {
+            return java.util.Optional.empty();
         }
+        signals.add("temporary_name");
         if (writeCount == 1 && readCount <= 1) {
             signals.add("single_calculation_phase");
-        }
-        if (writeCount == 0 && readCount <= 1 && temporaryName(field.name())) {
+        } else if (writeCount == 0 && readCount <= 1) {
             signals.add("sparse_temporary_state");
         }
         if (field.publicField()) {
             signals.add("exposed_temporary_state");
         }
-        if (signals.isEmpty() || participantCount > 2) {
-            return java.util.Optional.empty();
-        }
         return java.util.Optional.of(new TemporaryFieldCandidate(field, signals, readCount, writeCount));
     }
 
     private static boolean temporaryName(String name) {
-        String lower = name.toLowerCase(Locale.ROOT);
-        return TEMPORARY_NAME_TOKENS.stream().anyMatch(lower::contains);
+        String tokenized = name.replaceAll("([a-z0-9])([A-Z])", "$1_$2")
+                .toLowerCase(Locale.ROOT);
+        return java.util.Arrays.stream(tokenized.split("[^a-z0-9]+"))
+                .anyMatch(TEMPORARY_NAME_TOKENS::contains);
     }
 
     private static boolean benignStateName(String name) {

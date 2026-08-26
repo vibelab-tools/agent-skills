@@ -40,7 +40,7 @@ public final class MiddleManBadSmellDetector extends BookBadSmellDetector {
         if ("java".equals(context.analysis().language()) && !context.analysis().classes().isEmpty()) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(MiddleManCandidate candidate) {

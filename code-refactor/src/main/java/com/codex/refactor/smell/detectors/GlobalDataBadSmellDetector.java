@@ -33,7 +33,7 @@ public final class GlobalDataBadSmellDetector extends BookBadSmellDetector {
                         "Encapsulate the variable and restrict mutation behind intention-revealing operations."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<GlobalDataCandidate> candidate(JavaFieldInfo field) {

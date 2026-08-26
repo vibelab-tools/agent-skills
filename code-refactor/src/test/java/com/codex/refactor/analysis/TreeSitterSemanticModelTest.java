@@ -229,6 +229,33 @@ class TreeSitterSemanticModelTest {
     }
 
     @Test
+    void pythonModuleDoesNotPromoteFunctionLocalsToFields() throws Exception {
+        Path source = tempDir.resolve("config.py");
+        Files.writeString(source, """
+                import os
+
+                PROJECT_ROOT = "/tmp/project"
+
+                def path_from_env(name):
+                    raw = os.environ.get(name)
+                    return raw or PROJECT_ROOT
+                """);
+
+        SourceFileAnalysis analysis = new TreeSitterSourceAnalyzer().analyze(source, "python");
+
+        assertTrue(analysis.classes().stream().noneMatch(classInfo -> classInfo.name().equals("class@1")));
+        assertTrue(analysis.fields().stream().noneMatch(field -> field.name().equals("raw")));
+        assertTrue(analysis.fields().stream()
+                .filter(field -> field.name().equals("PROJECT_ROOT"))
+                .allMatch(JavaFieldInfo::finalField));
+        JavaMethodInfo method = analysis.methods().stream()
+                .filter(candidate -> candidate.name().equals("path_from_env"))
+                .findFirst()
+                .orElseThrow();
+        assertTrue(method.localVariables().contains("raw"));
+    }
+
+    @Test
     void bashModelInfersPositionalParametersFromFunctionBody() throws Exception {
         Path source = tempDir.resolve("configure.sh");
         Files.writeString(source, """

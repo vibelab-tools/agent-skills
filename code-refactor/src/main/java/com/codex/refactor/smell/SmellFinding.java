@@ -92,7 +92,7 @@ public record SmellFinding(
         return switch (confidence == null ? "" : confidence.toLowerCase(java.util.Locale.ROOT)) {
             case "high" -> "";
             case "medium" -> "Evidence is deterministic but still heuristic; confirm the design boundary before refactoring.";
-            default -> "Low-confidence fallback or shallow syntactic evidence; review the code before refactoring.";
+            default -> "Low-confidence syntactic evidence; review the code before refactoring.";
         };
     }
 }

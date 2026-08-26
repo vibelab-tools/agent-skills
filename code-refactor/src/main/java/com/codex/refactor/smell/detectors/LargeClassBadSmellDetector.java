@@ -55,7 +55,7 @@ public final class LargeClassBadSmellDetector extends BookBadSmellDetector {
                         "Extract Class around cohesive field and method groups."
                 ))
                 .toList();
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static java.util.Optional<LargeClassCandidate> candidate(JavaClassInfo classInfo) {

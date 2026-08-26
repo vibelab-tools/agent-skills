@@ -37,7 +37,7 @@ public final class LoopsBadSmellDetector extends BookBadSmellDetector {
         if (hasStructuredLoops) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(LoopCandidate candidate) {

@@ -3,8 +3,8 @@
 ## Project Purpose
 
 This directory is the development workspace for the Java/Maven implementation
-of the `code-refactor` skill tools and its installable Agent Skill snapshot for
-Codex and Claude Code.
+of the `code-refactor-tools` CLI and its installable `code-quality-review`
+Agent Skill snapshot for Codex and Claude Code.
 
 The current skill-facing commands are extensionless wrapper scripts backed by a
 packaged JAR:
@@ -12,18 +12,19 @@ packaged JAR:
 - `scripts/analyze-complexity`
 - `scripts/detect-smells`
 - `scripts/plan-refactor`
+- `scripts/review-changes`
 - `scripts/code-refactor-tools`
 
 The installed Codex skill lives at:
 
-`${CODEX_HOME:-~/.codex}/skills/code-refactor`
+`${CODEX_HOME:-~/.codex}/skills/code-quality-review`
 
 The installed Claude Code skill lives at:
 
-`${CLAUDE_HOME:-~/.claude}/skills/code-refactor`
+`${CLAUDE_HOME:-~/.claude}/skills/code-quality-review`
 
 Do not edit files in live skill directories by hand. Make changes in this
-workspace, update `skill/code-refactor`, run validation, and install the skill
+workspace, update `skill/code-quality-review`, run validation, and install the skill
 through the Makefile when replacing live copies is intended.
 
 ## Read Order For New Sessions
@@ -71,6 +72,10 @@ stable, versioned, and documented.
 - Pin generated-parser inputs and ANTLR runtime versions explicitly.
 - Add focused tests around output schema, parser error handling, and metric
   calculations for each supported language.
+- Prefer actionable precision and meaningful negative cases over smell-count or
+  language-by-smell coverage matrices. A valid analysis may report no smells.
+- Do not restore keyword-only fallback findings when structured detectors find
+  no evidence.
 - Prefer small staged support over claiming broad language coverage.
 - When adding a language, document grammar source, known limitations, and sample
   fixtures.

@@ -108,7 +108,7 @@ public final class ShotgunSurgeryBadSmellDetector extends BookBadSmellDetector {
                 .filter(evidence -> !emittedHistoryKeys.contains(evidence.changeKey()))
                 .map(evidence -> historyFinding(context, evidence))
                 .forEach(findings::add);
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static String normalizedChangeKey(JavaMethodInfo method) {

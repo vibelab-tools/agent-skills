@@ -57,7 +57,7 @@ public final class FeatureEnvyBadSmellDetector extends BookBadSmellDetector {
                         "Method is dominated by access to one external object and uses little data from its own owner.",
                         "Consider Move Function toward the envied data owner, or extract a collaboration that exposes behavior instead of data."
                 )));
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private static Optional<FeatureEnvyCandidate> candidate(JavaMethodInfo method, SmellAnalysisContext context) {
@@ -195,7 +195,7 @@ public final class FeatureEnvyBadSmellDetector extends BookBadSmellDetector {
         }
 
         String confidence() {
-            return envyScore >= 5 || foreignTypeEvidence.strongMatch() ? "high" : "medium";
+            return foreignTypeEvidence.strongMatch() ? "high" : "medium";
         }
 
         Map<String, Object> evidence() {

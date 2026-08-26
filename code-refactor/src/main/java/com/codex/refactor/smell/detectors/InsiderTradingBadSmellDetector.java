@@ -57,7 +57,7 @@ public final class InsiderTradingBadSmellDetector extends BookBadSmellDetector {
         if ("java".equals(context.analysis().language()) && !context.analysis().methods().isEmpty()) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(InsiderTradingCandidate candidate) {

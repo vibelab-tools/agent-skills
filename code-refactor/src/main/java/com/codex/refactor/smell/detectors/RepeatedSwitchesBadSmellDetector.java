@@ -75,7 +75,7 @@ public final class RepeatedSwitchesBadSmellDetector extends BookBadSmellDetector
         if (!dispatches.isEmpty()) {
             return findings;
         }
-        return DetectorSupport.fallbackIfEmpty(findings, smell(), context);
+        return findings;
     }
 
     private SmellFinding finding(
@@ -240,8 +240,9 @@ public final class RepeatedSwitchesBadSmellDetector extends BookBadSmellDetector
             return "";
         }
         String normalized = label.trim();
-        if ((normalized.startsWith("\"") && normalized.endsWith("\""))
-                || (normalized.startsWith("'") && normalized.endsWith("'"))) {
+        if (normalized.length() >= 2
+                && ((normalized.startsWith("\"") && normalized.endsWith("\""))
+                || (normalized.startsWith("'") && normalized.endsWith("'")))) {
             normalized = normalized.substring(1, normalized.length() - 1);
         }
         int dot = normalized.lastIndexOf('.');

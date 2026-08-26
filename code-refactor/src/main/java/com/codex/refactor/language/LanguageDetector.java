@@ -1,5 +1,7 @@
 package com.codex.refactor.language;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Set;
@@ -86,6 +88,28 @@ public final class LanguageDetector {
         }
         if (fileName.endsWith(".sh") || fileName.endsWith(".bash")) {
             return "bash";
+        }
+        return detectShebang(path);
+    }
+
+    private static String detectShebang(Path path) {
+        try (var reader = Files.newBufferedReader(path)) {
+            String firstLine = reader.readLine();
+            if (firstLine == null || !firstLine.startsWith("#!")) {
+                return "unknown";
+            }
+            String lower = firstLine.toLowerCase(Locale.ROOT);
+            if (lower.contains("python")) {
+                return "python";
+            }
+            if (lower.contains("ruby")) {
+                return "ruby";
+            }
+            if (lower.contains("bash") || lower.contains("/sh") || lower.contains(" sh")) {
+                return "bash";
+            }
+        } catch (IOException ignored) {
+            return "unknown";
         }
         return "unknown";
     }
