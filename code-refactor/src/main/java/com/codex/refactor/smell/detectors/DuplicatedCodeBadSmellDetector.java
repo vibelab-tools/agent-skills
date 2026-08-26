@@ -135,9 +135,7 @@ public final class DuplicatedCodeBadSmellDetector extends BookBadSmellDetector {
     }
 
     private static String canonicalize(String statement, Map<String, String> localNames) {
-        String normalized = statement
-                .replaceAll("\"(?:\\\\.|[^\"])*\"", "__STR__")
-                .replaceAll("'(?:\\\\.|[^'])*'", "__STR__")
+        String normalized = maskQuotedLiterals(statement)
                 .replaceAll("\\b\\d+(?:\\.\\d+)?[dDfFlL]?\\b", "__NUM__");
         Matcher matcher = Pattern.compile("[A-Za-z_$][A-Za-z0-9_$]*").matcher(normalized);
         StringBuilder result = new StringBuilder();
@@ -162,6 +160,35 @@ public final class DuplicatedCodeBadSmellDetector extends BookBadSmellDetector {
                 .replaceAll("\\s+", "")
                 .replace("__STR__", "__LIT__")
                 .replace("__NUM__", "__LIT__");
+    }
+
+    private static String maskQuotedLiterals(String value) {
+        StringBuilder result = new StringBuilder(value.length());
+        int index = 0;
+        while (index < value.length()) {
+            char quote = value.charAt(index);
+            if (quote != '\'' && quote != '"') {
+                result.append(quote);
+                index++;
+                continue;
+            }
+
+            int closingQuote = index + 1;
+            while (closingQuote < value.length() && value.charAt(closingQuote) != quote) {
+                if (value.charAt(closingQuote) == '\\' && closingQuote + 1 < value.length()) {
+                    closingQuote += 2;
+                } else {
+                    closingQuote++;
+                }
+            }
+            if (closingQuote == value.length()) {
+                result.append(value, index, value.length());
+                break;
+            }
+            result.append("__STR__");
+            index = closingQuote + 1;
+        }
+        return result.toString();
     }
 
     private static boolean followedByCall(String value, int offset) {

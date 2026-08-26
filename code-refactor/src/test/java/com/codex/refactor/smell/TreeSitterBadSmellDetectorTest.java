@@ -128,6 +128,24 @@ class TreeSitterBadSmellDetectorTest {
     }
 
     @Test
+    void duplicatedCodeHandlesLargeQuotedLiterals() throws Exception {
+        Path path = tempDir.resolve("large_query.py");
+        Files.writeString(path, """
+                def load_records():
+                    query = "%s"
+                    execute(query)
+                    return query
+                """.formatted("x".repeat(200_000)));
+        SourceFileAnalysis analysis = new TreeSitterSourceAnalyzer().analyze(path, "python");
+        assertTrue(analysis.parseErrors().isEmpty(), () -> analysis.parseErrors().toString());
+
+        List<SmellFinding> findings = new DuplicatedCodeBadSmellDetector()
+                .detect(new SmellAnalysisContext(analysis));
+
+        assertTrue(findings.isEmpty());
+    }
+
+    @Test
     void javascriptRepeatedSwitchesUsesIfElseDispatchEvidence() throws Exception {
         Path path = tempDir.resolve("dispatch.js");
         Files.writeString(path, """
