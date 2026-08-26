@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Emit a compact complexity/smell review for changed production code."""
+"""Run all smell detectors and emit compact candidates for changed code."""
 
 from __future__ import annotations
 
@@ -17,10 +17,22 @@ SOURCE_SUFFIXES = {
     ".ts", ".tsx", ".vue",
 }
 EXCLUDED_PARTS = {
-    ".git", ".next", ".nuxt", "build", "coverage", "dist", "fixtures",
-    "migrations", "node_modules", "snapshots", "target", "test", "tests", "vendor",
+    ".git", ".next", ".nuxt", "benchmark", "benchmarks", "build", "coverage",
+    "dist", "example", "examples", "fixtures", "migrations", "node_modules",
+    "snapshots", "target", "test", "tests", "vendor",
 }
 HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+MAX_CANDIDATES = 3
+MAX_REVIEWED_FILES = 12
+MAX_EVIDENCE_FIELDS = 8
+MAX_COLLECTION_ITEMS = 4
+MAX_STRING_LENGTH = 160
+SEVERITY_RANK = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+CONFIDENCE_RANK = {"high": 3, "medium": 2, "low": 1}
+EVIDENCE_LINE_KEYS = {
+    "line", "lines", "comment_lines", "concern_lines", "foreign_access_lines",
+    "chain_lines", "loop_lines",
+}
 
 
 def git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
@@ -60,7 +72,7 @@ def reviewable_source(root: Path, relative: Path) -> bool:
     name = relative.name.lower()
     if any(token in name for token in (".generated.", ".min.js", ".spec.", ".test.")):
         return False
-    if name.startswith("test_") or "_test." in name:
+    if name.startswith(("test_", "test-")) or "_test." in name or "-test." in name:
         return False
     path = root / relative
     if relative.suffix.lower() in SOURCE_SUFFIXES:
@@ -105,106 +117,197 @@ def merge_ranges(ranges: list[list[int]]) -> list[list[int]]:
     return merged
 
 
-def overlaps(location: dict[str, object], ranges: list[list[int]]) -> bool:
+def changed_line_count(location: object, ranges: list[list[int]]) -> int:
+    if not isinstance(location, dict):
+        return 0
     start = int(location.get("start_line") or location.get("line") or 0)
     end = int(location.get("end_line") or start)
-    return any(start <= range_end and end >= range_start for range_start, range_end in ranges)
+    return sum(
+        max(0, min(end, range_end) - max(start, range_start) + 1)
+        for range_start, range_end in ranges
+    )
 
 
-def function_with_signals(function: dict[str, object]) -> dict[str, object]:
-    result = dict(function)
-    metrics = function.get("metrics") or {}
-    signals = []
-    if int(metrics.get("physical_lines") or 0) >= 50:
-        signals.append("long_function")
-    if int(metrics.get("cyclomatic_complexity") or 0) >= 10:
-        signals.append("high_cyclomatic_complexity")
-    if int(metrics.get("cognitive_complexity") or 0) >= 15:
-        signals.append("high_cognitive_complexity")
-    if int(metrics.get("max_nesting_depth") or 0) >= 4:
-        signals.append("deep_nesting")
-    result["review_signals"] = signals
-    return result
+def evidence_line_numbers(value: object, key: str = "") -> set[int]:
+    if isinstance(value, dict):
+        return {
+            line
+            for child_key, child_value in value.items()
+            for line in evidence_line_numbers(child_value, str(child_key))
+        }
+    if isinstance(value, list):
+        return {
+            line
+            for child_value in value
+            for line in evidence_line_numbers(child_value, key)
+        }
+    if key in EVIDENCE_LINE_KEYS and isinstance(value, int) and not isinstance(value, bool):
+        return {value}
+    return set()
 
 
-def run_tool(tool: Path, root: Path, command: str, paths: list[Path]) -> dict[str, object]:
-    args = [str(tool), command, "--json"]
-    if command == "detect-smells":
-        args.extend(["--min-confidence", "high"])
+def line_in_ranges(line: int, ranges: list[list[int]]) -> bool:
+    return any(range_start <= line <= range_end for range_start, range_end in ranges)
+
+
+def materially_touched(smell: dict[str, object], ranges: list[list[int]]) -> bool:
+    location = smell.get("location")
+    if not isinstance(location, dict):
+        return False
+    changed_lines = changed_line_count(location, ranges)
+    if changed_lines == 0:
+        return False
+    evidence_lines = evidence_line_numbers(smell.get("evidence"))
+    if evidence_lines:
+        return any(line_in_ranges(line, ranges) for line in evidence_lines)
+    start = int(location.get("start_line") or location.get("line") or 0)
+    end = int(location.get("end_line") or start)
+    span = max(1, end - start + 1)
+    if span <= 100:
+        return True
+    required_lines = min(50, max(1, (span + 9) // 10))
+    return changed_lines >= required_lines
+
+
+def run_detectors(tool: Path, root: Path, paths: list[Path]) -> dict[str, object]:
+    args = [str(tool), "detect-smells", "--json", "--min-confidence", "high"]
     args.extend(str(path) for path in paths)
     result = subprocess.run(args, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or f"{command} exited with {result.returncode}")
+        raise RuntimeError(result.stderr.strip() or f"detect-smells exited with {result.returncode}")
     return json.loads(result.stdout)
+
+
+def bounded(value: object, depth: int = 0) -> object:
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, str):
+        return value if len(value) <= MAX_STRING_LENGTH else value[:MAX_STRING_LENGTH] + "…"
+    if depth >= 2:
+        return None
+    if isinstance(value, list):
+        return [bounded(item, depth + 1) for item in value[:MAX_COLLECTION_ITEMS]]
+    if isinstance(value, dict):
+        return {
+            str(key): bounded(item, depth + 1)
+            for key, item in list(value.items())[:MAX_COLLECTION_ITEMS]
+        }
+    return str(value)[:MAX_STRING_LENGTH]
+
+
+def compact_evidence(evidence: object) -> dict[str, object]:
+    if not isinstance(evidence, dict):
+        return {}
+    return {
+        str(key): bounded(value)
+        for key, value in list(evidence.items())[:MAX_EVIDENCE_FIELDS]
+    }
+
+
+def compact_location(location: object) -> dict[str, object]:
+    if not isinstance(location, dict):
+        return {}
+    return {
+        key: location[key]
+        for key in ("symbol", "start_line", "end_line")
+        if key in location
+    }
+
+
+def compact_candidate(
+    file: dict[str, object],
+    smell: dict[str, object],
+    ranges: list[list[int]],
+) -> dict[str, object]:
+    location = smell.get("location")
+    return {
+        "id": smell.get("id"),
+        "type": smell.get("type"),
+        "severity": smell.get("severity"),
+        "confidence": smell.get("confidence"),
+        "path": file.get("path"),
+        "language": file.get("language"),
+        "location": compact_location(location),
+        "changed_line_count": changed_line_count(location, ranges),
+        "evidence": compact_evidence(smell.get("evidence")),
+        "reason": bounded(smell.get("description")),
+    }
+
+
+def candidate_sort_key(candidate: dict[str, object]) -> tuple[object, ...]:
+    evidence = candidate.get("evidence") or {}
+    signals = evidence.get("signals") if isinstance(evidence, dict) else []
+    signal_count = len(signals) if isinstance(signals, list) else 0
+    location = candidate.get("location") or {}
+    return (
+        -SEVERITY_RANK.get(str(candidate.get("severity")), 0),
+        -CONFIDENCE_RANK.get(str(candidate.get("confidence")), 0),
+        -signal_count,
+        -int(candidate.get("changed_line_count") or 0),
+        str(candidate.get("path")),
+        int(location.get("start_line") or 0),
+        str(candidate.get("id")),
+    )
 
 
 def compact_report(
     root: Path,
     ranges_by_path: dict[Path, list[list[int]]],
-    complexity: dict[str, object],
-    smells: dict[str, object] | None,
+    smells: dict[str, object],
     base: str,
 ) -> dict[str, object]:
-    smells_by_path = {
-        Path(file["path"]): file.get("smells", [])
-        for file in (smells or {}).get("files", [])
-    }
-    files = []
-    hotspot_count = 0
-    smell_count = 0
-    for file in complexity.get("files", []):
+    candidates = []
+    files_with_parse_errors = 0
+    warnings = []
+    for file in smells.get("files", []):
         relative = Path(file["path"])
         ranges = ranges_by_path.get(relative, [])
-        changed_functions = [
-            function_with_signals(function)
-            for function in file.get("functions", [])
-            if overlaps(function.get("location", {}), ranges)
-        ]
-        changed_classes = [
-            class_info
-            for class_info in file.get("classes", [])
-            if overlaps(class_info.get("location", {}), ranges)
-        ]
-        candidates = [
-            smell
-            for smell in smells_by_path.get(relative, [])
-            if overlaps(smell.get("location", {}), ranges)
-        ]
-        hotspot_count += sum(bool(function["review_signals"]) for function in changed_functions)
-        smell_count += len(candidates)
-        files.append({
-            "path": str(relative),
-            "language": file.get("language"),
-            "status": file.get("status"),
-            "changed_line_ranges": ranges,
-            "file_metrics": file.get("metrics"),
-            "changed_functions": changed_functions,
-            "changed_classes": changed_classes,
-            "smell_candidates": candidates,
-            "parse_errors": file.get("parse_errors", []),
-            "warnings": file.get("warnings", []),
-        })
+        candidates.extend(
+            compact_candidate(file, smell, ranges)
+            for smell in file.get("smells", [])
+            if materially_touched(smell, ranges)
+        )
+        if file.get("parse_errors"):
+            files_with_parse_errors += 1
+        warnings.extend(str(warning) for warning in file.get("warnings", []))
+
+    candidates.sort(key=candidate_sort_key)
+    selected = candidates[:MAX_CANDIDATES]
+    reviewed_files = [str(path) for path in ranges_by_path]
+    analysis_scope = smells.get("analysis_scope") or {}
+    detectors_run = int(analysis_scope.get("detectors_run") or 0)
+    if detectors_run != 24:
+        warnings.append(f"Expected 24 standard detectors, but the analyzer reported {detectors_run}.")
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "tool": "review-changes",
-        "status": "ok",
+        "status": smells.get("status", "ok"),
         "repository_root": str(root),
         "base": base,
         "summary": {
-            "changed_production_files": len(files),
-            "changed_functions": sum(len(file["changed_functions"]) for file in files),
-            "hotspot_functions": hotspot_count,
-            "smell_candidates": smell_count,
+            "changed_production_files": len(ranges_by_path),
+            "detectors_run": detectors_run,
+            "candidates_found": len(candidates),
+            "candidates_reported": len(selected),
+            "candidates_omitted": max(0, len(candidates) - len(selected)),
+            "files_with_parse_errors": files_with_parse_errors,
         },
-        "files": files,
-        "warnings": [],
+        "reviewed_files": reviewed_files[:MAX_REVIEWED_FILES],
+        "reviewed_files_omitted": max(0, len(reviewed_files) - MAX_REVIEWED_FILES),
+        "candidates": selected,
+        "decision": "Validate each candidate against the diff and business context before refactoring.",
+        "warnings": list(dict.fromkeys(warnings))[:MAX_COLLECTION_ITEMS],
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", default="HEAD", help="Git base for the working-tree review")
-    parser.add_argument("--smells", action="store_true", help="Include high-confidence smell candidates")
+    parser.add_argument(
+        "--smells",
+        action="store_true",
+        help="Deprecated compatibility flag; all smell detectors now run by default",
+    )
     args = parser.parse_args()
 
     try:
@@ -219,25 +322,29 @@ def main() -> int:
         paths = list(ranges)
         if not paths:
             print(json.dumps({
-                "schema_version": "1.0",
+                "schema_version": "2.0",
                 "tool": "review-changes",
                 "status": "ok",
                 "repository_root": str(root),
                 "base": args.base,
                 "summary": {
                     "changed_production_files": 0,
-                    "changed_functions": 0,
-                    "hotspot_functions": 0,
-                    "smell_candidates": 0,
+                    "detectors_run": 0,
+                    "candidates_found": 0,
+                    "candidates_reported": 0,
+                    "candidates_omitted": 0,
+                    "files_with_parse_errors": 0,
                 },
-                "files": [],
+                "reviewed_files": [],
+                "reviewed_files_omitted": 0,
+                "candidates": [],
+                "decision": "No changed production source files require review.",
                 "warnings": ["No changed production source files were found."],
-            }, indent=2))
+            }, separators=(",", ":")))
             return 0
         tool = Path(__file__).resolve().with_name("code-refactor-tools")
-        complexity = run_tool(tool, root, "analyze-complexity", paths)
-        smells = run_tool(tool, root, "detect-smells", paths) if args.smells else None
-        print(json.dumps(compact_report(root, ranges, complexity, smells, args.base), indent=2))
+        smells = run_detectors(tool, root, paths)
+        print(json.dumps(compact_report(root, ranges, smells, args.base), separators=(",", ":")))
         return 0
     except (OSError, subprocess.CalledProcessError, RuntimeError, json.JSONDecodeError) as error:
         print(f"review-changes: {error}", file=sys.stderr)

@@ -1,6 +1,6 @@
 ---
 name: code-quality-review
-description: Review code quality after completing a non-trivial implementation by inspecting the current diff, using parser-backed complexity or smell evidence only when warranted, and applying only small behavior-preserving refactors that address problems introduced or worsened by the change. Use after feature, bug-fix, or refactor work and when asked to assess bad smells, risky growth, or refactoring need. Do not use for docs, formatting, or typo-only work, generated or vendored code, or unrelated legacy cleanup.
+description: Review the current Git diff after a non-trivial feature, bug fix, or refactor by running all 24 parser-backed smell detectors on changed production lines, validating up to three compact candidates, and applying only small behavior-preserving refactors for problems introduced or worsened by the change. Use as the final quality pass after implementation and when asked about bad smells, maintainability, or whether refactoring is warranted. Do not use for docs-only, formatting-only, typo-only, generated, vendored, or unrelated legacy cleanup.
 ---
 
 # Code Quality Review
@@ -11,30 +11,26 @@ old repository perfect.
 
 ## Post-Change Review
 
-1. Build the review scope from the current Git diff and relevant untracked
-   files. Review changed production code first. Exclude generated, vendored,
-   migration, fixture, configuration, and test files unless they implement
-   changed production behavior or the user explicitly includes them.
-2. Read the diff before running detectors. Look for duplication introduced by
-   the change, risky function growth, complex branching, mixed responsibilities,
-   unclear state lifetime, and abstractions that do not earn their cost.
-3. For every non-trivial implementation, run `scripts/review-changes`. It uses
-   the current Git diff, runs complexity analysis, and returns only functions and
-   classes overlapping changed lines.
-4. If the diff review or complexity report identifies a concrete hotspot, rerun
-   `scripts/review-changes --smells` to add only high-confidence smell candidates
-   overlapping changed lines. A report with no findings is a valid result.
-5. Validate each finding against the code and business responsibility. Reject
-   findings that describe framework idioms, ordinary data/configuration shape,
-   deliberate boundaries, or unrelated pre-existing code.
-6. Refactor during the current task only when the issue was introduced or
-   materially worsened by the change, the improvement is clear, and focused
-   verification can preserve behavior. Otherwise report or track it separately.
-7. After a refactor, rerun the affected checks and review the final diff. Do not
-   run `plan-refactor` until a specific finding has been confirmed manually.
+1. Confirm that the change includes non-trivial production behavior. Skip this
+   Skill for documentation, formatting, generated output, or test-only edits.
+2. Run `scripts/review-changes` once after implementation. The wrapper selects
+   changed production lines, runs all 24 standard detectors, and emits at most
+   three high-confidence candidates whose reported scope was materially touched
+   by the diff. A zero-candidate report is a valid result.
+3. Read the diff and the surrounding business responsibility for every emitted
+   candidate. Accept a candidate only when the evidence describes a real design
+   problem introduced or materially worsened by the current change. Reject
+   framework idioms, ordinary data/configuration shape, deliberate boundaries,
+   and unrelated legacy problems.
+4. Refactor only accepted candidates, and only when the behavior-preserving
+   improvement is clear, small, and inside the current requirement. Load the
+   matching smell/refactoring card only after accepting the candidate.
+5. Run the narrowest meaningful behavior check, then rerun
+   `scripts/review-changes`. Review the final diff for scope creep and accidental
+   behavior changes. Do not run `plan-refactor` before manual confirmation.
 
 Read [references/refactoring-workflow.md](references/refactoring-workflow.md)
-for scope selection, signal thresholds, and the completion decision. Read
+for scope selection, candidate validation, and the completion decision. Read
 [references/tooling.md](references/tooling.md) only when exact CLI usage or JSON
 fields are needed.
 
@@ -42,7 +38,6 @@ fields are needed.
 
 ```bash
 <skill>/scripts/review-changes
-<skill>/scripts/review-changes --smells
 <skill>/scripts/analyze-complexity --json <changed-production-file>...
 <skill>/scripts/detect-smells --json --min-confidence high <confirmed-hotspot>...
 <skill>/scripts/plan-refactor --json --max-findings 5 <confirmed-smell-report.json|->
@@ -56,6 +51,9 @@ target repository.
 
 - Tool output is evidence, not authority. Never refactor solely to clear a
   finding or threshold.
+- Do not treat the three-candidate cap as proof that omitted candidates require
+  work. Resolve the reported candidates first; a rescan reveals the next bounded
+  set only when further review is still warranted.
 - Prefer no refactor when the change is already clear and cohesive.
 - Keep accepted refactors small, behavior-preserving, and inside the current
   requirement's scope.

@@ -78,7 +78,12 @@ public final class ReportBuilder {
         report.put("status", topLevelStatus(files));
         report.put("summary", summary(command, files));
         if (command == ToolCommand.DETECT_SMELLS) {
-            report.put("analysis_scope", projectIndexPlan.toJson());
+            Map<String, Object> analysisScope = new LinkedHashMap<>(projectIndexPlan.toJson());
+            analysisScope.put("detector_mode", "all-standard");
+            analysisScope.put("detectors_run", BadSmellDetectionDispatcher.standard().detectors().stream()
+                    .filter(detector -> detector.isImplemented())
+                    .count());
+            report.put("analysis_scope", analysisScope);
         }
         if (command == ToolCommand.DETECT_SMELLS && historyAnalysis.enabled()) {
             report.put("history_analysis", historyAnalysis.toJson());

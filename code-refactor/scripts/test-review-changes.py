@@ -32,13 +32,58 @@ def main() -> int:
             "    return sum(values)\n",
             encoding="utf-8",
         )
+        (root / "test-helper.py").write_text(
+            "def test_total():\n    assert total([]) == 0\n",
+            encoding="utf-8",
+        )
 
         result = run(str(review_tool), cwd=root)
         report = json.loads(result.stdout)
         assert report["status"] == "ok"
+        assert report["schema_version"] == "2.0"
         assert report["summary"]["changed_production_files"] == 1
-        assert report["summary"]["changed_functions"] == 1
-        assert report["files"][0]["changed_functions"][0]["name"] == "total"
+        assert report["summary"]["detectors_run"] == 24
+        assert report["summary"]["candidates_reported"] == 0
+        assert report["candidates"] == []
+        assert len(result.stdout) < 2_000
+
+        compatibility_report = json.loads(run(str(review_tool), "--smells", cwd=root).stdout)
+        assert compatibility_report == report
+
+        preexisting_body = ["def process():", "    value = 0"]
+        preexisting_body.extend("    value += 1" for _ in range(110))
+        preexisting_body.append("    return value")
+        source.write_text("\n".join(preexisting_body) + "\n", encoding="utf-8")
+        run("git", "add", "service.py", cwd=root)
+        run("git", "commit", "-qm", "add preexisting long function", cwd=root)
+        preexisting_body[60] = "    value += 2"
+        source.write_text("\n".join(preexisting_body) + "\n", encoding="utf-8")
+
+        result = run(str(review_tool), cwd=root)
+        report = json.loads(result.stdout)
+        assert report["summary"]["detectors_run"] == 24
+        assert report["summary"]["candidates_reported"] == 0
+        assert report["candidates"] == []
+
+        long_functions = []
+        for name in ("alpha", "beta", "gamma", "delta"):
+            body = [f"def process_{name}():", "    value = 0"]
+            body.extend("    value += 1" for _ in range(76))
+            body.append("    return value")
+            long_functions.append("\n".join(body))
+        source.write_text("\n\n".join(long_functions) + "\n", encoding="utf-8")
+
+        result = run(str(review_tool), cwd=root)
+        report = json.loads(result.stdout)
+        assert report["summary"]["detectors_run"] == 24
+        assert report["summary"]["candidates_found"] >= 4
+        assert report["summary"]["candidates_reported"] == 3
+        assert report["summary"]["candidates_omitted"] >= 1
+        assert len(report["candidates"]) == 3
+        assert "recommended_refactoring" not in result.stdout
+        assert "changed_functions" not in result.stdout
+        assert "file_metrics" not in result.stdout
+        assert len(result.stdout) < 6_000
     return 0
 
 

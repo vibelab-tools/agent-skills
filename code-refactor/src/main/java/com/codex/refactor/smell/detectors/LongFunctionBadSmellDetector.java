@@ -15,6 +15,10 @@ public final class LongFunctionBadSmellDetector extends BookBadSmellDetector {
     private static final int WARNING_CYCLOMATIC = 10;
     private static final int WARNING_COGNITIVE = 15;
     private static final int WARNING_NESTING = 4;
+    private static final int HIGH_CONFIDENCE_LINES = 75;
+    private static final int HIGH_CONFIDENCE_CYCLOMATIC = 15;
+    private static final int HIGH_CONFIDENCE_COGNITIVE = 22;
+    private static final int HIGH_CONFIDENCE_NESTING = 6;
 
     public LongFunctionBadSmellDetector() {
         super(BadSmell.LONG_FUNCTION);
@@ -76,7 +80,13 @@ public final class LongFunctionBadSmellDetector extends BookBadSmellDetector {
         }
 
         String confidence() {
-            return signals.contains("too_many_physical_lines") || signals.size() >= 2 ? "high" : "medium";
+            return signals.size() >= 2
+                    || method.physicalLines() >= HIGH_CONFIDENCE_LINES
+                    || method.cyclomaticComplexity() >= HIGH_CONFIDENCE_CYCLOMATIC
+                    || method.cognitiveComplexity() >= HIGH_CONFIDENCE_COGNITIVE
+                    || method.maxNestingDepth() >= HIGH_CONFIDENCE_NESTING
+                    ? "high"
+                    : "medium";
         }
 
         Map<String, Object> evidence() {

@@ -36,7 +36,7 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
                         "Inline the class or wait until it carries meaningful behavior."
                 )));
         context.analysis().methods().stream()
-                .map(LazyElementBadSmellDetector::methodCandidate)
+                .map(method -> methodCandidate(context.analysis().language(), method))
                 .flatMap(java.util.Optional::stream)
                 .forEach(candidate -> findings.add(DetectorSupport.finding(
                         smell(), candidate.severity(), candidate.confidence(), candidate.method().name(),
@@ -81,13 +81,13 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
         return java.util.Optional.of(new ClassCandidate(classInfo, signals, methods.size()));
     }
 
-    private static java.util.Optional<MethodCandidate> methodCandidate(JavaMethodInfo method) {
+    private static java.util.Optional<MethodCandidate> methodCandidate(String language, JavaMethodInfo method) {
         if (method.constructor() || method.accessorMethod()) {
             return java.util.Optional.empty();
         }
         List<String> signals = new ArrayList<>();
         String body = method.normalizedBody() == null ? "" : method.normalizedBody().toLowerCase(Locale.ROOT);
-        if (emptyOrNoOpBody(body)) {
+        if (usesBracedFunctionBodies(language) && emptyOrNoOpBody(body)) {
             signals.add("empty_or_noop_method");
         }
         if (placeholderName(method.name()) && method.physicalLines() <= 5 && method.cyclomaticComplexity() <= 1) {
@@ -102,6 +102,13 @@ public final class LazyElementBadSmellDetector extends BookBadSmellDetector {
             return java.util.Optional.empty();
         }
         return java.util.Optional.of(new MethodCandidate(method, signals));
+    }
+
+    private static boolean usesBracedFunctionBodies(String language) {
+        return switch (language) {
+            case "c", "cpp", "csharp", "go", "java", "javascript", "rust", "tsx", "typescript" -> true;
+            default -> false;
+        };
     }
 
     private static boolean emptyOrNoOpBody(String body) {

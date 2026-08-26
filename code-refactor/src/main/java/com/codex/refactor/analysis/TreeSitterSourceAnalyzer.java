@@ -69,8 +69,7 @@ public final class TreeSitterSourceAnalyzer {
             "init_declarator",
             "declaration",
             "assignment",
-            "assignment_statement",
-            "pair"
+            "assignment_statement"
     );
     private static final Set<String> STATEMENT_NODES = Set.of(
             "expression_statement",

@@ -80,6 +80,41 @@ class TreeSitterSmellPrecisionTest {
     }
 
     @Test
+    void pythonConstantMappingEntriesAreNotGlobalData() throws Exception {
+        Path source = tempDir.resolve("rankings.py");
+        Files.writeString(source, """
+                SEVERITY_RANK = {"high": 3, "medium": 2, "low": 1}
+                """);
+
+        CliRun run = run("detect-smells", "--json", "--min-confidence", "high", source.toString());
+
+        assertEquals(0, run.exitCode(), run.stderr());
+        JsonNode smells = JSON.readTree(run.stdout()).path("files").get(0).path("smells");
+        for (JsonNode smell : smells) {
+            assertFalse(smell.path("id").asText().equals("global-data"));
+        }
+    }
+
+    @Test
+    void pythonFunctionReturningMappingIsNotAnEmptyLazyElement() throws Exception {
+        Path source = tempDir.resolve("report.py");
+        Files.writeString(source, """
+                def compact_report(value):
+                    if value is None:
+                        return {}
+                    return {"value": value}
+                """);
+
+        CliRun run = run("detect-smells", "--json", "--min-confidence", "high", source.toString());
+
+        assertEquals(0, run.exitCode(), run.stderr());
+        JsonNode smells = JSON.readTree(run.stdout()).path("files").get(0).path("smells");
+        for (JsonNode smell : smells) {
+            assertFalse(smell.path("id").asText().equals("lazy-element"));
+        }
+    }
+
+    @Test
     void rustIteratorPipelineIsNotReportedAsMessageChain() throws Exception {
         Path source = tempDir.resolve("path.rs");
         Files.writeString(source, """

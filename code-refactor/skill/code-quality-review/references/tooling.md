@@ -4,7 +4,6 @@ The Skill wrappers call the offline packaged JAR:
 
 ```bash
 scripts/review-changes
-scripts/review-changes --smells
 scripts/analyze-complexity --json <path>...
 scripts/detect-smells --json --min-confidence high <path>...
 scripts/detect-smells --json --min-confidence high --history-analysis git <path>...
@@ -13,10 +12,14 @@ scripts/plan-refactor --json --max-findings 5 <confirmed-report.json|->
 
 ## Scope And Output
 
-- Pass changed production files explicitly for post-change review.
+- Let `review-changes` select changed production files for post-change review;
+  pass paths explicitly only to the lower-level analyzers.
 - `review-changes` is the default post-change command. It selects the current
-  Git working-tree diff, excludes common test/generated paths, and emits only
-  functions, classes, and optional smell candidates that overlap changed lines.
+  Git working-tree diff, excludes common non-production paths, runs all 24
+  standard detectors, and emits at most three high-confidence smell candidates
+  whose reported scope was materially touched by changed lines.
+- `review-changes --smells` remains accepted for compatibility but is identical
+  to the default command.
 - Directory input is reserved for an explicitly requested module/project audit.
 - Save JSON outside the repository and inspect only summaries and relevant
   symbols; do not load a large report into model context wholesale.
@@ -55,6 +58,20 @@ java bash c cpp csharp go rust html css javascript typescript tsx vue ruby sql p
 ```
 
 ## Useful JSON Fields
+
+Changed-code review reports (`schema_version: 2.0`):
+
+- `summary.changed_production_files`
+- `summary.detectors_run`
+- `summary.candidates_found`
+- `summary.candidates_reported`
+- `summary.candidates_omitted`
+- `candidates[].id`
+- `candidates[].location`
+- `candidates[].changed_line_count`
+- `candidates[].evidence`
+- `decision`
+- `warnings`
 
 Complexity reports:
 

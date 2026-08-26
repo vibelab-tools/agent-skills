@@ -585,6 +585,12 @@ The skill can call this tool in one of two ways:
 Wrappers are acceptable if they keep the skill invocation stable while the
 implementation lives in a packaged JAR.
 
+`review-changes` is the post-change orchestration boundary. It selects changed
+production files from Git, runs the complete standard 24-detector set at high
+confidence, filters findings to scopes materially touched by changed lines, and
+deterministically returns no more than three compact candidates. The direct CLI
+retains its full report for explicit audits and confirmed-hotspot analysis.
+
 Large generated reports should be written under
 `${XDG_CACHE_HOME:-$HOME/.cache}/code-quality-review/<run-name>/`, not into the
 analyzed repository or the skill development workspace.

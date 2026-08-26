@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CliTest {
@@ -399,7 +400,7 @@ class CliTest {
                 class LongMethod {
                   void work() {
                 """);
-        for (int index = 0; index < 60; index++) {
+        for (int index = 0; index < 80; index++) {
             code.append("    System.out.println(").append(index).append(");\n");
         }
         code.append("""
@@ -417,6 +418,28 @@ class CliTest {
     }
 
     @Test
+    void highConfidenceFilterSuppressesBarelyLongStraightLineMethod() throws Exception {
+        Path source = tempDir.resolve("BarelyLong.java");
+        StringBuilder code = new StringBuilder("""
+                class BarelyLong {
+                  void work() {
+                """);
+        for (int index = 0; index < 55; index++) {
+            code.append("    System.out.println(").append(index).append(");\n");
+        }
+        code.append("""
+                  }
+                }
+                """);
+        Files.writeString(source, code.toString());
+
+        CliRun run = run("detect-smells", "--json", "--min-confidence", "high", source.toString());
+
+        assertEquals(0, run.exitCode(), () -> "stderr=" + run.stderr() + "\nstdout=" + run.stdout());
+        assertFalse(containsSmell(fileEndingWith(run.report(), "BarelyLong.java"), "long-function"));
+    }
+
+    @Test
     void detectSmellsReportsPartitionedProjectIndexForLargeConfiguredBatch() throws Exception {
         String previous = System.getProperty("codeRefactor.smell.projectIndexBatchSize");
         System.setProperty("codeRefactor.smell.projectIndexBatchSize", "2");
@@ -430,6 +453,8 @@ class CliTest {
             assertEquals(0, run.exitCode(), () -> "stderr=" + run.stderr() + "\nstdout=" + run.stdout());
             JsonNode scope = run.report().path("analysis_scope");
             assertEquals("partitioned", scope.path("project_index_mode").asText());
+            assertEquals("all-standard", scope.path("detector_mode").asText());
+            assertEquals(24, scope.path("detectors_run").asInt());
             assertEquals(2, scope.path("project_index_batch_size").asInt());
             assertEquals(2, scope.path("project_index_batch_count").asInt());
             assertEquals(3, run.report().path("summary").path("files_total").asInt());

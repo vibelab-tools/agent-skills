@@ -460,6 +460,11 @@ cross-file evidence was scoped. Small scans use `full`. Large scans may use
 bounded; local single-file smells are unaffected, while cross-file smells are
 scoped to the partition that contains the reported file.
 
+`analysis_scope.detector_mode` is `all-standard` for `detect-smells`, and
+`analysis_scope.detectors_run` is the number of implemented standard detectors
+executed. The Skill's `review-changes` wrapper uses this metadata to verify the
+complete 24-detector pass.
+
 ## Plan Refactor JSON
 
 Top-level shape:
@@ -609,6 +614,15 @@ extensionless wrappers and logical subcommands:
 - `scripts/detect-smells --json <path>...`
 - `scripts/plan-refactor --json <detect-smells-report.json|->`
 - `scripts/code-refactor-tools <command> [options] <path>...`
+
+`scripts/review-changes [--base <git-ref>]` is the default Skill workflow. Its
+schema-version `2.0` JSON selects changed production lines, runs all 24 standard
+detectors at high confidence, filters out broad scopes barely touched by the
+diff, and reports at most three candidates. Each candidate includes
+`changed_line_count`. The summary
+includes `changed_production_files`, `detectors_run`, `candidates_found`,
+`candidates_reported`, `candidates_omitted`, and `files_with_parse_errors`.
+`--smells` remains an accepted no-op compatibility flag.
 
 Directory analysis uses directory paths as normal positional inputs. The current
 Java implementation does not need to match old human-readable text exactly, but

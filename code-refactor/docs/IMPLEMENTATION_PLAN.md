@@ -179,6 +179,8 @@ Deliverables:
 - Thin wrapper scripts for the skill.
 - Updated `code-quality-review` Skill post-change workflow and tool commands.
 - Report-to-plan workflow for turning smell JSON into bounded refactoring steps.
+- A changed-code wrapper that runs all 24 detectors by default and emits at
+  most three compact candidates for manual validation.
 - Backward-compatible examples.
 - Makefile targets for bundle, validate, install, and uninstall.
 
@@ -187,6 +189,8 @@ Acceptance:
 - Existing skill commands have a working replacement path.
 - `quick_validate.py skill/code-quality-review` passes before installation.
 - A real local repo file can be analyzed through the skill workflow.
+- The changed-code smoke check proves the 24-detector pass, zero-candidate
+  behavior, the three-candidate cap, and bounded JSON output.
 - `make install` installs the validated snapshot to
   `${CODEX_HOME:-~/.codex}/skills/code-quality-review` only when live replacement is
   intended.

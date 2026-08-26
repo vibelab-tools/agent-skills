@@ -21,8 +21,9 @@ This project now contains a Maven-based Java CLI implementation with:
   default,
 - a `plan-refactor` command that turns `detect-smells` JSON into a bounded
   refactoring execution plan,
-- a `review-changes` wrapper that restricts complexity and optional smell
-  evidence to current Git diff line ranges,
+- a `review-changes` wrapper that runs all 24 detectors on changed production
+  lines and emits at most three compact high-confidence candidates from scopes
+  materially touched by the diff,
 - JUnit coverage for CLI behavior, Java smell rules, directory scanning,
   parser-backed language behavior, meaningful negative cases, and reproduced
   real-repository defects.

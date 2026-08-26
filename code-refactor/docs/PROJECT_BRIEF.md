@@ -16,6 +16,7 @@ extensionless wrappers around a packaged JAR:
 - `scripts/detect-smells`
 - `scripts/plan-refactor`
 - `scripts/code-refactor-tools`
+- `scripts/review-changes`
 
 ## Primary Goal
 
@@ -23,6 +24,11 @@ Maintain a local CLI tool suite that gives Codex compact, trustworthy evidence
 during post-change code-quality review. The tools support the decision whether a
 current change warrants a small behavior-preserving refactor; they do not make
 that decision for the agent.
+
+The default post-change workflow runs all 24 standard detectors against changed
+production source, keeps only findings whose reported scope was materially
+touched by changed lines, and returns at most three high-confidence candidates
+for manual validation.
 
 ## Tooling Scope
 
@@ -75,6 +81,8 @@ See `LANGUAGE_SUPPORT.md` for precision levels and known limitations.
   including reproduced defects from representative real repositories.
 - The installable skill wrappers can call the packaged CLI without breaking
   existing skill workflows.
+- The default changed-code wrapper proves that all 24 standard detectors ran
+  and bounds its output to three compact candidates.
 
 ## Non-Goals
 
