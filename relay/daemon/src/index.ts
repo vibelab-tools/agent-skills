@@ -29,6 +29,7 @@ import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
 import { Attachment } from "./types";
+import { injectRemotePrompt, PromptOriginTracker } from "./prompt-origin";
 
 const log = createLogger("daemon");
 
@@ -47,6 +48,7 @@ async function main(): Promise<void> {
 
   // Initialize components
   const sessionManager = new SessionManager(config);
+  const promptOrigins = new PromptOriginTracker();
   sessionManager.initializeFeishuRecovery();
 
   // 2026-03-17: Initialize all configured IM providers
@@ -57,7 +59,7 @@ async function main(): Promise<void> {
   let poller: Poller | null = null;
   if (telegramIsConfigured(config)) {
     telegramProvider = new TelegramProvider(config);
-    poller = new Poller(config, sessionManager);
+    poller = new Poller(config, sessionManager, promptOrigins);
     enabledProviders.push(telegramProvider.name);
   } else {
     log.info("Telegram provider disabled; worker URL, bot token, and chat ID are required");
@@ -79,7 +81,7 @@ async function main(): Promise<void> {
         return;
       }
       log.info({ tmuxSession: binding.tmuxSession }, "Injecting DingTalk message");
-      injectText(binding.tmuxSession, msg.text);
+      injectRemotePrompt(promptOrigins, binding.tmuxSession, msg.text, injectText);
     });
     await dingtalkProvider.connect();
     enabledProviders.push(dingtalkProvider.name);
@@ -106,7 +108,12 @@ async function main(): Promise<void> {
       // 2026-03-20: Build injection text with attachment file paths for agent sessions
       const injectionText = buildInjectionText(msg.text, msg.attachments);
       log.info({ tmuxSession: binding.tmuxSession }, "Injecting Feishu message");
-      if (injectText(binding.tmuxSession, injectionText)) {
+      if (injectRemotePrompt(
+        promptOrigins,
+        binding.tmuxSession,
+        injectionText,
+        injectText
+      )) {
         sessionManager.rememberFeishuMessage(rootMessageId, msg.id);
         return true;
       }
@@ -126,7 +133,14 @@ async function main(): Promise<void> {
   }
 
   // Initialize server with all providers
-  const server = new Server(config, sessionManager, telegramProvider, dingtalkProvider, feishuProvider);
+  const server = new Server(
+    config,
+    sessionManager,
+    promptOrigins,
+    telegramProvider,
+    dingtalkProvider,
+    feishuProvider
+  );
 
   // Start server and poller
   await server.start();

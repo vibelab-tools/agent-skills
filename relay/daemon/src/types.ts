@@ -94,6 +94,12 @@ export interface NotifyRequest {
   transcriptPath?: string;
 }
 
+/** POST /prompt-origin request from the UserPromptSubmit hook */
+export interface PromptOriginRequest {
+  tmuxSession: string;
+  fingerprint: string;
+}
+
 /** POST /bind request */
 export interface BindRequest {
   tmuxSession: string;

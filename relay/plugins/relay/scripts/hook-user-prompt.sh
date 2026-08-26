@@ -11,9 +11,6 @@ SCRIPT_DIR="$(dirname "$0")"
 
 DAEMON_URL="$(relay_daemon_url)"
 
-# 2026-04-03: Auto-ensure binding before sending
-"$SCRIPT_DIR/ensure-binding.sh" 2>/dev/null
-
 # Read hook input from stdin
 if [ -t 0 ]; then
     HOOK_INPUT=""
@@ -21,7 +18,7 @@ else
     HOOK_INPUT=$(cat)
 fi
 
-# Signal daemon that user submitted a prompt locally
+# Signal daemon that a user prompt was submitted.
 curl -s -X POST "${DAEMON_URL}/cancel-pending" >/dev/null 2>&1
 
 # 2026-04-03: Extract user prompt and relay to IM
@@ -31,10 +28,36 @@ if [ -z "$PROMPT" ] || [ ${#PROMPT} -lt 1 ]; then
     exit 0
 fi
 
+TMUX_SESSION="$(relay_detect_tmux_session)"
+
+# Prompts injected from IM are already visible there. Consume their short-lived
+# origin marker so only prompts typed directly in Codex are relayed back.
+if command -v sha256sum >/dev/null 2>&1; then
+    PROMPT_FINGERPRINT=$(printf '%s' "$PROMPT" | sha256sum | awk '{print $1}')
+elif command -v shasum >/dev/null 2>&1; then
+    PROMPT_FINGERPRINT=$(printf '%s' "$PROMPT" | shasum -a 256 | awk '{print $1}')
+else
+    PROMPT_FINGERPRINT=""
+fi
+
+if [ -n "$TMUX_SESSION" ] && [ -n "$PROMPT_FINGERPRINT" ]; then
+    ORIGIN=$(curl -s -X POST "${DAEMON_URL}/prompt-origin" \
+        -H "Content-Type: application/json" \
+        -d "$(jq -n \
+            --arg tmuxSession "$TMUX_SESSION" \
+            --arg fingerprint "$PROMPT_FINGERPRINT" \
+            '{tmuxSession: $tmuxSession, fingerprint: $fingerprint}'
+        )" 2>/dev/null | jq -r '.origin // "local"' 2>/dev/null)
+    if [ "$ORIGIN" = "im" ]; then
+        exit 0
+    fi
+fi
+
+# Auto-ensure a binding only when a local prompt will be relayed.
+"$SCRIPT_DIR/ensure-binding.sh" 2>/dev/null
+
 # Truncate long prompts to avoid flooding IM
 PROMPT=$(echo "$PROMPT" | head -c 3000)
-
-TMUX_SESSION="$(relay_detect_tmux_session)"
 
 # 2026-04-03: Prefix with sender indicator so IM readers can distinguish user vs assistant
 TEXT="👤 ${PROMPT}"

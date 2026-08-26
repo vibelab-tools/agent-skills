@@ -4,7 +4,7 @@
 // 2026-03-17: Implement local HTTP API for daemon control
 
 import * as http from "http";
-import { DaemonConfig, NotifyRequest, BindRequest } from "./types";
+import { DaemonConfig, NotifyRequest, BindRequest, PromptOriginRequest } from "./types";
 import { SessionManager } from "./session-manager";
 import { IMProvider } from "./providers/base";
 import { FeishuProvider } from "./providers/feishu";
@@ -12,12 +12,14 @@ import { requestJson } from "./http";
 import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
+import { PromptOriginTracker } from "./prompt-origin";
 
 const log = createLogger("server");
 
 export class Server {
   private config: DaemonConfig;
   private sessionManager: SessionManager;
+  private promptOrigins: PromptOriginTracker;
   private telegramProvider: IMProvider | null;
   // 2026-03-17: Add DingTalk provider for dual-platform notification
   private dingtalkProvider: IMProvider | null;
@@ -29,12 +31,14 @@ export class Server {
   constructor(
     config: DaemonConfig,
     sessionManager: SessionManager,
+    promptOrigins: PromptOriginTracker,
     telegramProvider: IMProvider | null,
     dingtalkProvider?: IMProvider | null,
     feishuProvider?: FeishuProvider | null
   ) {
     this.config = config;
     this.sessionManager = sessionManager;
+    this.promptOrigins = promptOrigins;
     this.telegramProvider = telegramProvider;
     this.dingtalkProvider = dingtalkProvider || null;
     this.feishuProvider = feishuProvider || null;
@@ -103,6 +107,10 @@ export class Server {
     // POST /cancel-pending
     else if (method === "POST" && url.pathname === "/cancel-pending") {
       this.handleCancelPending(res);
+    }
+    // POST /prompt-origin
+    else if (method === "POST" && url.pathname === "/prompt-origin") {
+      await this.handlePromptOrigin(req, res);
     }
     // 404
     else {
@@ -291,6 +299,29 @@ export class Server {
     this.pendingCancel = true;
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ ok: true }));
+  }
+
+  /** Identify and consume a prompt previously injected from an IM provider. */
+  private async handlePromptOrigin(
+    req: http.IncomingMessage,
+    res: http.ServerResponse
+  ): Promise<void> {
+    const body = await readBody<PromptOriginRequest>(req);
+    if (
+      !body.tmuxSession ||
+      typeof body.fingerprint !== "string" ||
+      !/^[0-9a-f]{64}$/.test(body.fingerprint)
+    ) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "tmuxSession and fingerprint are required" }));
+      return;
+    }
+
+    const origin = this.promptOrigins.consume(body.tmuxSession, body.fingerprint)
+      ? "im"
+      : "local";
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ origin }));
   }
 }
 

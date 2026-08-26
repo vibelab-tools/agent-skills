@@ -10,18 +10,25 @@ import { requestJson } from "./http";
 import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
+import { injectRemotePrompt, PromptOriginTracker } from "./prompt-origin";
 
 const log = createLogger("poller");
 
 export class Poller {
   private config: DaemonConfig;
   private sessionManager: SessionManager;
+  private promptOrigins: PromptOriginTracker;
   private timer: ReturnType<typeof setInterval> | null = null;
   private running = false;
 
-  constructor(config: DaemonConfig, sessionManager: SessionManager) {
+  constructor(
+    config: DaemonConfig,
+    sessionManager: SessionManager,
+    promptOrigins: PromptOriginTracker
+  ) {
     this.config = config;
     this.sessionManager = sessionManager;
+    this.promptOrigins = promptOrigins;
   }
 
   /** Start the polling loop */
@@ -92,7 +99,12 @@ export class Poller {
     }
 
     log.info({ from: msg.from.first_name, tmuxSession }, "Injecting message");
-    const success = injectText(tmuxSession, msg.text);
+    const success = injectRemotePrompt(
+      this.promptOrigins,
+      tmuxSession,
+      msg.text,
+      injectText
+    );
     if (!success) {
       log.error({ tmuxSession }, "Failed to inject");
     }

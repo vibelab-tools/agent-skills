@@ -2,14 +2,21 @@
 // ABOUTME: Verifies Feishu notifications reuse one session topic with selective alerts.
 
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { spawn } from "node:child_process";
 import test from "node:test";
 import { SessionManager } from "./session-manager";
 import { Server } from "./server";
 import { DaemonConfig } from "./types";
+import { PromptOriginTracker } from "./prompt-origin";
+
+const USER_PROMPT_HOOK = join(
+  __dirname,
+  "../../plugins/relay/scripts/hook-user-prompt.sh"
+);
 
 test("reuses one Feishu topic and alerts only attention events", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-server-test-"));
@@ -42,6 +49,7 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
   const server = new Server(
     config,
     sessionManager,
+    new PromptOriginTracker(),
     null,
     null,
     feishuProvider as any
@@ -102,3 +110,94 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
     rmSync(testDir, { recursive: true, force: true });
   }
 });
+
+test("relays local Codex prompts but not prompts injected from IM", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-prompt-origin-test-"));
+  const homeDir = join(testDir, "home");
+  const binDir = join(testDir, "bin");
+  const tmuxSession = "codex-demo-abc123";
+  const config = {
+    port: 0,
+    hostname: "gpu.example.com",
+    bindingsPath: join(testDir, "bindings.json"),
+  } as DaemonConfig;
+  const sessionManager = new SessionManager(config);
+  sessionManager.bind(tmuxSession, "topic-1");
+  const promptOrigins = new PromptOriginTracker();
+  const sent: Array<{ topicId?: string; text: string }> = [];
+  const telegramProvider = {
+    name: "telegram",
+    send: async (options: { topicId?: string; text: string }) => {
+      sent.push(options);
+      return true;
+    },
+  };
+  const server = new Server(
+    config,
+    sessionManager,
+    promptOrigins,
+    telegramProvider,
+    null,
+    null
+  );
+
+  try {
+    await server.start();
+    const address = (server as any).httpServer.address() as AddressInfo;
+    const relayHome = join(homeDir, ".vibelab-tools/agent-skills/relay");
+    mkdirSync(relayHome, { recursive: true });
+    writeFileSync(
+      join(relayHome, "config.json"),
+      JSON.stringify({ daemon: { port: address.port } })
+    );
+    mkdirSync(binDir, { recursive: true });
+    const tmuxPath = join(binDir, "tmux");
+    writeFileSync(tmuxPath, `#!/bin/sh\nprintf '%s' '${tmuxSession}'\n`);
+    chmodSync(tmuxPath, 0o755);
+
+    const remotePrompt = "sent from Feishu";
+    promptOrigins.record(tmuxSession, remotePrompt);
+    await runUserPromptHook(remotePrompt, homeDir, binDir);
+    assert.deepEqual(sent, []);
+
+    await runUserPromptHook("typed directly in Codex", homeDir, binDir);
+    assert.deepEqual(sent, [
+      { topicId: "topic-1", text: "👤 typed directly in Codex" },
+    ]);
+  } finally {
+    server.stop();
+    rmSync(testDir, { recursive: true, force: true });
+  }
+});
+
+function runUserPromptHook(
+  prompt: string,
+  homeDir: string,
+  binDir: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn("bash", [USER_PROMPT_HOOK], {
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        PATH: `${binDir}:${process.env.PATH || ""}`,
+        TMUX: "/tmp/tmux-test/default,1,0",
+      },
+      stdio: ["pipe", "ignore", "pipe"],
+    });
+    let stderr = "";
+    child.stderr.setEncoding("utf8");
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`hook exited ${code}: ${stderr}`));
+      }
+    });
+    child.stdin.end(JSON.stringify({ prompt }));
+  });
+}
