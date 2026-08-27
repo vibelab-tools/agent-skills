@@ -1,6 +1,6 @@
 ---
 name: manage-work-with-issues
-description: Manage repository requirements, defects, and execution plans through GitHub or GitLab issues so scope, visual evidence, dependencies, decisions, verification, and completion survive context compaction. Use whenever Codex or Claude Code is analyzing, planning, implementing, fixing, refactoring, documenting, testing, configuring, building, or releasing work in a Git repository whose authoritative remote is GitHub or GitLab; record concrete requirements and defects, attach safe and relevant screenshots supplied with requests especially for defects, turn each independently completable execution-plan task into an issue before coding, use `gh` for GitHub and `glab` for GitLab, require issue-linked commits, and close each issue only after verified completion is visible remotely.
+description: Manage repository requirements, defects, and execution plans through GitHub or GitLab issues so scope, visual evidence, dependencies, decisions, verification, and completion survive context compaction. Use whenever Codex or Claude Code is analyzing, planning, implementing, fixing, refactoring, documenting, testing, configuring, building, or releasing work in a Git repository whose authoritative remote is GitHub or GitLab; record concrete requirements and defects, attach safe and relevant screenshots supplied with requests especially for defects, turn each independently completable execution-plan task into an issue before coding, use `gh` for GitHub and `glab` for GitLab, commit and publish verified issue work by default unless the user explicitly prohibits it, require issue-linked commit footers, and close each issue only after verified completion is visible remotely.
 ---
 
 # Manage Work With Issues
@@ -16,18 +16,21 @@ GitHub or GitLab.
 3. Map every independently completable plan task to an authoritative issue
    before coding starts.
 4. Use `gh` only for GitHub and `glab` only for GitLab.
-5. Reference the current task issue from every commit belonging to it.
-6. Keep each issue open while its work or verification remains.
-7. Make the commit visible on the hosted repository before closing the issue.
-8. Write issue content in the target project's working language.
-9. Attach relevant and safe screenshots supplied with the request, especially
+5. Reference the current task issue from every commit belonging to it; use
+   `Closes #123` on the final completion-bearing commit.
+6. After implementation and required verification pass, commit and publish the
+   issue work unless the user explicitly prohibits the corresponding action.
+7. Keep each issue open while its work or verification remains.
+8. Make the commit visible on the hosted repository before closing the issue.
+9. Write issue content in the target project's working language.
+10. Attach relevant and safe screenshots supplied with the request, especially
    for defects, and explain what each image proves.
-10. Never place credentials, tokens, private customer data, or sensitive logs in
+11. Never place credentials, tokens, private customer data, or sensitive logs in
    an issue or commit message.
-11. For every multiline create, edit, or comment, use the bundled
+12. For every multiline create, edit, or comment, use the bundled
     `issue_markdown.py` provider mode. Do not construct `--raw-field` or normal
     quoted arguments containing `\n`.
-12. Before closure, reconcile every task-list item in the issue body: mark
+13. Before closure, reconcile every task-list item in the issue body: mark
     satisfied items `[x]`, preserve removed items as non-checkbox strikethrough
     bullets with a reason, and leave no unchecked task-list items.
 
@@ -390,16 +393,33 @@ Implement only the current issue scope and run the repository's relevant checks.
 Prefer completing one issue at a time unless the plan explicitly marks tasks as
 parallel. Review the final diff before committing.
 
+Committing and publishing are the default terminal actions for completed issue
+work. After the required checks pass, do not stop at "ready to commit," ask for
+separate confirmation, or leave the implementation only in the working tree.
+Commit and push through the repository's normal workflow unless the user has
+explicitly said not to commit, not to push, or to stop before either action.
+Apply a prohibition only to the named action: for example, "commit but do not
+push" permits the local commit and forbids publication.
+
+This default does not authorize force-pushing, bypassing branch protection,
+merging without required review, publishing unrelated user changes, or ignoring
+failed verification. Stage only the current issue's intended files. If the
+normal push requires unavailable credentials or review authority, preserve the
+valid local commit when permitted, keep the issue open, and report the exact
+remaining action.
+
 Reference the issue in every task commit. Preserve the repository's existing
 commit convention for the header and place the issue reference in the footer.
-Use an unambiguous full issue URL when the commit and issue are in different
-repositories.
+For an issue in another repository, use the provider's unambiguous cross-project
+form: `owner/repository#123` on GitHub or `group/project#123` on GitLab; use the
+full issue URL when a short reference is ambiguous or crosses GitLab instances.
 
 Avoid combining multiple issues in one commit. If an indivisible commit really
 does implement more than one plan task, reference every affected issue and do
 not close any of them until its own acceptance criteria pass.
 
-Use `Refs` for intermediate commits:
+Use `Refs` for an intermediate commit that must link the issue without closing
+it. `Ref` and `Refs` are reference labels, not provider closing actions:
 
 ```text
 fix(scope): correct the failing behavior
@@ -407,8 +427,7 @@ fix(scope): correct the failing behavior
 Refs #123
 ```
 
-Use a provider-supported closing keyword only on the final commit that actually
-completes the issue:
+Use `Closes` on the final commit that actually completes the issue:
 
 ```text
 feat(scope): deliver the requested capability
@@ -416,12 +435,19 @@ feat(scope): deliver the requested capability
 Closes #123
 ```
 
+`Closes` is the preferred common form supported by both GitHub and GitLab.
+`Fixes` and `Resolves` are also common closing keywords, but use them only when
+the repository has an established convention. Past-tense forms such as `Closed`
+and `Fixed` are provider-supported but are not the Skill default. Never use
+`Ref` or `Refs` when automatic closure is intended.
+
 When commits will be squashed, ensure the surviving commit message still
 references the issue. Do not create an empty commit for a no-code investigation;
 record its verified findings in the issue instead.
 
 ## 5. Publish and Close
 
+Publishing completed issue work is required by default, not an optional handoff.
 Do not close an issue merely because a local commit exists. Push the referencing
 commit according to repository policy, or merge the pull request or merge
 request, so the association is visible on GitHub or GitLab.
@@ -429,18 +455,23 @@ request, so the association is visible on GitHub or GitLab.
 - On a direct default-branch workflow, push the final `Closes #123` commit and
   verify whether the provider closed the issue automatically.
 - On a branch-and-review workflow, keep the issue open until the pull request or
-  merge request is merged. Keep commit footers linked with `Refs #123`, and add
-  the closing reference to the final integration commit or review request.
+  merge request is merged. Push the work branch proactively, use `Closes #123`
+  in the completion-bearing commit, and preserve that closing reference in any
+  squash or integration commit.
 - If pushing or merging requires authority that is not available, leave the
   issue open, add a concise blocker comment when possible, and report the exact
   remaining action.
 
-After the commit is remotely visible and all acceptance criteria pass,
-reconcile the issue body and require `--check-closure` to pass. Then add a short
-final comment containing the commit or review-request URL and the checks run.
-If the provider did not auto-close the issue, close it explicitly with the
-correct CLI. For GitLab, add the final note before `glab issue close`; for
-GitHub, `gh issue close --comment <text> --reason completed` may combine them.
+Before publishing a closing commit directly to the default branch, reconcile
+the issue body and require `--check-closure` to pass so `Closes #123` cannot
+auto-close an issue with unfinished criteria. In a branch-and-review workflow,
+perform this closure check after review requirements pass and before merge.
+
+After the commit is remotely visible, add a short final comment containing the
+commit or review-request URL and the checks run. If the provider did not
+auto-close the issue, close it explicitly with the correct CLI. For GitLab, add
+the final note before `glab issue close`; for GitHub,
+`gh issue close --comment <text> --reason completed` may combine them.
 
 Finally, verify the remote state:
 
