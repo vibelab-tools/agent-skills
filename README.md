@@ -18,6 +18,7 @@ removed with the same target names.
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
 | `weixin-article-reader` | Reads public WeChat Official Account articles as Markdown plus locally inspectable or MCP-native image evidence. | [weixin-article-reader/SKILL.md](weixin-article-reader/SKILL.md) |
+| `humanizer` | Rewrites Chinese, English, and mixed-language prose naturally while preserving claims, exact factual anchors, register, and reader-facing clarity. | [humanizer/SKILL.md](humanizer/SKILL.md) |
 
 ## Dependency Overview
 
@@ -30,6 +31,7 @@ removed with the same target names.
 | `video-understanding` | Python 3.10+, `ffmpeg`, preferably `ffprobe`, provider API credentials for provider-backed modes, and `boto3` in the isolated runtime venv when OSS/S3-compatible video upload is enabled. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
 | `weixin-article-reader` | Python 3.10+ with working `venv` and `pip`; the Codex install target also requires the `codex` CLI to register its stdio MCP server. |
+| `humanizer` | Python 3.9+ standard library for the optional exact-anchor checker; no network service or third-party package. |
 
 ## Install Layout
 

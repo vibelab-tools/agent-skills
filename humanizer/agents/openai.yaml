@@ -1,0 +1,4 @@
+interface:
+  display_name: "Humanizer"
+  short_description: "Rewrite Chinese and English prose naturally"
+  default_prompt: "Use $humanizer to rewrite this text naturally for its intended readers while preserving its facts, intent, register, and formatting."
