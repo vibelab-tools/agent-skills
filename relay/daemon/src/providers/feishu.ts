@@ -588,6 +588,56 @@ export class FeishuProvider implements IMProvider {
     }
   }
 
+  async sendPromptImages(
+    rootMessageId: string,
+    imagePaths: string[]
+  ): Promise<boolean> {
+    if (!this.client || imagePaths.length === 0) return false;
+
+    let sent = 0;
+    for (let index = 0; index < imagePaths.length; index += 1) {
+      try {
+        const uploaded = await this.client.im.image.create({
+          data: {
+            image_type: "message",
+            image: await fs.promises.readFile(imagePaths[index]),
+          },
+        });
+        const imageKey = (uploaded as any)?.image_key || (uploaded as any)?.data?.image_key;
+        if (!imageKey) throw new Error("image_key missing in upload response");
+
+        await this.client.im.message.reply({
+          path: { message_id: rootMessageId },
+          data: {
+            content: JSON.stringify({
+              zh_cn: {
+                title: "",
+                content: [
+                  [{ tag: "text", text: `[Image #${index + 1}]` }],
+                  [{ tag: "img", image_key: imageKey }],
+                ],
+              },
+            }),
+            msg_type: "post",
+            reply_in_thread: true,
+          },
+        });
+        sent += 1;
+      } catch (err) {
+        log.warn(
+          { err: summarizeError(err), imageNumber: index + 1 },
+          "Prompt image delivery failed"
+        );
+      }
+    }
+
+    if (sent > 0) {
+      this.hotUntil.set(rootMessageId, Date.now() + HOT_RECOVERY_WINDOW_MS);
+      log.info({ imageCount: sent }, "Sent prompt images");
+    }
+    return sent === imagePaths.length;
+  }
+
   /** Send a new message to the group, returns message_id */
   async sendNewRootMessage(chatId: string, title: string): Promise<string | null> {
     if (!this.client) return null;

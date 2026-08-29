@@ -2,6 +2,9 @@
 // ABOUTME: Ensures session replies remain grouped inside a Feishu topic.
 
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import { DaemonConfig } from "../types";
 import { FeishuProvider } from "./feishu";
@@ -68,6 +71,50 @@ test("mentions everyone for an attention reply", async () => {
     JSON.stringify({ text: '<at user_id="all">所有人</at> done' })
   );
   assert.equal(request.data.reply_in_thread, true);
+});
+
+test("uploads prompt images and replies inside the session topic", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-feishu-image-test-"));
+  const firstImage = join(testDir, "first.png");
+  const secondImage = join(testDir, "second.png");
+  writeFileSync(firstImage, "first");
+  writeFileSync(secondImage, "second");
+  const provider = new FeishuProvider({ feishuChatId: "oc_test" } as DaemonConfig);
+  const uploads: any[] = [];
+  const replies: any[] = [];
+
+  (provider as any).client = {
+    im: {
+      image: {
+        create: async (value: any) => {
+          uploads.push(value);
+          return { image_key: `img_${uploads.length}` };
+        },
+      },
+      message: {
+        reply: async (value: any) => {
+          replies.push(value);
+        },
+      },
+    },
+  };
+
+  try {
+    const sent = await provider.sendPromptImages("om_root", [firstImage, secondImage]);
+
+    assert.equal(sent, true);
+    assert.equal(uploads.length, 2);
+    assert.equal(uploads[0].data.image_type, "message");
+    assert.equal(uploads[1].data.image_type, "message");
+    assert.equal(Buffer.isBuffer(uploads[0].data.image), true);
+    assert.equal(Buffer.isBuffer(uploads[1].data.image), true);
+    assert.deepEqual(replies, [
+      promptImageReply("om_root", "img_1", 1),
+      promptImageReply("om_root", "img_2", 2),
+    ]);
+  } finally {
+    rmSync(testDir, { recursive: true, force: true });
+  }
 });
 
 test("polls user topic replies once when WebSocket delivery is missed", async () => {
@@ -359,5 +406,24 @@ function messageItem(messageId: string, createTime: string) {
     sender: { sender_type: "user", id: "ou_user" },
     root_id: "om_root",
     thread_id: "omt_thread",
+  };
+}
+
+function promptImageReply(rootMessageId: string, imageKey: string, number: number) {
+  return {
+    path: { message_id: rootMessageId },
+    data: {
+      content: JSON.stringify({
+        zh_cn: {
+          title: "",
+          content: [
+            [{ tag: "text", text: `[Image #${number}]` }],
+            [{ tag: "img", image_key: imageKey }],
+          ],
+        },
+      }),
+      msg_type: "post",
+      reply_in_thread: true,
+    },
   };
 }

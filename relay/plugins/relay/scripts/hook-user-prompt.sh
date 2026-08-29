@@ -23,6 +23,8 @@ curl -s -X POST "${DAEMON_URL}/cancel-pending" >/dev/null 2>&1
 
 # 2026-04-03: Extract user prompt and relay to IM
 PROMPT=$(echo "$HOOK_INPUT" | jq -r '.prompt // empty' 2>/dev/null)
+TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
+TURN_ID=$(echo "$HOOK_INPUT" | jq -r '.turn_id // empty' 2>/dev/null)
 
 if [ -z "$PROMPT" ] || [ ${#PROMPT} -lt 1 ]; then
     exit 0
@@ -69,7 +71,11 @@ curl -s -X POST "${DAEMON_URL}/notify" \
         --arg type "user_prompt" \
         --arg text "$TEXT" \
         --arg tmuxSession "$TMUX_SESSION" \
-        '{type: $type, text: $text, tmuxSession: $tmuxSession}'
+        --arg transcriptPath "$TRANSCRIPT_PATH" \
+        --arg turnId "$TURN_ID" \
+        '{type: $type, text: $text, tmuxSession: $tmuxSession}
+          + (if $transcriptPath != "" then {transcriptPath: $transcriptPath} else {} end)
+          + (if $turnId != "" then {turnId: $turnId} else {} end)'
     )" >/dev/null 2>&1
 
 exit 0

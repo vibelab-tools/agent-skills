@@ -92,6 +92,7 @@ export interface NotifyRequest {
   tmuxSession?: string;
   text: string;
   transcriptPath?: string;
+  turnId?: string;
 }
 
 /** POST /prompt-origin request from the UserPromptSubmit hook */

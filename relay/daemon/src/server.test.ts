@@ -170,10 +170,112 @@ test("relays local Codex prompts but not prompts injected from IM", async () => 
   }
 });
 
+test("relays Codex prompt images from the transcript to Feishu", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-prompt-image-test-"));
+  const homeDir = join(testDir, "home");
+  const binDir = join(testDir, "bin");
+  const tmuxSession = "codex-demo-abc123";
+  const turnId = "turn-image";
+  const transcriptPath = join(testDir, "rollout.jsonl");
+  const firstImage = join(testDir, "first.png");
+  const secondImage = join(testDir, "second.png");
+  const config = {
+    port: 0,
+    hostname: "gpu.example.com",
+    feishuChatId: "oc_test",
+    bindingsPath: join(testDir, "bindings.json"),
+  } as DaemonConfig;
+  const sessionManager = new SessionManager(config);
+  const sent: Array<{ topicId?: string; text: string }> = [];
+  const sentImages: string[][] = [];
+  const feishuProvider = {
+    name: "feishu",
+    sendNewRootMessage: async () => "om_session",
+    send: async (options: { topicId?: string; text: string }) => {
+      sent.push(options);
+      return true;
+    },
+    sendPromptImages: async (_rootMessageId: string, imagePaths: string[]) => {
+      sentImages.push(imagePaths);
+      return true;
+    },
+    getRecoveryStatus: () => ({
+      websocketState: "connected",
+      schedulerIntervalMs: 15_000,
+      activeBindings: 1,
+      requestsSinceStart: 0,
+    }),
+  };
+  const server = new Server(
+    config,
+    sessionManager,
+    new PromptOriginTracker(),
+    null,
+    null,
+    feishuProvider as any
+  );
+
+  try {
+    await server.start();
+    const address = (server as any).httpServer.address() as AddressInfo;
+    const relayHome = join(homeDir, ".vibelab-tools/agent-skills/relay");
+    mkdirSync(relayHome, { recursive: true });
+    writeFileSync(
+      join(relayHome, "config.json"),
+      JSON.stringify({ daemon: { port: address.port } })
+    );
+    mkdirSync(binDir, { recursive: true });
+    const tmuxPath = join(binDir, "tmux");
+    writeFileSync(tmuxPath, `#!/bin/sh\nprintf '%s' '${tmuxSession}'\n`);
+    chmodSync(tmuxPath, 0o755);
+    writeFileSync(firstImage, "first");
+    writeFileSync(secondImage, "second");
+
+    await runUserPromptHook(
+      "[Image #1] compare with [Image #2]",
+      homeDir,
+      binDir,
+      { transcript_path: transcriptPath, turn_id: turnId }
+    );
+    assert.deepEqual(sent, [
+      {
+        topicId: "om_session",
+        text: "👤 [Image #1] compare with [Image #2]",
+        mentionAll: false,
+      },
+    ]);
+
+    writeFileSync(
+      transcriptPath,
+      JSON.stringify({
+        type: "event_msg",
+        payload: {
+          turn_id: turnId,
+          item: {
+            type: "UserMessage",
+            content: [
+              { type: "local_image", path: firstImage },
+              { type: "local_image", path: secondImage },
+              { type: "text", text: "compare" },
+            ],
+          },
+        },
+      }) + "\n"
+    );
+
+    await waitFor(() => sentImages.length === 1);
+    assert.deepEqual(sentImages, [[firstImage, secondImage]]);
+  } finally {
+    server.stop();
+    rmSync(testDir, { recursive: true, force: true });
+  }
+});
+
 function runUserPromptHook(
   prompt: string,
   homeDir: string,
-  binDir: string
+  binDir: string,
+  extraInput: Record<string, string> = {}
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn("bash", [USER_PROMPT_HOOK], {
@@ -198,6 +300,14 @@ function runUserPromptHook(
         reject(new Error(`hook exited ${code}: ${stderr}`));
       }
     });
-    child.stdin.end(JSON.stringify({ prompt }));
+    child.stdin.end(JSON.stringify({ prompt, ...extraInput }));
   });
+}
+
+async function waitFor(predicate: () => boolean): Promise<void> {
+  const deadline = Date.now() + 3000;
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error("timed out waiting for prompt images");
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
 }
