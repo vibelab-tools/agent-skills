@@ -1,0 +1,316 @@
+{
+  "case_id": "06-zh-maintenance-notice",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 4,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺计划于 2026 年 9 月 6 日 01:00–02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能有最长 20 分钟处于只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "API 调用和移动端同步也可能受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑可正常使用"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行任何操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "A is concise, formal, and natural. It preserves all required times, impacts, contact details, and cautious commitments except that it weakens C3 from definite impact to possible impact, which reduces meaning preservation."
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 3,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺将于 2026 年 9 月 6 日 01:00–02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能进入最长 20 分钟的只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "API 调用和移动端同步也会受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑可正常使用"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "我们预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行任何操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "B preserves all mandatory claims accurately, but retains more promotional and aspirational wording from the source, making it less restrained than the best versions for the requested style."
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 4,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺将于 2026 年 9 月 6 日 01:00–02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能有最长 20 分钟处于只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "API 调用和移动端同步也可能受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑不受影响"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "我们预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行任何操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "C is clear and concise, but like A it weakens the certainty of API and mobile sync impact. Other required claims are preserved."
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺将于 2026 年 9 月 6 日 01:00–02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能有最长 20 分钟处于只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "API 调用和移动端同步也会受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑可正常使用"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "D is very restrained, direct, and formal. It preserves all mandatory claims and avoids unnecessary promotional wording."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺计划于 2026 年 9 月 6 日 01:00–02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能进入最长 20 分钟的只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "API 调用和移动端同步也会受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑可正常使用"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "我们预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行任何操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "E is formal, clear, restrained, and preserves all mandatory claims with explicit cautious wording for data loss. It keeps a minimal purpose statement without excessive promotion."
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "云笺将于 2026 年 9 月 6 日 01:00 至 02:30（CST）进行例行维护"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "文档可能有最长 20 分钟处于只读状态"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "API 调用和移动端同步也会受到影响"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "离线编辑不受影响"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "预计不会发生数据丢失"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "企业管理员无需进行任何操作"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "维护进展将发布在 https://status.yunjian.example.com"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "请发送邮件至 support@yunjian.example.com"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "F is clear, formal, and restrained, with all mandatory claims intact. It includes a small purpose phrase but remains concise."
+    }
+  ],
+  "ranking": [
+    "E",
+    "D",
+    "F",
+    "B",
+    "A",
+    "C"
+  ],
+  "best": "E",
+  "confidence": "high",
+  "limitations": "All outputs retain a heading despite the instruction to reply only with the rewritten body. Implicit attribution in C5 for outputs without an explicit subject was treated as intact because the notice voice preserves the issuer's expectation. No external verification of URLs or email addresses was performed."
+}

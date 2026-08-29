@@ -1,0 +1,48 @@
+{
+  "runs": [
+    {
+      "judge": "deepseek",
+      "case": "03-en-earnings",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "IncompleteRead(2 bytes read)"
+    },
+    {
+      "judge": "deepseek",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "06-zh-maintenance-notice",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "attempt": 2,
+      "error": "IncompleteRead(3 bytes read)"
+    },
+    {
+      "judge": "deepseek",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "attempt": 2,
+      "error": "IncompleteRead(0 bytes read)"
+    }
+  ]
+}

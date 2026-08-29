@@ -33,8 +33,13 @@ NUMBER_RE = re.compile(
     r"(?:\s?(?:%|‰|ms|s|min|h|KB|MB|GB|TB|KiB|MiB|GiB|Hz|kHz|MHz|GHz|°C|°F))?(?![\w])",
     re.IGNORECASE,
 )
-ACRONYM_RE = re.compile(r"(?<![A-Za-z0-9])[A-Z][A-Z0-9_-]{1,}(?![A-Za-z0-9])")
+ACRONYM_RE = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9_-]{1,})(?:s)?(?![A-Za-z0-9])")
 CITATION_RE = re.compile(r"\[(?:\^?[A-Za-z0-9][A-Za-z0-9_.:-]*|\d+(?:\s*[-,]\s*\d+)*)\]")
+EN_WEEKDAY_RE = re.compile(
+    r"(?<![A-Za-z])(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?![A-Za-z])",
+    re.IGNORECASE,
+)
+ZH_WEEKDAY_RE = re.compile(r"(?:周|星期|礼拜)([一二三四五六日天])")
 QUOTED_RES = (
     re.compile(r'“([^”\n]+)”'),
     re.compile(r'‘([^’\n]+)’'),
@@ -63,10 +68,10 @@ def extract_anchors(text: str) -> Counter[Anchor]:
     protected_spans: list[tuple[int, int]] = []
 
     for match in FENCED_CODE_RE.finditer(text):
-        anchors[Anchor("code block", match.group(2).strip("\n"))] += 1
+        anchors[Anchor("code", match.group(2).strip("\n"))] += 1
         protected_spans.append(match.span())
     for match in INLINE_CODE_RE.finditer(text):
-        anchors[Anchor("inline code", match.group(1))] += 1
+        anchors[Anchor("code", match.group(1))] += 1
         protected_spans.append(match.span())
 
     remaining = _mask_spans(text, protected_spans)
@@ -87,10 +92,39 @@ def extract_anchors(text: str) -> Counter[Anchor]:
     for pattern in QUOTED_RES:
         collect("quoted text", pattern, 1)
 
+    weekdays = {
+        "monday": "1",
+        "tuesday": "2",
+        "wednesday": "3",
+        "thursday": "4",
+        "friday": "5",
+        "saturday": "6",
+        "sunday": "7",
+        "一": "1",
+        "二": "2",
+        "三": "3",
+        "四": "4",
+        "五": "5",
+        "六": "6",
+        "日": "7",
+        "天": "7",
+    }
+    weekday_values: set[str] = set()
+    weekday_spans: list[tuple[int, int]] = []
+    for match in EN_WEEKDAY_RE.finditer(text):
+        weekday_values.add(weekdays[match.group(0).casefold()])
+        weekday_spans.append(match.span())
+    for match in ZH_WEEKDAY_RE.finditer(text):
+        weekday_values.add(weekdays[match.group(1)])
+        weekday_spans.append(match.span())
+    for value in weekday_values:
+        anchors[Anchor("weekday", value)] += 1
+    remaining = _mask_spans(remaining, weekday_spans)
+
     for match in NUMBER_RE.finditer(remaining):
         anchors[Anchor("number", match.group(0))] += 1
     for match in ACRONYM_RE.finditer(remaining):
-        anchors[Anchor("acronym", match.group(0))] += 1
+        anchors[Anchor("acronym", match.group(1))] += 1
 
     return anchors
 

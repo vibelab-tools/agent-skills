@@ -1,0 +1,399 @@
+{
+  "case_id": "02-en-oauth",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "OAuth 2.0 is the industry-standard protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you have clicked “Sign in with Google,” you have used OAuth in action."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication verifies who you are. Authorization determines what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "OAuth 2.0 lets a third-party application access a user’s resources, such as email or calendar data, without seeing the user’s password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "The resource owner: the user; The client: the application requesting access; The authorization server: the server that issues tokens; The resource server: the server that stores the protected data"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "First, the client redirects the user to the authorization server. The user grants consent there, and the authorization server sends an authorization code to the client’s redirect URI. The client exchanges that code, along with its client secret, for an access token. It can then use the access token to request resources from the resource server."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Access tokens are usually short-lived and often expire after one hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "For single-page applications, the PKCE extension (Proof Key for Code Exchange) provides extra protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims survive with the required qualifiers and order. The prose is clear and appropriately registered, though the rhythm is still somewhat plain."
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "dropped",
+          "evidence": "No evidence exists."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "OAuth 2.0 handles authorization, such as when you click \"Sign in with Google.\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "Authentication verifies who you are. Authorization determines what you can access. OAuth 2.0 handles authorization."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "OAuth lets another application access a user's resources, such as email or calendar data, without giving that application the user's password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "The resource owner is the user. The client is the application requesting access. The authorization server issues tokens. The resource server stores the protected data."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "First, the client sends the user to the authorization server. The user grants access there, and the server sends an authorization code to the client's redirect URI. The client exchanges that code, along with its client secret, for an access token. It can then use the access token to request data from the resource server."
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "Access tokens are usually short-lived and often expire after about one hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "For single-page applications, PKCE (Proof Key for Code Exchange) adds protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "The rewrite is concise and clear, but it omits the industry-standard protocol claim and changes the one-hour token lifetime into an approximation."
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "OAuth 2.0 is the industry-standard protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you have used “Sign in with Google,” you have already seen OAuth in action."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication checks who you are; authorization controls what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "With OAuth 2.0, a third-party application can access a user’s resources—such as an email address or calendar—without receiving the user’s password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "The resource owner is the user. The client is the application requesting access. The authorization server issues tokens. The resource server stores the protected data."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "The client first sends the user to the authorization server. After the user grants consent, the authorization server sends an authorization code to the client’s redirect URI. The client then exchanges that code, along with its client secret, for an access token. It can use the access token to request data from the resource server."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Access tokens are usually short-lived and often expire after one hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user to grant access again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "For single-page applications, the PKCE extension (Proof Key for Code Exchange) provides extra protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "This version preserves every claim with the required precision while reading smoothly for junior developers. It has the best balance of fidelity, clarity, and register."
+    },
+    {
+      "label": "D",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "OAuth 2.0 is a protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "altered",
+          "evidence": "If you have clicked \"Sign in with Google,\" you have probably used OAuth."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth handles authorization, not authentication. Authentication verifies who you are. Authorization determines what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "With OAuth 2.0, a third-party application can access resources such as your email address or calendar without receiving your password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "The resource owner is the user. The client is the application requesting access. The authorization server issues tokens. The resource server stores the protected data."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "First, the client redirects the user to the authorization server. The user grants access there, and the authorization server sends an authorization code to the client's redirect URI. The client then exchanges that code and its client secret for an access token. It uses the access token to request data from the resource server."
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "Access tokens are usually short-lived and often expire after about an hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client request a new access token without asking the user to grant access again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "Single-page applications use the PKCE extension, which stands for Proof Key for Code Exchange. PKCE adds protection while avoiding the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "Single-page applications use the PKCE extension.",
+          "evidence": "Single-page applications use the PKCE extension, which stands for Proof Key for Code Exchange."
+        }
+      ],
+      "rationale": "The output is readable, but it weakens the industry-standard claim, hedges the Google example, approximates the one-hour lifetime, and adds a universal PKCE usage claim."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "OAuth 2.0 is a standard way for an application to get permission to access a user’s data."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you’ve ever clicked “Sign in with Google,” you’ve used OAuth."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication confirms who you are. Authorization determines what you’re allowed to access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "With OAuth 2.0, an application can access resources such as your email or calendar without needing your password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "The resource owner: the user who owns the data; The client: the application requesting access; The authorization server: the server that issues tokens; The resource server: the server that stores the protected data"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common OAuth flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "First, the application redirects the user to the authorization server. The user signs in there and grants permission. The authorization server then sends an authorization code to the application’s redirect URI. The application exchanges that code, along with its client secret, for an access token. It can then use the access token to request data from the resource server."
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "Access tokens are usually short-lived and often expire after about an hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Refresh tokens let an application request a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "For single-page applications, PKCE (Proof Key for Code Exchange) adds extra protection. It also means the application does not need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The user signs in at the authorization server.",
+          "evidence": "The user signs in there and grants permission."
+        }
+      ],
+      "rationale": "This is highly readable and well registered, but it changes the industry-standard claim, approximates the token lifetime, and adds a sign-in step not present in the source."
+    },
+    {
+      "label": "F",
+      "naturalness": 4,
+      "reader_clarity": 2,
+      "register_fit": 1,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "dropped",
+          "evidence": "No evidence exists."
+        },
+        {
+          "id": "C2",
+          "status": "altered",
+          "evidence": "你平时点击“使用 Google 登录”时，背后通常就有 OAuth 在工作。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "认证是确认“你是谁”，授权则是决定“你能访问什么”。OAuth 2.0 属于授权机制。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "它允许第三方应用访问用户的资源，比如邮箱或日历，同时不需要拿到用户密码。"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "资源所有者，也就是用户；客户端，也就是请求访问权限的应用；授权服务器，负责验证用户并签发令牌；资源服务器，保存受保护的数据。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "最常见的流程是授权码模式。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "客户端先把用户重定向到授权服务器，用户在那里登录并同意授权。授权服务器随后把一个授权码发送到客户端指定的回调地址。客户端再拿这个授权码和自己的客户端密钥，向授权服务器换取访问令牌。拿到访问令牌后，客户端就可以向资源服务器请求相应资源。"
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "访问令牌通常有效期较短，常见情况是一个小时左右。"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "访问令牌过期后，客户端可以使用刷新令牌获取新的访问令牌，这样用户不必重新确认授权。"
+        },
+        {
+          "id": "C10",
+          "status": "altered",
+          "evidence": "PKCE（Proof Key for Code Exchange）扩展可以在授权码流程中增加一层保护，并避免客户端密钥必须存放在浏览器里。"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The authorization server verifies the user.",
+          "evidence": "授权服务器，负责验证用户并签发令牌"
+        },
+        {
+          "claim": "The user logs in at the authorization server during the flow.",
+          "evidence": "用户在那里登录并同意授权"
+        },
+        {
+          "claim": "For single-page applications, the browser is not suitable for storing a client secret.",
+          "evidence": "对于单页应用，浏览器里不适合保存客户端密钥。"
+        }
+      ],
+      "rationale": "The Chinese prose is readable, but it mismatches the expected English rewrite. It drops the industry-standard claim, weakens or changes several qualifiers, and adds extra role and flow details."
+    }
+  ],
+  "ranking": [
+    "C",
+    "A",
+    "E",
+    "B",
+    "D",
+    "F"
+  ],
+  "best": "C",
+  "confidence": "medium",
+  "limitations": "The evaluation assumes the requested audience is English-speaking because the source and task are in English. It also requires judgment calls on whether approximations such as 'about one hour' and paraphrases of password handling or PKCE framing preserve the pre-registered claim strength."
+}

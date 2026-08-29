@@ -1,0 +1,466 @@
+{
+  "case_id": "03-en-earnings",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "“Northwind Robotics reported third-quarter revenue ... for the quarter ended September 30”; the required Thursday timing is omitted."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“revenue of $412 million ... up 23% year-over-year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales accounted for 34% of total revenue, up from 28% a year ago.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin fell to 41.3% from 43.1%.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a 3% workforce reduction, affecting approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Exceptionally concise and readable financial-news prose. It preserves every inventoried claim except the weekday, and its treatment of the workforce reduction is especially clear."
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "“Northwind Robotics reported third-quarter revenue ... for the quarter ended September 30”; no Thursday timing appears."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“revenue of $412 million ... up 23% year-over-year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales accounted for 34% of total revenue, up from 28% a year ago.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin fell to 41.3% from 43.1%.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Clear, accurate, and appropriately formal, apart from the omitted Thursday. The apposition “3%, approximately 210 positions” is slightly compressed and less idiomatic than alternatives using “or” or “affecting.”"
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "“Northwind Robotics reported third-quarter revenue ... for the quarter ended September 30”; the output omits Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“revenue of $412 million ... up 23% year-over-year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales accounted for 34% of total revenue, up from 28% a year ago.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin fell to 41.3% from 43.1%.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a workforce reduction of 3%, or approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "The strongest overall rendering: concise, idiomatic, and precise, with clean handling of the approximate headcount and prior guidance. Its only inventory failure is omission of Thursday."
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "“Northwind Robotics reported third-quarter revenue ... for the quarter ended September 30”; Thursday is not stated."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“revenue of $412 million ... up 23% year-over-year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales rose to 34% of total revenue, from 28% a year ago.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin contracted to 41.3% from 43.1%”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed [the contraction] to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to a range of $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Polished and direct, with all numerical relationships preserved except the missing weekday. “International sales rose to 34% of total revenue” is understandable but marginally less exact stylistically than saying they accounted for that share."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "“Northwind Robotics reported third-quarter revenue ... for the quarter ended September 30”; the required Thursday reference is absent."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“revenue of $412 million ... up 23% year over year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales accounted for 34% of total revenue, up from 28% a year ago.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin fell to 41.3% from 43.1%.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a workforce reduction of 3%, or approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Concise, natural financial-news writing with precise figures and qualifiers. It omits Thursday, and it is slightly less temporally explicit than versions retaining “following the announcement,” though C13 itself remains intact."
+    },
+    {
+      "label": "F",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "The headline says “Northwind Robotics Reports Third-Quarter Results,” and the body says “for the quarter ended September 30,” but Thursday is omitted."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“$412 million in revenue ... up 23% year-over-year”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“above analyst expectations of $389 million”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“We are seeing unprecedented demand for our autonomous fulfillment systems,” said CEO Marta Lindqvist ... “Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“PickStream platform grew 61%”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“the services segment expanded 18%”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“International sales accounted for 34% of total revenue, up from 28% a year ago”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Gross margin fell to 41.3% from 43.1%.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.”"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "“a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually”"
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "“raised its full-year revenue guidance to $1.58 billion to $1.62 billion, up from its prior forecast of $1.52 billion to $1.57 billion”"
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "“Shares rose 6.8% in after-hours trading”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventoried content except Thursday survives clearly. However, the “supporting the company's continued momentum in the warehouse automation landscape” clause is promotional and cumbersome, making this less concise and less conventionally news-like than the other versions; the sentiment itself comes from the source."
+    }
+  ],
+  "ranking": [
+    "C",
+    "A",
+    "E",
+    "D",
+    "B",
+    "F"
+  ],
+  "best": "C",
+  "confidence": "high",
+  "limitations": "All six outputs are extremely similar and share the same substantive inventory defect: omission of Thursday. The ranking therefore turns on small stylistic differences. C1 bundles several details, so it is marked altered rather than dropped because the company, reporting event, and September 30 quarter date remain while the weekday does not."
+}

@@ -1,0 +1,385 @@
+{
+  "case_id": "02-en-oauth",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "OAuth 2.0 is the industry-standard protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you have clicked “Sign in with Google,” you have used OAuth in action."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication verifies who you are. Authorization determines what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "OAuth 2.0 lets a third-party application access a user’s resources, such as email or calendar data, without seeing the user’s password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Bullets map resource owner=user, client=requesting application, authorization server=issues tokens, resource server=stores the protected data."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "redirects the user to the authorization server → grants consent → code sent to the client’s redirect URI → exchanges that code, along with its client secret, for an access token → uses the token to request resources from the resource server; order preserved."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Access tokens are usually short-lived and often expire after one hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "the PKCE extension (Proof Key for Code Exchange) provides extra protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All ten claims survive with values, qualifiers, and sequence intact. Prose is clean and appropriately plain for junior developers; minor awkwardness in 'used OAuth in action' and a slightly clipped cadence keep it just below the most polished entries. It silently drops the source's un-inventoried sentence about the roles working together for security, a small overall meaning loss."
+    },
+    {
+      "label": "B",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "OAuth 2.0 is a standard way for an application to get permission to access a user’s data. — weakens 'industry-standard protocol' to 'a standard way' and drops the technical term 'delegated authorization'."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you’ve ever clicked “Sign in with Google,” you’ve used OAuth."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication confirms who you are. Authorization determines what you’re allowed to access."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "an application can access resources such as your email or calendar without needing your password. — drops the 'third-party' qualifier and shifts 'without seeing' to 'without needing'; substance survives."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "All four roles with correct mappings ('resource owner: the user who owns the data' adds only an entailed gloss)."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common OAuth flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "redirect → user signs in and grants permission → code to redirect URI → exchange code plus client secret for access token → request data from resource server; order preserved ('signs in' is entailed by the consent step)."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Access tokens are usually short-lived and often expire after about an hour. — both qualifiers kept; 'about' hedges the figure without changing its value or direction."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Refresh tokens let an application request a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "PKCE (Proof Key for Code Exchange) adds extra protection… does not need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "The most conversational, clearly human voice of the set, and an excellent register fit for junior developers. However, it pays for that smoothness with the weakest rendering of C1 (losing 'industry-standard', 'protocol', and 'delegated authorization') and a qualifier-level slip on C4, so it loses the meaning-preservation gate to A, D, and C."
+    },
+    {
+      "label": "C",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "OAuth 2.0 is a protocol for delegated authorization. — keeps the technical term but drops 'industry-standard', weakening strength."
+        },
+        {
+          "id": "C2",
+          "status": "altered",
+          "evidence": "If you have clicked \"Sign in with Google,\" you have probably used OAuth. — the 'probably' hedge softens an asserted example."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth handles authorization, not authentication. Authentication verifies who you are. Authorization determines what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "a third-party application can access resources such as your email address or calendar without receiving your password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Four bullets with correct role mappings."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "redirects → grants access → code to redirect URI → exchanges that code and its client secret for an access token → requests data from the resource server; order preserved."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "usually short-lived and often expire after about an hour — qualifiers kept, figure hedged but not changed."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client request a new access token without asking the user to grant access again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "PKCE extension, which stands for Proof Key for Code Exchange… avoiding the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Preserves the key technical vocabulary (C1 keeps 'protocol for delegated authorization'; C4 keeps 'third-party') with only two strength-level alterations. The style is plain and a touch dry compared with B and D, but fully competent and clear. Ranks below A/D on completeness of preservation, above B on technical precision."
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "OAuth 2.0 is the industry-standard protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "If you have used “Sign in with Google,” you have already seen OAuth in action."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "OAuth is about authorization, not authentication. Authentication checks who you are; authorization controls what you can access."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "a third-party application can access a user’s resources—such as an email address or calendar—without receiving the user’s password."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Four bullets with correct mappings, plus 'Together, these roles handle the authorization process and help keep each step secure' faithfully rendering the source's coordination sentence."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "sends the user to the authorization server → grants consent → code to redirect URI → exchanges code plus client secret for access token → requests data from the resource server; order preserved."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Access tokens are usually short-lived and often expire after one hour."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user to grant access again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "the PKCE extension (Proof Key for Code Exchange) provides extra protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Full claim preservation with exact figures and qualifiers, and it is the only entry besides F to retain the source's point about the roles jointly securing each step. Sentence rhythm is varied and idiomatic, register suits junior developers, and no content is added. Best overall balance of fidelity and humanization."
+    },
+    {
+      "label": "E",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "dropped",
+          "evidence": "No evidence exists: the output only says 'OAuth 2.0 handles authorization'; nothing about being the industry-standard protocol or about delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "OAuth 2.0 handles authorization, such as when you click \"Sign in with Google.\" — example survives, restructured."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "Authentication verifies who you are. Authorization determines what you can access. OAuth 2.0 handles authorization — direction survives though the explicit 'not authentication' contrast is only implied."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "OAuth lets another application access a user’s resources… without giving that application the user’s password. — 'third-party' qualifier lost; substance survives."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Four bullets with correct role mappings."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "The most common flow is the Authorization Code flow."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "sends the user to the authorization server → grants access → code to redirect URI → exchanges code plus client secret → requests data from the resource server; order preserved."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "usually short-lived and often expire after about one hour — qualifiers kept, figure hedged but not changed."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "A refresh token lets the client get a new access token without asking the user for consent again."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "PKCE (Proof Key for Code Exchange) adds protection by removing the need to store a client secret in the browser."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Readable, clean simplification with nine of ten claims essentially preserved, but C1 — the framing fact that OAuth 2.0 is the industry-standard protocol for delegated authorization — is dropped outright, the single largest fidelity loss among the English entries. Ranks below the entries that at least partially preserve C1."
+    },
+    {
+      "label": "F",
+      "naturalness": 4,
+      "reader_clarity": 2,
+      "register_fit": 1,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "dropped",
+          "evidence": "No evidence exists: only 'OAuth 2.0 属于授权机制' (an authorization mechanism); no claim of being the industry-standard protocol for delegated authorization."
+        },
+        {
+          "id": "C2",
+          "status": "altered",
+          "evidence": "你平时点击“使用 Google 登录”时，背后通常就有 OAuth 在工作。 — example survives but is hedged with 'usually' (通常)."
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "认证是确认“你是谁”，授权则是决定“你能访问什么”。OAuth 2.0 属于授权机制。 — direction preserved."
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "它允许第三方应用访问用户的资源，比如邮箱或日历，同时不需要拿到用户密码。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "授权服务器，负责验证用户并签发令牌 — assigns the authorization server an added duty ('verifying the user') beyond the source mapping of issuing tokens; other three mappings correct."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "最常见的流程是授权码模式。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "重定向到授权服务器 → 同意授权 → 授权码发送到回调地址 → 授权码加客户端密钥换访问令牌 → 向资源服务器请求资源; order preserved."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "访问令牌通常有效期较短，常见情况是一个小时左右。 — qualifiers kept; 左右 hedges the figure without changing it."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "客户端可以使用刷新令牌获取新的访问令牌，这样用户不必重新确认授权。"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "PKCE（Proof Key for Code Exchange）扩展…避免客户端密钥必须存放在浏览器里。 — expansion and purpose correct."
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The authorization server is responsible for verifying the user (in addition to issuing tokens).",
+          "evidence": "授权服务器，负责验证用户并签发令牌"
+        },
+        {
+          "claim": "Browsers are unsuitable for storing client secrets, stated as a standalone rationale.",
+          "evidence": "对于单页应用，浏览器里不适合保存客户端密钥。"
+        }
+      ],
+      "rationale": "The Chinese prose itself is fluent and human, but the task, source, and audience are English and no language switch was requested — a serious register mismatch and a clarity barrier for the stated audience. On content it also drops C1 entirely, hedges C2, and augments the authorization server's role. Ranked last despite decent underlying translation fidelity."
+    }
+  ],
+  "ranking": [
+    "D",
+    "A",
+    "C",
+    "B",
+    "E",
+    "F"
+  ],
+  "best": "D",
+  "confidence": "high",
+  "limitations": "Judgment calls: (1) 'about an hour' / '一个小时左右' hedges were treated as intact because the one-hour value, direction, and both qualifiers survive; a stricter reading of the inventory could mark these altered for C, B, E, and F, which would not change the ranking since D and A keep the figure exactly. (2) Loss of the 'third-party' qualifier on C4 (B, E) was marked altered per the intactness definition, though the security gist survives. (3) F was penalized primarily on register_fit and reader_clarity for the unrequested language switch rather than on naturalness, since its Chinese prose is fluent; evaluators who weight language choice as an automatic hard failure would still rank it last, so the ordering is robust."
+}

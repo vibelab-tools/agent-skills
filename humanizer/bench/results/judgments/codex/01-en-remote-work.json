@@ -1,0 +1,413 @@
+{
+  "case_id": "01-en-remote-work",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“Once considered a rare perk, it’s now a central part of the modern workplace.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement.”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see higher productivity”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see ... lower overhead”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see ... greater employee satisfaction”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“Remote workers also save an average of 55 minutes a day by skipping their commute.”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“maintain team cohesion, reduce isolation”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“Managers are especially important in keeping distributed teams aligned, engaged, and motivated.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“three core elements: communication, trust, and clear boundaries”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“Whether you’ve worked remotely for years or are just getting started”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Clear, natural professional prose with excellent audience fit. It preserves all figures, sources, challenges, managerial responsibilities, pillars, and audience groups, but adds the qualifier “often” to all three company-benefit claims."
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“Once considered a rare perk, it is now central to how millions of professionals approach their careers.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement.”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“Organizations that adapt to it are seeing practical benefits, including higher productivity”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“Organizations that adapt to it are seeing practical benefits, including ... lower overhead costs”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“Organizations that adapt to it are seeing practical benefits, including ... greater employee satisfaction.”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“Studies also show that remote workers save an average of 55 minutes a day by avoiding the commute.”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“maintain team cohesion, reduce isolation”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“Managers are especially important in keeping distributed teams aligned, engaged, and motivated.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“This post examines three foundations of successful remote work: communication, trust, and boundaries.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“Whether you have worked remotely for years or are just getting started”"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The survey result demonstrates how much employees value flexibility, rather than merely the importance of flexibility in the job market.",
+          "evidence": "“underscoring how much employees value flexibility”"
+        }
+      ],
+      "rationale": "The only output to preserve all ten registered claims without changing their qualifiers or attribution. It remains clear and appropriately professional, though phrases such as “fundamentally changed” and “underscoring” make it slightly more formulaic than the most natural alternatives. It adds a mild interpretation of the Gallup result."
+    },
+    {
+      "label": "C",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“What was once a rare perk is now a regular part of the modern workplace.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement.”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“Companies that adopt it report higher productivity”; “report” newly makes the companies the source of the claim."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "“Companies that adopt it report ... lower overhead costs”; “report” newly makes the companies the source of the claim."
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "“Companies that adopt it report ... greater employee satisfaction”; “report” newly makes the companies the source of the claim."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“Studies also show that remote workers save an average of 55 minutes a day by skipping their commute.”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“Organizations need to keep teams connected and reduce isolation”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“managers must help distributed employees stay aligned, engaged, and motivated.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Successful remote work depends on communication, trust, and clear boundaries.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“whether someone has worked remotely for years or is just getting started”"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The Gallup result shows that flexibility matters specifically to today’s workers.",
+          "evidence": "“showing how much flexibility matters to today’s workers”"
+        },
+        {
+          "claim": "Companies adopting remote work themselves report the three stated benefits.",
+          "evidence": "“Companies that adopt it report higher productivity, lower overhead costs, and greater employee satisfaction.”"
+        }
+      ],
+      "rationale": "Concise and easy to follow, though “The arrangement” and “distributed employees” are mildly stiff. All required subject matter survives, but the benefit claims gain a new company-reporting attribution, and the Gallup finding receives an added worker-focused interpretation."
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“Once considered a rare perk, it is now a central part of how millions of professionals work.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement.”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see higher productivity”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see ... lower overhead costs”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "“Companies that support remote work often see ... greater employee satisfaction”; “often” weakens the source’s unqualified claim."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“Remote workers also save an average of 55 minutes a day by avoiding their commute.”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“Teams may struggle to stay connected, and employees can feel isolated.”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“managers must keep distributed teams aligned, engaged, and motivated.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“This post looks at three foundations of successful remote work: communication, trust, and boundaries.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“Whether you have worked remotely for years or are just getting started”"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The Gallup result demonstrates how much employees value flexibility.",
+          "evidence": "“underscoring how much employees value flexibility”"
+        }
+      ],
+      "rationale": "Highly natural, clear blog prose that retains the source’s structure and all hard numerical details. Its main losses are the added “often” hedge on all three benefits and a mild new interpretation of the survey result."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“What used to be an occasional perk is now part of the routine for millions of professionals.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“A 2023 Gallup survey found that 52% of U.S. employees who can work remotely have hybrid arrangements.”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“Remote workers tend to be more productive”; this shifts the subject from companies seeing increased productivity to a qualified claim about individual workers."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "“employers can reduce office costs”; this weakens the outcome to a possibility and narrows overhead costs to office costs."
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "“Remote workers tend to be ... satisfied”; this shifts the framing and weakens the source’s improved-employee-satisfaction claim."
+        },
+        {
+          "id": "C6",
+          "status": "altered",
+          "evidence": "“remote employees save about 55 minutes a day”; “about” replaces the required average of 55 minutes with an approximation."
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“Teams can lose their sense of connection, and remote employees may feel isolated.”"
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "“Managers need clear ways to keep distributed teams coordinated and engaged.” Motivation is omitted."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“Good remote work depends on communication, trust, and reasonable boundaries.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“whether someone has worked remotely for years or is just getting started”"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "The Gallup result shows that workers value flexibility.",
+          "evidence": "“showing how much workers value flexibility”"
+        },
+        {
+          "claim": "Remote workers tend to be more productive and satisfied, rather than companies embracing remote work seeing productivity and satisfaction benefits.",
+          "evidence": "“Remote workers tend to be more productive and satisfied”"
+        },
+        {
+          "claim": "The reduced overhead specifically consists of office costs.",
+          "evidence": "“employers can reduce office costs”"
+        }
+      ],
+      "rationale": "The prose is compact, natural, and clear, but it has the largest meaning drift. It changes the framing and strength of all three benefits, narrows overhead to office costs, approximates the 55-minute average, and omits managers’ role in keeping teams motivated."
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“Remote work has gone from a rare perk to a standard part of working life for millions of professionals.”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“In a 2023 Gallup survey, 52% of remote-capable employees in the United States said they work in a hybrid arrangement.”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“Businesses that support remote work report higher productivity”; “report” newly makes the businesses the source of the claim."
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "“Businesses that support remote work report ... lower overhead costs”; “report” newly makes the businesses the source of the claim."
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "“Businesses that support remote work report ... greater employee satisfaction”; “report” newly makes the businesses the source of the claim."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“Remote workers also save an average of 55 minutes a day by skipping the commute.”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“Teams can struggle to stay connected, and employees may feel isolated.”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“managers have to keep distributed teams aligned, engaged, and motivated.”"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "“This post focuses on three foundations of successful remote work: communication, trust, and boundaries.”"
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "“whether you're an experienced remote professional or just getting started”"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "Businesses supporting remote work themselves report the three stated benefits.",
+          "evidence": "“Businesses that support remote work report higher productivity, lower overhead costs, and greater employee satisfaction.”"
+        }
+      ],
+      "rationale": "Natural, direct, and well suited to a general professional audience. It preserves every hard figure and structural element, but changes the attribution of the three company benefits by presenting businesses themselves as reporting them."
+    }
+  ],
+  "ranking": [
+    "B",
+    "A",
+    "D",
+    "F",
+    "C",
+    "E"
+  ],
+  "best": "B",
+  "confidence": "high",
+  "limitations": "The closest distinctions turn on strict application of the benchmark rule that qualifiers and attribution must survive: “often” is treated as weaker than the source, while “report” is treated as a new company-reporting attribution. Stylistic differences among the outputs are otherwise small."
+}

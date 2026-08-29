@@ -1,0 +1,11 @@
+{
+  "pass": false,
+  "missing": [
+    {
+      "kind": "code",
+      "value": "Secret",
+      "count": 1
+    }
+  ],
+  "added": []
+}

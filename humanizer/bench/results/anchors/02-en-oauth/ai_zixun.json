@@ -1,0 +1,42 @@
+{
+  "pass": false,
+  "missing": [
+    {
+      "kind": "acronym",
+      "value": "URI",
+      "count": 1
+    },
+    {
+      "kind": "quoted text",
+      "value": "Sign in with Google,",
+      "count": 1
+    }
+  ],
+  "added": [
+    {
+      "kind": "quoted text",
+      "value": "一个应用能访问用户的哪些资源",
+      "count": 1
+    },
+    {
+      "kind": "quoted text",
+      "value": "你是谁",
+      "count": 1
+    },
+    {
+      "kind": "quoted text",
+      "value": "你能访问什么",
+      "count": 1
+    },
+    {
+      "kind": "quoted text",
+      "value": "使用 Google 登录",
+      "count": 1
+    },
+    {
+      "kind": "version",
+      "value": "2.0",
+      "count": 1
+    }
+  ]
+}

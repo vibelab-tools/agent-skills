@@ -1,0 +1,252 @@
+{
+  "codex": {
+    "01-en-remote-work": {
+      "A": "baseline",
+      "B": "ours",
+      "C": "blader",
+      "D": "ai_zixun",
+      "E": "op7418",
+      "F": "skillproof"
+    },
+    "02-en-oauth": {
+      "A": "ai_zixun",
+      "B": "ours",
+      "C": "skillproof",
+      "D": "blader",
+      "E": "baseline",
+      "F": "op7418"
+    },
+    "03-en-earnings": {
+      "A": "ai_zixun",
+      "B": "ours",
+      "C": "blader",
+      "D": "baseline",
+      "E": "op7418",
+      "F": "skillproof"
+    },
+    "04-zh-retail-analysis": {
+      "A": "blader",
+      "B": "ai_zixun",
+      "C": "op7418",
+      "D": "ours",
+      "E": "baseline",
+      "F": "skillproof"
+    },
+    "05-zh-technical-handoff": {
+      "A": "op7418",
+      "B": "baseline",
+      "C": "ours",
+      "D": "blader",
+      "E": "skillproof",
+      "F": "ai_zixun"
+    },
+    "06-zh-maintenance-notice": {
+      "A": "ai_zixun",
+      "B": "op7418",
+      "C": "ours",
+      "D": "skillproof",
+      "E": "blader",
+      "F": "baseline"
+    }
+  },
+  "bailian": {
+    "01-en-remote-work": {
+      "A": "baseline",
+      "B": "op7418",
+      "C": "ai_zixun",
+      "D": "blader",
+      "E": "skillproof",
+      "F": "ours"
+    },
+    "02-en-oauth": {
+      "A": "ours",
+      "B": "blader",
+      "C": "skillproof",
+      "D": "op7418",
+      "E": "baseline",
+      "F": "ai_zixun"
+    },
+    "03-en-earnings": {
+      "A": "ai_zixun",
+      "B": "blader",
+      "C": "baseline",
+      "D": "ours",
+      "E": "skillproof",
+      "F": "op7418"
+    },
+    "04-zh-retail-analysis": {
+      "A": "ai_zixun",
+      "B": "op7418",
+      "C": "baseline",
+      "D": "ours",
+      "E": "blader",
+      "F": "skillproof"
+    },
+    "05-zh-technical-handoff": {
+      "A": "ours",
+      "B": "op7418",
+      "C": "baseline",
+      "D": "blader",
+      "E": "ai_zixun",
+      "F": "skillproof"
+    },
+    "06-zh-maintenance-notice": {
+      "A": "ai_zixun",
+      "B": "skillproof",
+      "C": "op7418",
+      "D": "baseline",
+      "E": "ours",
+      "F": "blader"
+    }
+  },
+  "kimi": {
+    "01-en-remote-work": {
+      "A": "ours",
+      "B": "blader",
+      "C": "ai_zixun",
+      "D": "op7418",
+      "E": "skillproof",
+      "F": "baseline"
+    },
+    "02-en-oauth": {
+      "A": "ours",
+      "B": "baseline",
+      "C": "op7418",
+      "D": "skillproof",
+      "E": "blader",
+      "F": "ai_zixun"
+    },
+    "03-en-earnings": {
+      "A": "blader",
+      "B": "baseline",
+      "C": "op7418",
+      "D": "skillproof",
+      "E": "ai_zixun",
+      "F": "ours"
+    },
+    "04-zh-retail-analysis": {
+      "A": "blader",
+      "B": "baseline",
+      "C": "op7418",
+      "D": "ai_zixun",
+      "E": "ours",
+      "F": "skillproof"
+    },
+    "05-zh-technical-handoff": {
+      "A": "ours",
+      "B": "skillproof",
+      "C": "baseline",
+      "D": "ai_zixun",
+      "E": "blader",
+      "F": "op7418"
+    },
+    "06-zh-maintenance-notice": {
+      "A": "baseline",
+      "B": "blader",
+      "C": "skillproof",
+      "D": "op7418",
+      "E": "ours",
+      "F": "ai_zixun"
+    }
+  },
+  "gemini": {
+    "01-en-remote-work": {
+      "A": "skillproof",
+      "B": "ours",
+      "C": "baseline",
+      "D": "op7418",
+      "E": "ai_zixun",
+      "F": "blader"
+    },
+    "02-en-oauth": {
+      "A": "blader",
+      "B": "op7418",
+      "C": "baseline",
+      "D": "ai_zixun",
+      "E": "skillproof",
+      "F": "ours"
+    },
+    "03-en-earnings": {
+      "A": "skillproof",
+      "B": "ai_zixun",
+      "C": "blader",
+      "D": "baseline",
+      "E": "op7418",
+      "F": "ours"
+    },
+    "04-zh-retail-analysis": {
+      "A": "blader",
+      "B": "op7418",
+      "C": "baseline",
+      "D": "skillproof",
+      "E": "ours",
+      "F": "ai_zixun"
+    },
+    "05-zh-technical-handoff": {
+      "A": "blader",
+      "B": "skillproof",
+      "C": "op7418",
+      "D": "ai_zixun",
+      "E": "ours",
+      "F": "baseline"
+    },
+    "06-zh-maintenance-notice": {
+      "A": "ai_zixun",
+      "B": "skillproof",
+      "C": "blader",
+      "D": "baseline",
+      "E": "op7418",
+      "F": "ours"
+    }
+  },
+  "deepseek": {
+    "01-en-remote-work": {
+      "A": "op7418",
+      "B": "ours",
+      "C": "ai_zixun",
+      "D": "skillproof",
+      "E": "blader",
+      "F": "baseline"
+    },
+    "02-en-oauth": {
+      "A": "op7418",
+      "B": "baseline",
+      "C": "ours",
+      "D": "skillproof",
+      "E": "blader",
+      "F": "ai_zixun"
+    },
+    "03-en-earnings": {
+      "A": "ours",
+      "B": "baseline",
+      "C": "skillproof",
+      "D": "op7418",
+      "E": "ai_zixun",
+      "F": "blader"
+    },
+    "04-zh-retail-analysis": {
+      "A": "ai_zixun",
+      "B": "ours",
+      "C": "baseline",
+      "D": "blader",
+      "E": "skillproof",
+      "F": "op7418"
+    },
+    "05-zh-technical-handoff": {
+      "A": "blader",
+      "B": "baseline",
+      "C": "ai_zixun",
+      "D": "skillproof",
+      "E": "op7418",
+      "F": "ours"
+    },
+    "06-zh-maintenance-notice": {
+      "A": "skillproof",
+      "B": "ai_zixun",
+      "C": "op7418",
+      "D": "baseline",
+      "E": "blader",
+      "F": "ours"
+    }
+  }
+}

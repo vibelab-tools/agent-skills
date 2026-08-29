@@ -1,0 +1,316 @@
+{
+  "case_id": "06-zh-maintenance-notice",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00–02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能有最长 20 分钟处于只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“API 调用和移动端同步也可能受到影响”将原文确定的“会受到影响”弱化为“可能受到影响”。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑可正常使用”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行任何操作”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "整体正式、简洁、清楚，但“可能有最长 20 分钟处于”略显生硬；更重要的是，将 API 和移动端同步确定会受影响改成了可能受影响，造成实质性弱化。"
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00–02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能有最长 20 分钟处于只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "“API 调用和移动端同步也可能受到影响”将原文的“会受到影响”弱化为不确定影响。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑不受影响”保留了离线编辑仍可正常使用的含义。"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“我们预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行任何操作”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "语气正式克制，信息组织清晰，但只读状态句式稍生硬，且错误弱化了 API 调用和移动端同步的影响范围。"
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00–02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能进入最长 20 分钟的只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“API 调用和移动端同步也会受到影响”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑可正常使用”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“我们预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行任何操作”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "完整保留所有必要信息及承诺强度，句式自然直接，删去了原文较空泛的宣传性表达，正式且克制。"
+    },
+    {
+      "label": "D",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00–02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能进入最长 20 分钟的只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“API 调用和移动端同步也会受到影响”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑可正常使用”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“我们预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行任何操作”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "事实保留完整，表达也通顺，但“夯实技术底座”“以更高标准”“共同提升协作效率”等宣传性措辞偏多，不够克制，也未充分去除原文的模板化风格。"
+    },
+    {
+      "label": "E",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00 至 02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能有最长 20 分钟处于只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“API 调用和移动端同步也会受到影响”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑不受影响”保留了离线编辑仍可正常使用的含义。"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行任何操作”"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "必要事实均完整保留，整体简洁正式。“文档可能有最长 20 分钟处于只读状态”不如“进入最长 20 分钟的只读状态”自然，且预计数据不丢失的主体仅由语境暗示。"
+    },
+    {
+      "label": "F",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "“2026 年 9 月 6 日 01:00–02:30（CST）”"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "“文档可能有最长 20 分钟处于只读状态”"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "“API 调用和移动端同步也会受到影响”"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "“离线编辑可正常使用”"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "“预计不会发生数据丢失”"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "“企业管理员无需进行操作”保留了无需采取操作的要求。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "“维护进展将发布在 https://status.yunjian.example.com”"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "“请发送邮件至 support@yunjian.example.com”"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "内容完整而克制，通知体裁适配良好；主要不足是只读状态句式略生硬，且省略“任何”后，用户动作表述的强调程度略低，但实际要求未改变。"
+    }
+  ],
+  "ranking": [
+    "C",
+    "E",
+    "F",
+    "D",
+    "A",
+    "B"
+  ],
+  "best": "C",
+  "confidence": "high",
+  "limitations": "排名中 E、F、D 的先后涉及对简洁克制与语言流畅度的权衡；A、B 因弱化 C3 而明确排在所有完整保留事实的版本之后。"
+}

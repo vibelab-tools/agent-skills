@@ -1,0 +1,11 @@
+{
+  "pass": false,
+  "missing": [
+    {
+      "kind": "weekday",
+      "value": "4",
+      "count": 1
+    }
+  ],
+  "added": []
+}

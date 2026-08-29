@@ -1,0 +1,11 @@
+{
+  "pass": false,
+  "missing": [],
+  "added": [
+    {
+      "kind": "acronym",
+      "value": "PKCE",
+      "count": 1
+    }
+  ]
+}

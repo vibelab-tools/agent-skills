@@ -1,0 +1,321 @@
+{
+  "case_id": "04-zh-retail-analysis",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "AI 客服……星河零售于 2026 年 4 月在 12 家门店启动试点。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间从 4 分钟缩短到 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例从 31% 降至 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度仍保持在 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "回答常见问题，接入订单查询系统，为售后问题添加标签；缺少“自动”这一限定。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "员工则可以少花时间处理这些事务，把精力留给更复杂、也更需要沟通温度的服务。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款，仍是目前最主要的挑战。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "公司计划先完成隐私评估，再在第四季度将系统扩展到 40 家门店。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "整体是流畅的中文行业分析，核心数据、计划顺序和限制均保留。唯一问题是 C5 未保留“自动”这一限定词。"
+    },
+    {
+      "label": "B",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "星河零售于 2026 年 4 月在 12 家门店启动试点。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间从 4 分钟缩短至 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例从 31% 降至 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度则保持在 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "回答常见问题、连接订单查询系统，以及为售后问题添加标签；缺少“自动”。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "减少员工在重复事务上耗费的时间，让他们把精力放到更需要沟通和判断的服务环节。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款仍是主要挑战。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "星河零售计划先完成隐私评估，再于 Q4 将系统扩大到 40 家门店。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "非常贴近来源，语体自然正式，判断强度保持较好；仅 C5 去掉了“自动”。"
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "星河零售于 2026 年 4 月在 12 家门店启动 AI 客服试点。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间由 4 分钟缩短至 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例由 31% 降至 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度则维持在 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "回答常见问题、接入订单查询系统，以及为售后问题添加标签；缺少“自动”。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "减少员工在重复性事务上的投入，让他们把更多精力放在需要沟通和判断的服务环节上。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款仍是主要挑战。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "公司计划先完成隐私评估，并于 Q4 将系统扩展至 40 家门店。"
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "星河零售启动试点，重点观察其对顾客体验和一线服务工作的影响",
+          "evidence": "星河零售于 2026 年 4 月在 12 家门店启动 AI 客服试点，重点观察其对顾客体验和一线服务工作的影响。"
+        }
+      ],
+      "rationale": "核心事实保存完整，表达清楚；但 C5 缺“自动”，并且额外写入了来源未明确的试点观察目的。"
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "星河零售于 2026 年 4 月在 12 家门店启动试点。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间从 4 分钟缩短至 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例从 31% 降至 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度则保持在 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "自动回答常见问题、接入订单查询系统，以及为售后问题添加标签。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "员工可以少做重复劳动，把更多精力放在需要沟通和判断的服务上。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款仍是主要挑战。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "公司计划先完成隐私评估，再于 Q4 将系统扩大到 40 家门店。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "所有事实清单项均得到保留，包括 C5 的“自动回答”；表达自然正式，清晰且无多余信息。"
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "星河零售已在 12 家门店启动 AI 客服试点。试点始于 2026 年 4 月。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间由 4 分钟降至 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例从 31% 降到 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度仍为 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "回答常见问题、接入订单查询系统、给售后问题加标签；缺少“自动”。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "把员工从重复咨询中解放出来，转去处理更需要沟通和判断的问题。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款仍是眼下的主要难点。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "公司计划先完成隐私评估，再于 Q4 把系统扩展到 40 家门店。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "表达直接自然，信息基本完整；但 C5 缺“自动”，且部分用词略偏口语化。"
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "星河零售于 2026 年 4 月在 12 家门店启动 AI 客服试点。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "顾客平均等待时间从 4 分钟降至 45 秒。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "转人工比例从 31% 降至 18%。"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "满意度为 4.2/5，与上一季度持平。"
+        },
+        {
+          "id": "C5",
+          "status": "altered",
+          "evidence": "回答常见问题、接入订单查询系统，以及为售后问题添加标签；缺少“自动”。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "它的作用是分担重复性事务，让员工把时间留给更需要沟通的工作。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "方言识别和复杂退款仍是试点中的主要难点。"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "公司计划先完成隐私评估，再于第四季度将系统扩展到 40 家门店。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "简洁清晰，核心事实均保留；但 C5 失去“自动”，部分来源中较完整的判断表达也有所压缩。"
+    }
+  ],
+  "ranking": [
+    "D",
+    "B",
+    "A",
+    "E",
+    "F",
+    "C"
+  ],
+  "best": "D",
+  "confidence": "medium",
+  "limitations": "评分对限定词省略较严格，例如系统是否“自动”回答。‘接入’‘连接’等近义替换未按事实变更处理。所有输出均未出现硬失败级别的新增门店、顾客案例、财务数字或裁员判断。"
+}

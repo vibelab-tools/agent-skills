@@ -1,0 +1,11 @@
+{
+  "pass": false,
+  "missing": [],
+  "added": [
+    {
+      "kind": "code",
+      "value": "kubectl",
+      "count": 1
+    }
+  ]
+}

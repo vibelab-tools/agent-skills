@@ -1,0 +1,376 @@
+{
+  "case_id": "01-en-remote-work",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "Remote work has gone from a rare perk to a standard part of working life for millions of professionals."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "In a 2023 Gallup survey, 52% of remote-capable employees in the United States said they work in a hybrid arrangement"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "Businesses that support remote work report higher productivity"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "lower overhead costs"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "greater employee satisfaction"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "save an average of 55 minutes a day by skipping the commute"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "Teams can struggle to stay connected, and employees may feel isolated."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "managers have to keep distributed teams aligned, engaged, and motivated."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "This post focuses on three foundations of successful remote work: communication, trust, and boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "whether you're an experienced remote professional or just getting started"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output A successfully removes the AI-sounding clichés while preserving all claims accurately. It maintains a professional yet accessible tone."
+    },
+    {
+      "label": "B",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "Once considered a rare perk, it is now central to how millions of professionals approach their careers."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "higher productivity"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "lower overhead costs"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "greater employee satisfaction"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "save an average of 55 minutes a day by avoiding the commute"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "maintain team cohesion, reduce isolation"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Managers are especially important in keeping distributed teams aligned, engaged, and motivated."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "This post examines three foundations of successful remote work: communication, trust, and boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "Whether you have worked remotely for years or are just getting started"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output B preserves all claims but retains a few more of the original AI-like phrases ('fundamentally changed', 'major shift'), making it slightly less natural than the best rewrites."
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "Once considered a rare perk, it’s now a central part of the modern workplace."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "higher productivity"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "lower overhead"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "greater employee satisfaction"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "save an average of 55 minutes a day by skipping their commute"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "maintain team cohesion, reduce isolation"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "Managers are especially important in keeping distributed teams aligned, engaged, and motivated."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Successful remote work depends on three core elements: communication, trust, and clear boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "Whether you’ve worked remotely for years or are just getting started"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output C is highly natural, effectively stripping away the AI-generated fluff and meta-discourse ('In this post...') while keeping all factual claims and structural elements perfectly intact."
+    },
+    {
+      "label": "D",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "What used to be an occasional perk is now part of the routine for millions of professionals."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "A 2023 Gallup survey found that 52% of U.S. employees who can work remotely have hybrid arrangements"
+        },
+        {
+          "id": "C3",
+          "status": "altered",
+          "evidence": "Remote workers tend to be more productive"
+        },
+        {
+          "id": "C4",
+          "status": "altered",
+          "evidence": "employers can reduce office costs"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "and satisfied"
+        },
+        {
+          "id": "C6",
+          "status": "altered",
+          "evidence": "save about 55 minutes a day"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "Teams can lose their sense of connection, and remote employees may feel isolated."
+        },
+        {
+          "id": "C8",
+          "status": "altered",
+          "evidence": "Managers need clear ways to keep distributed teams coordinated and engaged."
+        },
+        {
+          "id": "C9",
+          "status": "altered",
+          "evidence": "Good remote work depends on communication, trust, and reasonable boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "whether someone has worked remotely for years or is just getting started."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output D alters several claims: it shifts productivity from a company benefit to a worker trait, changes 'overhead' to 'office costs', dilutes the 55-minute average to 'about', drops 'motivated' from the manager's role, and adds 'reasonable' to boundaries."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "Once considered a rare perk, it is now a central part of how millions of professionals work."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "higher productivity"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "lower overhead costs"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "greater employee satisfaction"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "save an average of 55 minutes a day by avoiding their commute"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "Teams may struggle to stay connected, and employees can feel isolated."
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "managers must keep distributed teams aligned, engaged, and motivated."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "This post looks at three foundations of successful remote work: communication, trust, and boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "Whether you have worked remotely for years or are just getting started"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output E is a strong, natural rewrite that preserves all claims and meaning while removing the most obvious AI-generated phrasing."
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "What was once a rare perk is now a regular part of the modern workplace."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "A 2023 Gallup survey found that 52% of remote-capable employees in the United States work in a hybrid arrangement"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "higher productivity"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "lower overhead costs"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "greater employee satisfaction"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "save an average of 55 minutes a day by skipping their commute"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "keep teams connected and reduce isolation"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "managers must help distributed employees stay aligned, engaged, and motivated."
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Successful remote work depends on communication, trust, and clear boundaries."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "whether someone has worked remotely for years or is just getting started."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Output F is concise, highly readable, and successfully humanizes the text by dropping clunky meta-discourse while keeping all required claims intact."
+    }
+  ],
+  "ranking": [
+    "C",
+    "F",
+    "A",
+    "E",
+    "B",
+    "D"
+  ],
+  "best": "C",
+  "confidence": "high",
+  "limitations": "The distinction between the top four outputs (C, F, A, E) is minor, as all successfully humanize the text and preserve the claims. The ranking prioritizes the removal of meta-discourse ('In this post...') as a marker of more natural human writing."
+}

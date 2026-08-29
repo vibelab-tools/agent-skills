@@ -1,0 +1,471 @@
+{
+  "case_id": "03-en-earnings",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Company and quarter-end date survive (\"Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30\"), but the source's announcement timing \"on Thursday\" is dropped."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"revenue of $412 million ... up 23% year-over-year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim, attributed to \"CEO Marta Lindqvist during the earnings call.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"Revenue from the company's flagship PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago.\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin fell to 41.3% from 43.1%.\" Direction and figures preserved."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a workforce reduction of 3%, or approximately 210 positions ... expected to save $25 million annually\" — approximation qualifier retained."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading following the announcement\""
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Clean wire-style rewrite. Every figure, quote, name, and attribution survives; it retains the source's \"prior forecast\" wording, the \"following the announcement\" timing, and the investor-confidence framing, and the added \"or\" in \"3%, or approximately 210 positions\" is an entailed clarification, not a new claim. Only the \"on Thursday\" announcement detail is lost (common to all outputs)."
+    },
+    {
+      "label": "B",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Name and quarter-end date intact (\"for the quarter ended September 30\"), but \"on Thursday\" announcement timing is dropped."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"revenue of $412 million ... up 23% year-over-year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim, attributed to \"CEO Marta Lindqvist during the earnings call.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales rose to 34% of total revenue, from 28% a year ago.\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin contracted to 41.3% from 43.1%\" — matches source verb and figures."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"which CFO David Chen attributed to elevated component costs and tariff-related pressures\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually\""
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to a range of $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading following the announcement.\""
+        }
+      ],
+      "added_claims": [],
+      "rationale": "The most source-literal of the set (retains \"contracted,\" \"a range of,\" \"same quarter last year\"). However, it silently drops the source's closing assertion that the share move highlighted investor confidence in the company's trajectory, a small meaning loss relative to A/C/D/F, which retain it."
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Name and quarter-end date intact; \"on Thursday\" announcement timing dropped."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"revenue of $412 million ... up 23% year over year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim with full CEO attribution."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago.\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin fell to 41.3% from 43.1%.\""
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a workforce reduction of 3%, or approximately 210 positions ... expected to save $25 million annually\""
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading\""
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Full fidelity on all inventory claims and keeps the investor-confidence framing, but trims \"following the announcement,\" slightly loosening the temporal link between the report and the share move. Otherwise polished, concise financial-news prose."
+    },
+    {
+      "label": "D",
+      "naturalness": 4,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Name and quarter-end date intact (\"reported $412 million in revenue for the quarter ended September 30\"); \"on Thursday\" dropped, and the body no longer labels the period as the third quarter (only the headline does)."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"$412 million in revenue ... up 23% year-over-year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim with full CEO attribution."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin fell to 41.3% from 43.1%.\""
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually\""
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to $1.58 billion to $1.62 billion, up from its prior forecast of $1.52 billion to $1.57 billion\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading following the announcement\""
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "International sales growth specifically supports the company's continued warehouse-automation momentum (the source attaches that momentum framing to overall results, not to the international segment).",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago, supporting the company's continued momentum in the warehouse automation landscape.\""
+        }
+      ],
+      "rationale": "Preserves all figures, quotes, and both of the source's editorial framings, but relocates the momentum framing from overall performance onto the international-sales sentence, narrowing its attribution; the appended clause also makes that sentence do double duty. A small re-scoping rather than a hard failure."
+    },
+    {
+      "label": "E",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Name and quarter-end date intact; \"on Thursday\" announcement timing dropped."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"revenue of $412 million ... up 23% year-over-year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim with full CEO attribution."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago.\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin fell to 41.3% from 43.1%.\""
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a 3% workforce reduction, affecting approximately 210 positions ... expected to save $25 million annually\""
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading following the announcement.\""
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Accurate and readable, but like B it drops the source's closing investor-confidence assertion, and its wording is marginally looser than B's (\"fell\" vs. source \"contracted,\" \"affecting approximately 210 positions\"). No inventory claim fails."
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Name and quarter-end date intact; \"on Thursday\" announcement timing dropped."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "\"revenue of $412 million ... up 23% year-over-year\""
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "\"above analyst expectations of $389 million\""
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "\"Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year.\""
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "Both quotes verbatim with full CEO attribution."
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "\"PickStream platform grew 61%\""
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "\"the services segment expanded 18%\""
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "\"International sales accounted for 34% of total revenue, up from 28% a year ago.\""
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "\"Gross margin fell to 41.3% from 43.1%.\""
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "\"CFO David Chen attributed the decline to elevated component costs and tariff-related pressures.\""
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "\"a workforce reduction of 3%, approximately 210 positions ... expected to save $25 million annually\""
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "\"raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously\""
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "\"Shares rose 6.8% in after-hours trading following the announcement\""
+        }
+      ],
+      "added_claims": [],
+      "rationale": "Essentially tied with A: all inventory claims intact, keeps \"following the announcement\" and the investor-confidence framing. Ranked just below A only because its guidance sentence (\"from $1.52 billion to $1.57 billion previously\") sheds the source's \"prior forecast\" noun, a hair less precise; differences at this level are minimal."
+    }
+  ],
+  "ranking": [
+    "A",
+    "F",
+    "C",
+    "D",
+    "B",
+    "E"
+  ],
+  "best": "A",
+  "confidence": "medium",
+  "limitations": "All six outputs are near-identical, professional rewrites with zero hard failures on the registered inventory; every figure, quote, name, direction, and attribution survives in all of them. All six also drop the source's \"on Thursday\" announcement timing, so C1 is uniformly altered and cannot differentiate. Ranking therefore rests on marginal meaning-preservation differences outside the inventory: A/F/C retain the source's investor-confidence framing (C drops \"following the announcement\"), D retains it but re-scopes the momentum framing onto international sales, and B/E omit the investor-confidence assertion (B is otherwise the most source-literal). Tier-level ordering (A/F/C > D > B/E) is fairly robust; within-tier ordering, especially A vs. F, is close."
+}

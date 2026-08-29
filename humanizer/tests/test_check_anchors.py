@@ -53,6 +53,29 @@ class AnchorCheckerCliTests(unittest.TestCase):
         self.assertEqual(report["missing"], [])
         self.assertEqual(report["added"], [])
 
+    def test_code_may_move_between_inline_and_fenced_form(self):
+        source = "Run `make validate` before release."
+        rewrite = "Run this before release:\n```sh\nmake validate\n```"
+        result = self.run_check(source, rewrite, "--json")
+        report = json.loads(result.stdout)
+        self.assertTrue(report["pass"])
+
+    def test_acronym_plural_inflection_preserves_anchor(self):
+        result = self.run_check("This API is stable.", "These APIs are stable.", "--json")
+        report = json.loads(result.stdout)
+        self.assertTrue(report["pass"])
+
+    def test_missing_weekday_fails(self):
+        result = self.run_check("Results were announced Thursday.", "Results were announced.", "--json")
+        report = json.loads(result.stdout)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(report["missing"], [{"kind": "weekday", "value": "4", "count": 1}])
+
+    def test_chinese_weekday_variants_share_an_anchor(self):
+        result = self.run_check("星期四发布。", "改为周四发布。", "--json")
+        report = json.loads(result.stdout)
+        self.assertTrue(report["pass"])
+
     def test_missing_and_added_numbers_fail(self):
         result = self.run_check("The limit is 35.", "The limit is 50.", "--json")
         report = json.loads(result.stdout)
@@ -73,7 +96,7 @@ class AnchorCheckerCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertEqual(
             {(entry["kind"], entry["value"]) for entry in report["missing"]},
-            {("code block", "make validate"), ("link target", "docs/setup.md")},
+            {("code", "make validate"), ("link target", "docs/setup.md")},
         )
 
 

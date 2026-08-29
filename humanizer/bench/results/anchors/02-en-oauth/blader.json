@@ -1,0 +1,22 @@
+{
+  "pass": false,
+  "missing": [
+    {
+      "kind": "quoted text",
+      "value": "Sign in with Google,",
+      "count": 1
+    },
+    {
+      "kind": "version",
+      "value": "2.0",
+      "count": 1
+    }
+  ],
+  "added": [
+    {
+      "kind": "quoted text",
+      "value": "Sign in with Google.",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "seed": 20260828,
+  "generation": {
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "medium"
+  },
+  "judges": {
+    "codex": {
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high"
+    },
+    "bailian": {
+      "provider": "openai-compatible",
+      "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "model": "qwen3.8-max"
+    },
+    "kimi": {
+      "provider": "openai-compatible",
+      "endpoint": "https://api.moonshot.cn/v1/chat/completions",
+      "api_key_env": "KIMI_API_KEY",
+      "model": "kimi-k3",
+      "temperature": 1
+    },
+    "gemini": {
+      "provider": "gemini",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+      "api_key_env": "GOOGLE_AI_API_KEY",
+      "model": "gemini-3.1-pro-preview"
+    },
+    "deepseek": {
+      "provider": "openai-compatible",
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "model": "deepseek-v4-pro"
+    }
+  },
+  "arms": {
+    "baseline": {
+      "label": "No-skill baseline"
+    },
+    "ours": {
+      "label": "Repository Humanizer",
+      "local_path": ".."
+    },
+    "blader": {
+      "label": "blader/humanizer",
+      "peer_directory": "blader",
+      "repository": "https://github.com/blader/humanizer",
+      "revision": "e2e92e7b4b8229253ed5c8e81dc65463fdeddda5"
+    },
+    "op7418": {
+      "label": "op7418/Humanizer-zh",
+      "peer_directory": "op7418",
+      "repository": "https://github.com/op7418/Humanizer-zh",
+      "revision": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
+    },
+    "ai_zixun": {
+      "label": "ai-zixun/humanizer-zh",
+      "peer_directory": "ai-zixun",
+      "repository": "https://github.com/ai-zixun/humanizer-zh",
+      "revision": "f75f1ac9735c4f10da1bba0148e0ea7228c5c3b3"
+    },
+    "skillproof": {
+      "label": "Skillproofdev/text-humanizer",
+      "peer_directory": "skillproof",
+      "repository": "https://github.com/Skillproofdev/text-humanizer",
+      "revision": "14ceeb7b2a4923b95d170cb70752445cab67a100"
+    }
+  },
+  "cases": [
+    {
+      "id": "01-en-remote-work",
+      "language": "en",
+      "source": "cases/01-en-remote-work.md",
+      "ground_truth": "ground-truth/01-en-remote-work.md",
+      "prompt": "Humanize this text—it sounds AI-generated. Rewrite it so it reads like a competent human wrote it, keeping the meaning. Reply with the rewritten text only."
+    },
+    {
+      "id": "02-en-oauth",
+      "language": "en",
+      "source": "cases/02-en-oauth.md",
+      "ground_truth": "ground-truth/02-en-oauth.md",
+      "prompt": "Humanize this technical explainer—it sounds AI-generated. Rewrite it for junior developers so it reads like a competent human wrote it, keeping the meaning and technical precision. Reply with the rewritten text only."
+    },
+    {
+      "id": "03-en-earnings",
+      "language": "en",
+      "source": "cases/03-en-earnings.md",
+      "ground_truth": "ground-truth/03-en-earnings.md",
+      "prompt": "Humanize this earnings summary—it sounds AI-generated. Rewrite it as concise financial news while keeping every fact, figure, attribution, and quotation unchanged. Reply with the rewritten text only."
+    },
+    {
+      "id": "04-zh-retail-analysis",
+      "language": "zh",
+      "source": "cases/04-zh-retail-analysis.md",
+      "ground_truth": "ground-truth/04-zh-retail-analysis.md",
+      "prompt": "请给这段行业分析去掉 AI 味，改得像成熟的中文作者写的，同时保持全部事实、判断强度和信息。只回复改写后的正文。"
+    },
+    {
+      "id": "05-zh-technical-handoff",
+      "language": "zh-mixed",
+      "source": "cases/05-zh-technical-handoff.md",
+      "ground_truth": "ground-truth/05-zh-technical-handoff.md",
+      "prompt": "请把这段技术交接说明改得自然、准确，让没有参与当前项目的工程师也能读懂必要术语。不得改变命令、文件、数量或操作边界。只回复改写后的正文。"
+    },
+    {
+      "id": "06-zh-maintenance-notice",
+      "language": "zh",
+      "source": "cases/06-zh-maintenance-notice.md",
+      "ground_truth": "ground-truth/06-zh-maintenance-notice.md",
+      "prompt": "请给这份客户维护通知去掉 AI 味，保持正式、清楚、克制，并保留全部时间、影响范围、承诺和联系方式。只回复改写后的正文。"
+    }
+  ]
+}

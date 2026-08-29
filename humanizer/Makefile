@@ -23,6 +23,7 @@ validate:
 		echo "Skipping structure validation: $(VALIDATOR) not found"; \
 	fi
 	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
+	cd bench && $(PYTHON) run_benchmark.py verify
 
 install: install-all
 
@@ -33,7 +34,10 @@ install-codex: validate
 	$(RSYNC) -a --delete \
 		--exclude '.git/' \
 		--exclude 'Makefile' \
+		--exclude 'bench/' \
 		--exclude 'tests/' \
+		--exclude '__pycache__/' \
+		--exclude '*.pyc' \
 		--exclude '.DS_Store' \
 		./ "$(CODEX_INSTALL_DIR)/"
 	@echo "Installed $(SKILL_NAME) to $(CODEX_INSTALL_DIR)"
@@ -43,7 +47,10 @@ install-claude: validate
 	$(RSYNC) -a --delete \
 		--exclude '.git/' \
 		--exclude 'Makefile' \
+		--exclude 'bench/' \
 		--exclude 'tests/' \
+		--exclude '__pycache__/' \
+		--exclude '*.pyc' \
 		--exclude '.DS_Store' \
 		./ "$(CLAUDE_INSTALL_DIR)/"
 	@echo "Installed $(SKILL_NAME) to $(CLAUDE_INSTALL_DIR)"
@@ -61,7 +68,7 @@ uninstall-claude:
 	@echo "Uninstalled $(SKILL_NAME) from $(CLAUDE_INSTALL_DIR)"
 
 clean:
-	rm -rf scripts/__pycache__ tests/__pycache__
+	rm -rf bench/__pycache__ scripts/__pycache__ tests/__pycache__
 
 help:
 	@printf '%s\n' \

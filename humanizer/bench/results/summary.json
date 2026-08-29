@@ -1,0 +1,3433 @@
+{
+  "arms": {
+    "baseline": {
+      "label": "No-skill baseline",
+      "naturalness": 4.77,
+      "reader_clarity": 4.97,
+      "register_fit": 4.87,
+      "claims_intact": 52,
+      "claims_total": 57,
+      "claim_integrity_percent": 91.2,
+      "altered": 5,
+      "dropped": 0,
+      "disputed": 0,
+      "added_cases": 2,
+      "non_intact_cases": 4,
+      "anchor_passes": 5,
+      "wins": 6,
+      "ranked_count": 30,
+      "majority_wins": 1,
+      "average_rank": 3.4
+    },
+    "ours": {
+      "label": "Repository Humanizer",
+      "naturalness": 4.67,
+      "reader_clarity": 5,
+      "register_fit": 4.97,
+      "claims_intact": 56,
+      "claims_total": 57,
+      "claim_integrity_percent": 98.2,
+      "altered": 1,
+      "dropped": 0,
+      "disputed": 0,
+      "added_cases": 0,
+      "non_intact_cases": 1,
+      "anchor_passes": 5,
+      "wins": 14,
+      "ranked_count": 30,
+      "majority_wins": 2,
+      "average_rank": 1.8
+    },
+    "blader": {
+      "label": "blader/humanizer",
+      "naturalness": 4.57,
+      "reader_clarity": 4.73,
+      "register_fit": 4.73,
+      "claims_intact": 54,
+      "claims_total": 57,
+      "claim_integrity_percent": 94.7,
+      "altered": 2,
+      "dropped": 1,
+      "disputed": 0,
+      "added_cases": 0,
+      "non_intact_cases": 2,
+      "anchor_passes": 4,
+      "wins": 5,
+      "ranked_count": 30,
+      "majority_wins": 1,
+      "average_rank": 3.27
+    },
+    "op7418": {
+      "label": "op7418/Humanizer-zh",
+      "naturalness": 4.6,
+      "reader_clarity": 4.7,
+      "register_fit": 4.63,
+      "claims_intact": 47,
+      "claims_total": 57,
+      "claim_integrity_percent": 82.5,
+      "altered": 10,
+      "dropped": 0,
+      "disputed": 0,
+      "added_cases": 1,
+      "non_intact_cases": 5,
+      "anchor_passes": 2,
+      "wins": 0,
+      "ranked_count": 30,
+      "majority_wins": 0,
+      "average_rank": 4.53
+    },
+    "ai_zixun": {
+      "label": "ai-zixun/humanizer-zh",
+      "naturalness": 4.7,
+      "reader_clarity": 4.27,
+      "register_fit": 4.2,
+      "claims_intact": 51,
+      "claims_total": 57,
+      "claim_integrity_percent": 89.5,
+      "altered": 5,
+      "dropped": 1,
+      "disputed": 0,
+      "added_cases": 1,
+      "non_intact_cases": 4,
+      "anchor_passes": 3,
+      "wins": 2,
+      "ranked_count": 30,
+      "majority_wins": 0,
+      "average_rank": 4.17
+    },
+    "skillproof": {
+      "label": "Skillproofdev/text-humanizer",
+      "naturalness": 4.53,
+      "reader_clarity": 4.63,
+      "register_fit": 4.5,
+      "claims_intact": 56,
+      "claims_total": 57,
+      "claim_integrity_percent": 98.2,
+      "altered": 1,
+      "dropped": 0,
+      "disputed": 0,
+      "added_cases": 1,
+      "non_intact_cases": 1,
+      "anchor_passes": 3,
+      "wins": 3,
+      "ranked_count": 30,
+      "majority_wins": 1,
+      "average_rank": 3.83
+    }
+  },
+  "judges": {
+    "codex": {
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "arms": {
+        "baseline": {
+          "naturalness": 4.83,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 3.5,
+          "wins": 1,
+          "cases": 6
+        },
+        "ours": {
+          "naturalness": 4.33,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 2.17,
+          "wins": 3,
+          "cases": 6
+        },
+        "blader": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.83,
+          "register_fit": 5,
+          "average_rank": 2.83,
+          "wins": 1,
+          "cases": 6
+        },
+        "op7418": {
+          "naturalness": 4.67,
+          "reader_clarity": 5,
+          "register_fit": 4.83,
+          "average_rank": 4.33,
+          "wins": 0,
+          "cases": 6
+        },
+        "ai_zixun": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.17,
+          "register_fit": 4.33,
+          "average_rank": 4.17,
+          "wins": 0,
+          "cases": 6
+        },
+        "skillproof": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.83,
+          "register_fit": 4.67,
+          "average_rank": 4,
+          "wins": 1,
+          "cases": 6
+        }
+      }
+    },
+    "bailian": {
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "arms": {
+        "baseline": {
+          "naturalness": 4.67,
+          "reader_clarity": 5,
+          "register_fit": 4.83,
+          "average_rank": 3.5,
+          "wins": 0,
+          "cases": 6
+        },
+        "ours": {
+          "naturalness": 4.83,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 1.5,
+          "wins": 3,
+          "cases": 6
+        },
+        "blader": {
+          "naturalness": 4.83,
+          "reader_clarity": 4.83,
+          "register_fit": 5,
+          "average_rank": 2.67,
+          "wins": 2,
+          "cases": 6
+        },
+        "op7418": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.33,
+          "register_fit": 4.5,
+          "average_rank": 4.83,
+          "wins": 0,
+          "cases": 6
+        },
+        "ai_zixun": {
+          "naturalness": 4.83,
+          "reader_clarity": 4.17,
+          "register_fit": 4.17,
+          "average_rank": 4.67,
+          "wins": 0,
+          "cases": 6
+        },
+        "skillproof": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.5,
+          "register_fit": 4.5,
+          "average_rank": 3.83,
+          "wins": 1,
+          "cases": 6
+        }
+      }
+    },
+    "kimi": {
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "arms": {
+        "baseline": {
+          "naturalness": 5,
+          "reader_clarity": 5,
+          "register_fit": 4.83,
+          "average_rank": 3.5,
+          "wins": 2,
+          "cases": 6
+        },
+        "ours": {
+          "naturalness": 4.67,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 1.67,
+          "wins": 2,
+          "cases": 6
+        },
+        "blader": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.83,
+          "register_fit": 4.67,
+          "average_rank": 3.5,
+          "wins": 1,
+          "cases": 6
+        },
+        "op7418": {
+          "naturalness": 4.83,
+          "reader_clarity": 5,
+          "register_fit": 4.83,
+          "average_rank": 4.5,
+          "wins": 0,
+          "cases": 6
+        },
+        "ai_zixun": {
+          "naturalness": 4.67,
+          "reader_clarity": 4.33,
+          "register_fit": 4.17,
+          "average_rank": 4.67,
+          "wins": 0,
+          "cases": 6
+        },
+        "skillproof": {
+          "naturalness": 4.67,
+          "reader_clarity": 4.67,
+          "register_fit": 4.5,
+          "average_rank": 3.17,
+          "wins": 1,
+          "cases": 6
+        }
+      }
+    },
+    "gemini": {
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "arms": {
+        "baseline": {
+          "naturalness": 4.5,
+          "reader_clarity": 4.83,
+          "register_fit": 4.67,
+          "average_rank": 2.67,
+          "wins": 1,
+          "cases": 6
+        },
+        "ours": {
+          "naturalness": 4.5,
+          "reader_clarity": 5,
+          "register_fit": 4.83,
+          "average_rank": 2.17,
+          "wins": 3,
+          "cases": 6
+        },
+        "blader": {
+          "naturalness": 4.33,
+          "reader_clarity": 4.5,
+          "register_fit": 4.17,
+          "average_rank": 3.67,
+          "wins": 0,
+          "cases": 6
+        },
+        "op7418": {
+          "naturalness": 4.33,
+          "reader_clarity": 4.5,
+          "register_fit": 4,
+          "average_rank": 4.67,
+          "wins": 0,
+          "cases": 6
+        },
+        "ai_zixun": {
+          "naturalness": 4.83,
+          "reader_clarity": 4.5,
+          "register_fit": 4,
+          "average_rank": 3.33,
+          "wins": 2,
+          "cases": 6
+        },
+        "skillproof": {
+          "naturalness": 4.17,
+          "reader_clarity": 4.5,
+          "register_fit": 4,
+          "average_rank": 4.5,
+          "wins": 0,
+          "cases": 6
+        }
+      }
+    },
+    "deepseek": {
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "arms": {
+        "baseline": {
+          "naturalness": 4.83,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 3.83,
+          "wins": 2,
+          "cases": 6
+        },
+        "ours": {
+          "naturalness": 5,
+          "reader_clarity": 5,
+          "register_fit": 5,
+          "average_rank": 1.5,
+          "wins": 3,
+          "cases": 6
+        },
+        "blader": {
+          "naturalness": 4.67,
+          "reader_clarity": 4.67,
+          "register_fit": 4.83,
+          "average_rank": 3.67,
+          "wins": 1,
+          "cases": 6
+        },
+        "op7418": {
+          "naturalness": 4.67,
+          "reader_clarity": 4.67,
+          "register_fit": 5,
+          "average_rank": 4.33,
+          "wins": 0,
+          "cases": 6
+        },
+        "ai_zixun": {
+          "naturalness": 4.67,
+          "reader_clarity": 4.17,
+          "register_fit": 4.33,
+          "average_rank": 4,
+          "wins": 0,
+          "cases": 6
+        },
+        "skillproof": {
+          "naturalness": 4.83,
+          "reader_clarity": 4.67,
+          "register_fit": 4.83,
+          "average_rank": 3.67,
+          "wins": 0,
+          "cases": 6
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "01-en-remote-work",
+      "best_by_votes": "ours",
+      "vote_winners": [
+        "ours"
+      ],
+      "votes": {
+        "ours": 4,
+        "baseline": 1
+      },
+      "best_votes": 4,
+      "judge_count": 5,
+      "majority": true,
+      "judges": {
+        "codex": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "kimi": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "gemini": {
+          "best": "baseline",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "ours",
+          "confidence": "high"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 9,
+            "altered": 1
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "altered": 2,
+                "intact": 3
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "altered": 2,
+                "intact": 3
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.6
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 10
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.8
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 10
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 2,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.2
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 4.4,
+            "register_fit": 4.4
+          },
+          "claims": {
+            "intact": 5,
+            "altered": 5
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C4": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C5": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C6": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            }
+          },
+          "added_votes": 2,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 6
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 9,
+            "altered": 1
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "altered": 2,
+                "intact": 3
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "altered": 2,
+                "intact": 3
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.6
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 10
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "altered": 1,
+                "intact": 4
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 2.8
+        }
+      }
+    },
+    {
+      "case": "02-en-oauth",
+      "best_by_votes": "skillproof",
+      "vote_winners": [
+        "skillproof"
+      ],
+      "votes": {
+        "skillproof": 3,
+        "ours": 2
+      },
+      "best_votes": 3,
+      "judge_count": 5,
+      "majority": true,
+      "judges": {
+        "codex": {
+          "best": "skillproof",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "skillproof",
+          "confidence": "medium"
+        },
+        "kimi": {
+          "best": "skillproof",
+          "confidence": "high"
+        },
+        "gemini": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "ours",
+          "confidence": "high"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 4.8,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "altered": 3,
+            "intact": 7
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 4,
+          "added_consensus": true,
+          "anchor_pass": true,
+          "average_rank": 3.8
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 4.4,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 10
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.6
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.2,
+            "reader_clarity": 4.6,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "dropped": 1,
+            "intact": 8,
+            "altered": 1
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "dropped",
+              "votes": {
+                "altered": 2,
+                "dropped": 3
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 4.4
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.2,
+            "reader_clarity": 4.6,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "altered": 3,
+            "intact": 7
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 3.8
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 4.2,
+            "reader_clarity": 2,
+            "register_fit": 1
+          },
+          "claims": {
+            "dropped": 1,
+            "intact": 7,
+            "altered": 2
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "dropped",
+              "votes": {
+                "altered": 2,
+                "dropped": 3
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C2": {
+              "status": "altered",
+              "votes": {
+                "altered": 3,
+                "intact": 2
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 5,
+          "added_consensus": true,
+          "anchor_pass": false,
+          "average_rank": 6
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 10
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 1.4
+        }
+      }
+    },
+    {
+      "case": "03-en-earnings",
+      "best_by_votes": "blader",
+      "vote_winners": [
+        "blader"
+      ],
+      "votes": {
+        "blader": 3,
+        "ai_zixun": 1,
+        "baseline": 1
+      },
+      "best_votes": 3,
+      "judge_count": 5,
+      "majority": true,
+      "judges": {
+        "codex": {
+          "best": "blader",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "blader",
+          "confidence": "medium"
+        },
+        "kimi": {
+          "best": "blader",
+          "confidence": "medium"
+        },
+        "gemini": {
+          "best": "ai_zixun",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "baseline",
+          "confidence": "medium"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 3
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 2.8
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 2
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 4
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 3.6
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 4,
+            "reader_clarity": 4.6,
+            "register_fit": 4.2
+          },
+          "claims": {
+            "altered": 1,
+            "intact": 12
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "altered",
+              "votes": {
+                "altered": 5
+              }
+            },
+            "C10": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C11": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C12": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C13": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C9": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 3,
+          "added_consensus": true,
+          "anchor_pass": false,
+          "average_rank": 5.6
+        }
+      }
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "best_by_votes": null,
+      "vote_winners": [
+        "blader",
+        "ours"
+      ],
+      "votes": {
+        "ours": 2,
+        "blader": 2,
+        "ai_zixun": 1
+      },
+      "best_votes": 2,
+      "judge_count": 5,
+      "majority": false,
+      "judges": {
+        "codex": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "blader",
+          "confidence": "medium"
+        },
+        "kimi": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "gemini": {
+          "best": "ai_zixun",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "blader",
+          "confidence": "medium"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 3,
+                "altered": 2
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            }
+          },
+          "added_votes": 5,
+          "added_consensus": true,
+          "anchor_pass": true,
+          "average_rank": 5.8
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 3,
+                "altered": 2
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.6
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.4,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.8
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 4.4
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 3,
+                "altered": 2
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 5
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 3,
+                "altered": 2
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 2,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 3.2
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 3,
+                "altered": 2
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.6
+        }
+      }
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "best_by_votes": "baseline",
+      "vote_winners": [
+        "baseline"
+      ],
+      "votes": {
+        "baseline": 3,
+        "ours": 2
+      },
+      "best_votes": 3,
+      "judge_count": 5,
+      "majority": true,
+      "judges": {
+        "codex": {
+          "best": "baseline",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "kimi": {
+          "best": "baseline",
+          "confidence": "high"
+        },
+        "gemini": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "baseline",
+          "confidence": "high"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.4
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 2,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.8
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 3.8,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 5
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.8,
+            "reader_clarity": 4.4,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 3,
+          "added_consensus": true,
+          "anchor_pass": false,
+          "average_rank": 2.8
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 3.8,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 1,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 4.2
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 4.2,
+            "reader_clarity": 3.8,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": false,
+          "average_rank": 5.8
+        }
+      }
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "best_by_votes": "ours",
+      "vote_winners": [
+        "ours"
+      ],
+      "votes": {
+        "ours": 4,
+        "baseline": 1
+      },
+      "best_votes": 4,
+      "judge_count": 5,
+      "majority": true,
+      "judges": {
+        "codex": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "bailian": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "kimi": {
+          "best": "baseline",
+          "confidence": "high"
+        },
+        "gemini": {
+          "best": "ours",
+          "confidence": "high"
+        },
+        "deepseek": {
+          "best": "ours",
+          "confidence": "medium"
+        }
+      },
+      "arms": {
+        "baseline": {
+          "scores": {
+            "naturalness": 4.4,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 2.8
+        },
+        "ours": {
+          "scores": {
+            "naturalness": 5,
+            "reader_clarity": 5,
+            "register_fit": 5
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 1.2
+        },
+        "blader": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 5,
+            "register_fit": 4.8
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.2
+        },
+        "op7418": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 4.8,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 7,
+            "altered": 1
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 4,
+                "altered": 1
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 5.6
+        },
+        "ai_zixun": {
+          "scores": {
+            "naturalness": 4.6,
+            "reader_clarity": 4.8,
+            "register_fit": 4.6
+          },
+          "claims": {
+            "intact": 7,
+            "altered": 1
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "altered",
+              "votes": {
+                "altered": 4,
+                "intact": 1
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 4.4
+        },
+        "skillproof": {
+          "scores": {
+            "naturalness": 4,
+            "reader_clarity": 4.4,
+            "register_fit": 3.4
+          },
+          "claims": {
+            "intact": 8
+          },
+          "claim_consensus": {
+            "C1": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C2": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C3": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C4": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C5": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C6": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C7": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            },
+            "C8": {
+              "status": "intact",
+              "votes": {
+                "intact": 5
+              }
+            }
+          },
+          "added_votes": 0,
+          "added_consensus": false,
+          "anchor_pass": true,
+          "average_rank": 3.8
+        }
+      }
+    }
+  ],
+  "language_groups": {
+    "english": {
+      "baseline": {
+        "average_rank": 3.47,
+        "naturalness": 4.93,
+        "reader_clarity": 4.93,
+        "register_fit": 4.87
+      },
+      "ours": {
+        "average_rank": 2.07,
+        "naturalness": 4.53,
+        "reader_clarity": 5,
+        "register_fit": 4.93
+      },
+      "blader": {
+        "average_rank": 3.2,
+        "naturalness": 4.6,
+        "reader_clarity": 4.87,
+        "register_fit": 4.73
+      },
+      "op7418": {
+        "average_rank": 4.6,
+        "naturalness": 4.53,
+        "reader_clarity": 4.67,
+        "register_fit": 4.67
+      },
+      "ai_zixun": {
+        "average_rank": 4.4,
+        "naturalness": 4.73,
+        "reader_clarity": 4,
+        "register_fit": 3.67
+      },
+      "skillproof": {
+        "average_rank": 3.27,
+        "naturalness": 4.67,
+        "reader_clarity": 4.87,
+        "register_fit": 4.73
+      }
+    },
+    "chinese_mixed": {
+      "baseline": {
+        "average_rank": 3.33,
+        "naturalness": 4.6,
+        "reader_clarity": 5,
+        "register_fit": 4.87
+      },
+      "ours": {
+        "average_rank": 1.53,
+        "naturalness": 4.8,
+        "reader_clarity": 5,
+        "register_fit": 5
+      },
+      "blader": {
+        "average_rank": 3.33,
+        "naturalness": 4.53,
+        "reader_clarity": 4.6,
+        "register_fit": 4.73
+      },
+      "op7418": {
+        "average_rank": 4.47,
+        "naturalness": 4.67,
+        "reader_clarity": 4.73,
+        "register_fit": 4.6
+      },
+      "ai_zixun": {
+        "average_rank": 3.93,
+        "naturalness": 4.67,
+        "reader_clarity": 4.53,
+        "register_fit": 4.73
+      },
+      "skillproof": {
+        "average_rank": 4.4,
+        "naturalness": 4.4,
+        "reader_clarity": 4.4,
+        "register_fit": 4.27
+      }
+    }
+  },
+  "failed_attempts": [
+    {
+      "judge": "deepseek",
+      "case": "03-en-earnings",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "IncompleteRead(2 bytes read)"
+    },
+    {
+      "judge": "deepseek",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "06-zh-maintenance-notice",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "error": "judge API connection failed: SSLEOFError"
+    },
+    {
+      "judge": "deepseek",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "attempt": 2,
+      "error": "IncompleteRead(3 bytes read)"
+    },
+    {
+      "judge": "deepseek",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "attempt": 2,
+      "error": "IncompleteRead(0 bytes read)"
+    }
+  ]
+}

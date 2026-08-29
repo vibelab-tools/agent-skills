@@ -1,0 +1,471 @@
+{
+  "case_id": "03-en-earnings",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "revenue of $412 million for the quarter ended September 30, up 23% year-over-year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin fell to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "CFO David Chen attributed the decline to elevated component costs and tariff-related pressures."
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a 3% workforce reduction, affecting approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading following the announcement."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims except C1 are preserved, with Thursday omitted. The writing is clear and register-appropriate, but it omits the source's investor-confidence closing."
+    },
+    {
+      "label": "B",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "revenue of $412 million for the quarter ended September 30, up 23% year-over-year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin fell to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "CFO David Chen attributed the decline to elevated component costs and tariff-related pressures."
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a workforce reduction of 3%, or approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading following the announcement, highlighting investor confidence in the company's trajectory."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims except C1 are intact. It retains the explicit prior-forecast qualifier and the investor-confidence clause, with no added claims, making it the strongest among imperfect outputs."
+    },
+    {
+      "label": "C",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "revenue of $412 million for the quarter ended September 30, up 23% year-over-year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales rose to 34% of total revenue, from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin contracted to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "which CFO David Chen attributed to elevated component costs and tariff-related pressures"
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a workforce reduction of 3%, approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to a range of $1.58 billion to $1.62 billion, from its prior forecast of $1.52 billion to $1.57 billion."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading following the announcement."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims except C1 are intact, and it preserves several source wordings precisely. It omits the investor-confidence clause, reducing overall meaning preservation slightly."
+    },
+    {
+      "label": "D",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "revenue of $412 million for the quarter ended September 30, up 23% year-over-year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, in the same quarter last year."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin fell to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "CFO David Chen attributed the decline to elevated component costs and tariff-related pressures."
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a workforce reduction of 3%, approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading following the announcement, highlighting investor confidence in the company's trajectory."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims except C1 are intact. It retains the investor-confidence clause and the same-quarter comparison, though it is slightly less explicit than B on the prior forecast."
+    },
+    {
+      "label": "E",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 4,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported $412 million in revenue for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "reported $412 million in revenue for the quarter ended September 30, up 23% year-over-year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin fell to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "CFO David Chen attributed the decline to elevated component costs and tariff-related pressures."
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a workforce reduction of 3%, approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to $1.58 billion to $1.62 billion, up from its prior forecast of $1.52 billion to $1.57 billion."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading following the announcement, highlighting investor confidence in the company's trajectory."
+        }
+      ],
+      "added_claims": [
+        {
+          "claim": "International sales supported Northwind's continued momentum in warehouse automation.",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago, supporting the company's continued momentum in the warehouse automation landscape."
+        }
+      ],
+      "rationale": "All inventory claims except C1 are intact, but the output adds a causal momentum claim tied specifically to international sales. That makes it less faithful and slightly less concise."
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "altered",
+          "evidence": "Northwind Robotics reported third-quarter revenue of $412 million for the quarter ended September 30; it does not say the results were announced on Thursday."
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "revenue of $412 million for the quarter ended September 30, up 23% year over year"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "above analyst expectations of $389 million"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "Net income rose to $47.2 million, or $0.94 per diluted share, from $31.5 million, or $0.63 per share, a year earlier."
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "\"We are seeing unprecedented demand for our autonomous fulfillment systems,\" said CEO Marta Lindqvist during the earnings call. \"Our order backlog now stands at $1.8 billion, which gives us exceptional visibility into 2027.\""
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "Revenue from the company's flagship PickStream platform grew 61%"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "the services segment expanded 18%"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "International sales accounted for 34% of total revenue, up from 28% a year ago"
+        },
+        {
+          "id": "C9",
+          "status": "intact",
+          "evidence": "Gross margin fell to 41.3% from 43.1%."
+        },
+        {
+          "id": "C10",
+          "status": "intact",
+          "evidence": "CFO David Chen attributed the decline to elevated component costs and tariff-related pressures."
+        },
+        {
+          "id": "C11",
+          "status": "intact",
+          "evidence": "The company also announced a workforce reduction of 3%, or approximately 210 positions, as part of a broader restructuring initiative expected to save $25 million annually."
+        },
+        {
+          "id": "C12",
+          "status": "intact",
+          "evidence": "Northwind raised its full-year revenue guidance to $1.58 billion to $1.62 billion, from $1.52 billion to $1.57 billion previously."
+        },
+        {
+          "id": "C13",
+          "status": "intact",
+          "evidence": "Shares rose 6.8% in after-hours trading, highlighting investor confidence in the company's trajectory."
+        }
+      ],
+      "added_claims": [],
+      "rationale": "All inventory claims except C1 are intact. It retains the investor-confidence clause but omits the source phrase following the announcement, slightly reducing fidelity."
+    }
+  ],
+  "ranking": [
+    "B",
+    "D",
+    "C",
+    "A",
+    "F",
+    "E"
+  ],
+  "best": "B",
+  "confidence": "medium",
+  "limitations": "All outputs omit the Thursday announcement, so C1 is altered in every label. Several outputs also omit non-inventory source color, and the ranking among B, D, C, A, and F depends on small differences in retained context because all share the same core claim failure."
+}

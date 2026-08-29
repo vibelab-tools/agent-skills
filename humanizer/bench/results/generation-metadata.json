@@ -1,0 +1,256 @@
+{
+  "runs": [
+    {
+      "case": "01-en-remote-work",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7083
+    },
+    {
+      "case": "01-en-remote-work",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9779
+    },
+    {
+      "case": "01-en-remote-work",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 15250
+    },
+    {
+      "case": "01-en-remote-work",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 14804
+    },
+    {
+      "case": "01-en-remote-work",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 10152
+    },
+    {
+      "case": "01-en-remote-work",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9493
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7397
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9516
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 15557
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 12113
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 17586
+    },
+    {
+      "case": "02-en-oauth",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9791
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7389
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 11822
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 13312
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 13112
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 16884
+    },
+    {
+      "case": "03-en-earnings",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9407
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7252
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 6575
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 13264
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 13378
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 14795
+    },
+    {
+      "case": "04-zh-retail-analysis",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7900
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 5205
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 6302
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 14897
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 13578
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 12608
+    },
+    {
+      "case": "05-zh-technical-handoff",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9573
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "baseline",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 7082
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "ours",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 10738
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "blader",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9495
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "op7418",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9934
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "ai_zixun",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9184
+    },
+    {
+      "case": "06-zh-maintenance-notice",
+      "arm": "skillproof",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium",
+      "tokens": 9862
+    }
+  ]
+}

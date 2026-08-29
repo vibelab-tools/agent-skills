@@ -1,0 +1,274 @@
+{
+  "runs": [
+    {
+      "judge": "codex",
+      "case": "01-en-remote-work",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 27214,
+      "status": "ok"
+    },
+    {
+      "judge": "codex",
+      "case": "02-en-oauth",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 26116,
+      "status": "ok"
+    },
+    {
+      "judge": "codex",
+      "case": "03-en-earnings",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 6087,
+      "status": "ok"
+    },
+    {
+      "judge": "codex",
+      "case": "04-zh-retail-analysis",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 27055,
+      "status": "ok"
+    },
+    {
+      "judge": "codex",
+      "case": "05-zh-technical-handoff",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 24076,
+      "status": "ok"
+    },
+    {
+      "judge": "codex",
+      "case": "06-zh-maintenance-notice",
+      "provider": "codex",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "tokens": 22019,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "01-en-remote-work",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 19220,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "02-en-oauth",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 25635,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "03-en-earnings",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 22360,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 20246,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 17761,
+      "status": "ok"
+    },
+    {
+      "judge": "bailian",
+      "case": "06-zh-maintenance-notice",
+      "provider": "openai-compatible",
+      "model": "qwen3.8-max",
+      "reasoning_effort": null,
+      "tokens": 12566,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "01-en-remote-work",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 17497,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "02-en-oauth",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 17698,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "03-en-earnings",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 15333,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 14638,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 8010,
+      "status": "ok"
+    },
+    {
+      "judge": "kimi",
+      "case": "06-zh-maintenance-notice",
+      "provider": "openai-compatible",
+      "model": "kimi-k3",
+      "reasoning_effort": null,
+      "tokens": 5893,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "01-en-remote-work",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 13320,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "02-en-oauth",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 17169,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "03-en-earnings",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 20740,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "04-zh-retail-analysis",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 18235,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "05-zh-technical-handoff",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 14481,
+      "status": "ok"
+    },
+    {
+      "judge": "gemini",
+      "case": "06-zh-maintenance-notice",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "reasoning_effort": null,
+      "tokens": 11991,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "01-en-remote-work",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 16845,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "02-en-oauth",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 24303,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "03-en-earnings",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 19292,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "06-zh-maintenance-notice",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 16664,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "04-zh-retail-analysis",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 18466,
+      "status": "ok"
+    },
+    {
+      "judge": "deepseek",
+      "case": "05-zh-technical-handoff",
+      "provider": "openai-compatible",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": null,
+      "tokens": 16118,
+      "status": "ok"
+    }
+  ]
+}

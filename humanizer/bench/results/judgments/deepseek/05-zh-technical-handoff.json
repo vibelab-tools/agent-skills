@@ -1,0 +1,316 @@
+{
+  "case_id": "05-zh-technical-handoff",
+  "evaluations": [
+    {
+      "label": "A",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "下一步不要直接操作生产环境。……此步骤不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "先生成不含 `Secret` 的候选发布包……也不会把任何 `Secret` 写入候选包。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "执行 `kubectl apply --server-side --dry-run=server -f dist/`"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单，以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`、27 个 `.sql` 迁移文件，以及覆盖全部文件的 `SHA256SUMS`。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果 server-side dry-run 报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "修正候选包后再重新校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "所有事实清单项均完整保留，内容接近源文；语言正式但较少解释术语，因此清晰度稍低于带术语说明的版本。"
+    },
+    {
+      "label": "B",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "下一步不是直接操作生产环境……这一步不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "首先生成不包含 `Secret` 的候选发布包……不会将任何 `Secret` 写入候选包。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "执行 `kubectl apply --server-side --dry-run=server -f dist/`"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单，以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`……27 个 `.sql` 迁移文件，以及覆盖全部文件的 `SHA256SUMS` 校验和清单。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果 server-side dry-run 报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "先修正候选包，再重新执行校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "完整保留所有事实清单项，并通过括号解释 context、manifest、Job、SHA256SUMS 等术语，清晰且自然。dry-run 不实际应用资源的说明由命令语义推出，不构成新增事实。"
+    },
+    {
+      "label": "C",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "下一步不要直接操作生产环境……这一步不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "先生成不含 `Secret` 的候选发布包……不会将任何 `Secret` 写入候选包。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "```bash\nkubectl apply --server-side --dry-run=server -f dist/\n```"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单，以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`、27 个 `.sql` 迁移文件，以及覆盖全部文件的 `SHA256SUMS`。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果 server-side dry-run 报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "修正候选包后再重新校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "所有事实清单项均保留；表达清楚，但术语解释较少。“只有校验通过，才能……”是停止修正条件的合理推论，不视为新增事实。"
+    },
+    {
+      "label": "D",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "这一步不会直接操作生产环境，也不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "候选包中不得包含任何 `Secret`。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "```bash\nkubectl apply --server-side --dry-run=server -f dist/\n```"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单，以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`、27 个 `.sql` 迁移文件和覆盖全部文件的 `SHA256SUMS`。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果校验报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "先修正候选包，再重新执行校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "事实清单项均保留，但先列包内容再讲生成与切换，信息顺序稍作调整；“校验报告”可辨认为前面 server-side dry-run 报告。未发现新增事实。"
+    },
+    {
+      "label": "E",
+      "naturalness": 4,
+      "reader_clarity": 4,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "下一步不要直接操作生产环境……此步骤不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "先生成不含 `Secret` 的候选发布包……不会把任何 `Secret` 写入候选包。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "```bash\nkubectl apply --server-side --dry-run=server -f dist/\n```"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单，以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`、27 个 `.sql` 迁移文件，以及覆盖全部文件的 `SHA256SUMS`。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果 server-side dry-run 报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "修正候选包后再重新校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "所有事实清单项完整，有少量术语解释和 dry-run 不实际应用资源的说明；整体清晰。校验通过后才继续的表述可由失败停止条件推出。"
+    },
+    {
+      "label": "F",
+      "naturalness": 5,
+      "reader_clarity": 5,
+      "register_fit": 5,
+      "claims": [
+        {
+          "id": "C1",
+          "status": "intact",
+          "evidence": "下一步不要直接操作生产环境……此步骤不会修改生产环境。"
+        },
+        {
+          "id": "C2",
+          "status": "intact",
+          "evidence": "先生成不含 `Secret` 的候选发布包……不会将任何 `Secret` 写入候选包。"
+        },
+        {
+          "id": "C3",
+          "status": "intact",
+          "evidence": "切换到 `staging-eu2` Kubernetes context"
+        },
+        {
+          "id": "C4",
+          "status": "intact",
+          "evidence": "```bash\nkubectl apply --server-side --dry-run=server -f dist/\n```"
+        },
+        {
+          "id": "C5",
+          "status": "intact",
+          "evidence": "副本数为 0 的停写清单、副本数为 1 的 canary 清单（灰度发布清单），以及副本数为 4 的正式清单。"
+        },
+        {
+          "id": "C6",
+          "status": "intact",
+          "evidence": "数据库迁移 `Job`、27 个 `.sql` 迁移文件，以及覆盖全部文件的 `SHA256SUMS`。"
+        },
+        {
+          "id": "C7",
+          "status": "intact",
+          "evidence": "如果 server-side dry-run（服务端模拟执行）报告字段不兼容或资源冲突，应立即停止"
+        },
+        {
+          "id": "C8",
+          "status": "intact",
+          "evidence": "修正候选包后再重新校验。"
+        }
+      ],
+      "added_claims": [],
+      "rationale": "所有事实清单项完整保留，同时用简短括注解释集群上下文、资源配置文件、灰度发布清单、服务端模拟执行，适合未参与项目的工程师阅读；表达自然正式。"
+    }
+  ],
+  "ranking": [
+    "B",
+    "F",
+    "E",
+    "C",
+    "A",
+    "D"
+  ],
+  "best": "B",
+  "confidence": "high",
+  "limitations": "未进行外部资料查证；对术语括注和 dry-run 语义说明按源文或命令语义可自然推出的内容处理，未列为新增事实。"
+}

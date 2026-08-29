@@ -1,0 +1,11 @@
+{
+  "pass": false,
+  "missing": [
+    {
+      "kind": "acronym",
+      "value": "Q4",
+      "count": 1
+    }
+  ],
+  "added": []
+}

@@ -31,7 +31,7 @@ User and project requirements override general style advice. A relevant writing 
 Make a claim map before a deep rewrite. Preserve:
 
 - every factual claim, qualification, uncertainty, negation, comparison, causal relationship, scope limit, and audience condition;
-- names, numbers, units, dates, times, prices, versions, acronym expansions, quotations, citations, URLs, link targets, code, commands, identifiers, and paths;
+- names, numbers, units, dates, weekdays, times, prices, versions, acronym expansions, quotations, citations, URLs, link targets, code, commands, identifiers, and paths;
 - the writer's actual position, including mixed feelings and deliberate ambiguity;
 - required headings, Markdown, data, and document structure when the format is part of the contract.
 
