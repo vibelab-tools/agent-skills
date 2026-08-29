@@ -1,0 +1,111 @@
+{
+  "purpose": "Compare ordinary first-draft answers with and without the Humanizer pre-draft hook.",
+  "arms": {
+    "baseline": {
+      "label": "Codex without Humanizer hooks"
+    },
+    "pre_draft": {
+      "label": "Codex with the Humanizer UserPromptSubmit hook",
+      "hook_config": "../../hooks/hooks.json",
+      "guidance": "../../references/pre-draft.md"
+    }
+  },
+  "rubric": [
+    "factual fidelity",
+    "reader clarity",
+    "naturalness",
+    "register fit",
+    "unnecessary jargon cost"
+  ],
+  "cases": [
+    {
+      "id": "01-zh-release-status",
+      "language": "zh",
+      "prompt": "用两三句话告诉团队现在能不能发版，以及下一步做什么。",
+      "facts": [
+        "2.4.0-rc.3 已通过单元测试。",
+        "macOS 安装包仍未通过签名校验。",
+        "签名校验通过前不能发布。",
+        "林然会在 16:30 再检查一次。"
+      ],
+      "protected_anchors": [
+        "2.4.0-rc.3",
+        "macOS",
+        "16:30"
+      ],
+      "criteria": [
+        "直接说明目前不能发布",
+        "说清阻塞原因和下一步动作",
+        "不用自造的流程标签代替具体事实"
+      ]
+    },
+    {
+      "id": "02-zh-option-selection",
+      "language": "zh",
+      "prompt": "这三个方案我该先保留哪个？简短说明理由。",
+      "facts": [
+        "方案 A 的开发量是 2 天，但不支持离线使用。",
+        "方案 B 的开发量是 4 天，支持离线使用，也沿用现有 SQLite 数据结构。",
+        "方案 C 的开发量是 3 天，支持离线使用，但需要迁移全部历史数据。",
+        "当前版本必须支持离线使用，并尽量避免数据迁移。"
+      ],
+      "protected_anchors": [
+        "A",
+        "B",
+        "C",
+        "2 天",
+        "4 天",
+        "3 天",
+        "SQLite"
+      ],
+      "criteria": [
+        "选择方案 B",
+        "理由对应离线要求和迁移成本",
+        "使用日常项目表达，不发明候选状态术语"
+      ]
+    },
+    {
+      "id": "03-zh-conflict-explainer",
+      "language": "zh-mixed",
+      "prompt": "为什么这个接口偶尔返回 409？用产品经理能听懂的话解释。",
+      "facts": [
+        "客户端先读取订单版本号，再提交更新。",
+        "如果另一位用户已经更新了同一订单，服务端版本号会变化。",
+        "客户端提交旧版本号时，PATCH /orders/:id 返回 HTTP 409。",
+        "客户端重新读取订单后可以再次提交，服务端不会覆盖较新的修改。"
+      ],
+      "protected_anchors": [
+        "PATCH /orders/:id",
+        "HTTP 409"
+      ],
+      "criteria": [
+        "用同时修改同一订单的过程解释冲突",
+        "保留接口和状态码",
+        "不把并发控制简化成系统随机失败"
+      ]
+    },
+    {
+      "id": "04-en-deploy-handoff",
+      "language": "en",
+      "prompt": "Write a short handoff for the engineer taking over this deployment.",
+      "facts": [
+        "Release v1.8.2 is running in staging.",
+        "The /health endpoint returns 200.",
+        "Production has not been changed.",
+        "Before deployment, run make smoke and confirm ticket OPS-417."
+      ],
+      "protected_anchors": [
+        "v1.8.2",
+        "/health",
+        "200",
+        "make smoke",
+        "OPS-417"
+      ],
+      "criteria": [
+        "distinguishes staging from production",
+        "states the two required checks as actions",
+        "uses ordinary engineering language without decorative process labels"
+      ]
+    }
+  ]
+}

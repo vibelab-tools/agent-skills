@@ -1,0 +1,32 @@
+{
+  "name": "humanizer",
+  "version": "0.1.0",
+  "description": "Guide Codex to write natural, precise reader-facing prose on the first draft.",
+  "author": {
+    "name": "VibeLab Tools",
+    "url": "https://github.com/vibelab-tools"
+  },
+  "homepage": "https://github.com/vibelab-tools/agent-skills/tree/main/humanizer",
+  "repository": "https://github.com/vibelab-tools/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "writing",
+    "humanizer",
+    "chinese",
+    "english",
+    "hooks"
+  ],
+  "interface": {
+    "displayName": "Humanizer",
+    "shortDescription": "Write natural, precise prose on the first draft.",
+    "longDescription": "Humanizer adds concise pre-draft guidance to each Codex turn while preserving technical terms, exact facts, code, commands, and task-specific formats.",
+    "developerName": "VibeLab Tools",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Explain this clearly in natural language."
+    ]
+  }
+}
