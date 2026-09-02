@@ -148,15 +148,9 @@ relay_config_path() {
 }
 
 relay_topic_name() {
-    local agent="$1"
     local project_dir="$2"
     local project_name
 
     project_name=$(basename "$project_dir")
-
-    if [ "$agent" = "codex" ]; then
-        printf 'codex:%s' "$project_name"
-    else
-        printf '%s' "$project_name"
-    fi
+    printf '%s' "$project_name"
 }

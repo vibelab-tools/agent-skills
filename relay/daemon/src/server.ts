@@ -403,15 +403,8 @@ function detectTmuxSession(): string | undefined {
 }
 
 function formatSessionTitle(tmuxSession: string): string {
-  const agent = detectAgent(tmuxSession);
   const projectName = deriveProjectName(tmuxSession);
-  const projectPart = agent === "claude" ? projectName : `${agent}:${projectName}`;
-  return `🔗 ${projectPart}`;
-}
-
-function detectAgent(tmuxSession: string): string {
-  const match = tmuxSession.match(/^(claude|codex)-/);
-  return match ? match[1] : "claude";
+  return `🔗 ${projectName}`;
 }
 
 function deriveProjectName(tmuxSession: string): string {

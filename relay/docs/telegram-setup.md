@@ -105,9 +105,8 @@ Daemon polls Worker -> receives reply -> injects text into tmux
 Agent stops or asks -> daemon -> Worker /api/notify -> Telegram Bot API
 ```
 
-Each project gets its own Topic, usually named `<project>` for Claude Code and
-`codex:<project>` for Codex. The Topic ID is stored in `.claude/relay.json` or
-`.codex/relay.json`.
+Each project gets its own Topic named `<project>` for both Claude Code and
+Codex. The Topic ID is stored in `.claude/relay.json` or `.codex/relay.json`.
 
 ## Known Issues
 

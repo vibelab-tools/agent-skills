@@ -77,7 +77,7 @@ test("uses concise Feishu topic titles, reuses topics, and alerts only attention
     }
 
     assert.deepEqual(created, [
-      { chatId: "oc_test", title: "🔗 codex:demo" },
+      { chatId: "oc_test", title: "🔗 demo" },
     ]);
     assert.deepEqual(sent, [
       { topicId: "om_session", text: "first completion", mentionAll: true },

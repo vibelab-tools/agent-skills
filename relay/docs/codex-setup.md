@@ -172,4 +172,4 @@ make clean
 4. Replies in a Telegram Topic, DingTalk group, or the latest Feishu relay
    Topic are injected back into the matching `codex-...` tmux session.
 
-Telegram Topic names use `codex:<project>`. Claude Code uses `<project>`.
+Telegram Topic names use `<project>` for both Codex and Claude Code.
