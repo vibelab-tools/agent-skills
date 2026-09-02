@@ -18,7 +18,7 @@ const USER_PROMPT_HOOK = join(
   "../../plugins/relay/scripts/hook-user-prompt.sh"
 );
 
-test("reuses one Feishu topic and alerts only attention events", async () => {
+test("uses concise Feishu topic titles, reuses topics, and alerts only attention events", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-server-test-"));
   const config = {
     port: 0,
@@ -33,7 +33,7 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
     name: "feishu",
     sendNewRootMessage: async (chatId: string, title: string) => {
       created.push({ chatId, title });
-      return "om_session";
+      return created.length === 1 ? "om_session" : "om_claude";
     },
     send: async (options: { topicId?: string; text: string; mentionAll?: boolean }) => {
       sent.push(options);
@@ -77,7 +77,7 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
     }
 
     assert.deepEqual(created, [
-      { chatId: "oc_test", title: "🔗 gpu:codex:demo" },
+      { chatId: "oc_test", title: "🔗 codex:demo" },
     ]);
     assert.deepEqual(sent, [
       { topicId: "om_session", text: "first completion", mentionAll: true },
@@ -105,6 +105,23 @@ test("reuses one Feishu topic and alerts only attention events", async () => {
     assert.equal(status.bindings[0].feishuLastMessageIds, undefined);
     assert.equal(status.bindings[0].feishuRecentMessageIds, undefined);
     assert.equal(status.bindings[0].feishuMissingSince, undefined);
+
+    const claudeResponse = await fetch(`http://127.0.0.1:${address.port}/notify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "user_prompt",
+        tmuxSession: "claude-editor-def456",
+        text: "edit this",
+      }),
+    });
+    assert.equal(claudeResponse.status, 200);
+    assert.deepEqual(created[1], { chatId: "oc_test", title: "🔗 editor" });
+    assert.deepEqual(sent[3], {
+      topicId: "om_claude",
+      text: "edit this",
+      mentionAll: false,
+    });
   } finally {
     server.stop();
     rmSync(testDir, { recursive: true, force: true });

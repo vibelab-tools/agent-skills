@@ -165,7 +165,7 @@ export class Server {
     if (this.feishuProvider && this.config.feishuChatId) {
       let rootMsgId = binding?.feishuRootMessageId;
       if (!rootMsgId) {
-        const title = formatSessionTitle(this.config, tmuxSession);
+        const title = formatSessionTitle(tmuxSession);
         rootMsgId = await this.feishuProvider.sendNewRootMessage(
           this.config.feishuChatId,
           title
@@ -402,12 +402,11 @@ function detectTmuxSession(): string | undefined {
   return undefined;
 }
 
-function formatSessionTitle(config: DaemonConfig, tmuxSession: string): string {
-  const hostname = config.hostname.split(".")[0];
+function formatSessionTitle(tmuxSession: string): string {
   const agent = detectAgent(tmuxSession);
   const projectName = deriveProjectName(tmuxSession);
   const projectPart = agent === "claude" ? projectName : `${agent}:${projectName}`;
-  return `🔗 ${hostname}:${projectPart}`;
+  return `🔗 ${projectPart}`;
 }
 
 function detectAgent(tmuxSession: string): string {

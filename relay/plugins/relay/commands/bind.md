@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(curl:*), Bash(tmux:*), Bash(echo:*), Bash(jq:*), Bash(cat:*), Bash(mkdir:*), Bash(hostname:*)
+allowed-tools: Bash(curl:*), Bash(tmux:*), Bash(echo:*), Bash(jq:*), Bash(cat:*), Bash(mkdir:*)
 description: Bind current tmux session to a Telegram topic (auto-creates if needed)
 ---
 
@@ -21,9 +21,8 @@ Bind the current tmux session to a Telegram topic.
    - Else if `.claude/relay.json` exists and has a `topicId`, use that
    - Else create a new topic automatically:
      ```bash
-     HOSTNAME=$(hostname -s)
      PROJECT_NAME=$(basename "$PWD")
-     TOPIC_NAME="${HOSTNAME}:${PROJECT_NAME}"
+     TOPIC_NAME="${PROJECT_NAME}"
      CONFIG="$HOME/.vibelab-tools/agent-skills/relay/config.json"
      BOT_TOKEN=$(jq -r '.telegram.bot_token // empty' "$CONFIG")
      CHAT_ID=$(jq -r '.telegram.chat_id // empty' "$CONFIG")
