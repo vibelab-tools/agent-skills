@@ -1,9 +1,9 @@
 ---
-name: manage-project-work
+name: project-work
 description: Manage Git repository work from requirement or defect capture through issue-backed planning, implementation, Conventional Commits, publication, delivery, release, and verified closure. Use whenever Codex or Claude Code analyzes, plans, implements, fixes, refactors, documents, tests, configures, builds, deploys, or releases work in a GitHub- or GitLab-hosted repository, and when it drafts or reviews a commit message for any Git repository. Preserve repository-specific workflows and authorization boundaries.
 ---
 
-# Manage Project Work
+# Project Work
 
 Treat the repository's issue and delivery policy as the durable contract for
 the work. Keep chat concise while preserving the goal, scope, decisions,

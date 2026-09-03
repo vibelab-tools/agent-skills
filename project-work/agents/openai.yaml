@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Work"
+  short_description: "Manage requirements through verified delivery"
+  default_prompt: "Use $project-work to manage this repository task from its requirement and issue through implementation, delivery, and closure."
