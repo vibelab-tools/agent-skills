@@ -28,6 +28,7 @@ export interface DaemonConfig {
   feishuAppId: string;
   feishuAppSecret: string;
   feishuChatId: string;
+  feishuUserTokenPath: string;
   telegramProxy: ProxyConfig;
   dingtalkProxy: ProxyConfig;
   feishuProxy: ProxyConfig;

@@ -133,6 +133,7 @@ export function loadConfig(): DaemonConfig {
     feishuAppId: raw.feishu?.app_id || legacyEnv(raw, "FEISHU_APP_ID") || "",
     feishuAppSecret: raw.feishu?.app_secret || legacyEnv(raw, "FEISHU_APP_SECRET") || "",
     feishuChatId: raw.feishu?.chat_id || legacyEnv(raw, "FEISHU_CHAT_ID") || "",
+    feishuUserTokenPath: path.join(relayDir, "feishu-user-token.json"),
     telegramProxy: loadProxyConfig(raw.telegram?.proxy, raw, "TELEGRAM"),
     dingtalkProxy: loadProxyConfig(raw.dingtalk?.proxy, raw, "DINGTALK"),
     feishuProxy: loadProxyConfig(raw.feishu?.proxy, raw, "FEISHU"),

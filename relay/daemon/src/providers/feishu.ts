@@ -17,6 +17,7 @@ import {
 import { IMProvider, SendOptions } from "./base";
 import { createProxyAgent, createProxyHttpClient, maskProxyUrl, proxyIsEnabled, summarizeError } from "../proxy";
 import { createLogger } from "../logger";
+import { FeishuUserAuth } from "../feishu-user-auth";
 
 // 2026-03-20: Use pino for structured logging
 const log = createLogger("feishu");
@@ -29,6 +30,7 @@ export type FeishuMessageHandler = (
 
 interface FeishuSendOptions extends SendOptions {
   mentionAll?: boolean;
+  sendAsUser?: boolean;
 }
 
 interface FeishuRecoverySource {
@@ -76,11 +78,19 @@ export class FeishuProvider implements IMProvider {
   private threadIds = new Map<string, string>();
   private handledMessageIds = new Set<string>();
   private handledMessageOrder: string[] = [];
+  private pendingUserMessages = new Set<string>();
+  private userAuth: FeishuUserAuth;
   // 2026-03-20: Temp directory for downloaded Feishu attachments
   private tmpDir: string;
 
   constructor(config: DaemonConfig) {
     this.config = config;
+    this.userAuth = new FeishuUserAuth(
+      config.feishuAppId,
+      config.feishuAppSecret,
+      config.feishuUserTokenPath,
+      config.feishuProxy
+    );
     this.tmpDir = path.join(os.tmpdir(), "vibelab-relay");
     if (!fs.existsSync(this.tmpDir)) {
       fs.mkdirSync(this.tmpDir, { recursive: true });
@@ -271,6 +281,14 @@ export class FeishuProvider implements IMProvider {
       text = text.replace(/@\S+\s*/g, "").trim();
     }
 
+    if (
+      sender?.sender_type === "user" &&
+      this.consumePendingUserMessage(effectiveRootId, text)
+    ) {
+      this.rememberMessage(message_id);
+      return true;
+    }
+
     if (!text && attachments.length === 0) {
       this.rememberMessage(message_id);
       return true;
@@ -422,7 +440,10 @@ export class FeishuProvider implements IMProvider {
     for (const item of unseen) {
       const handled = await this.handleIncomingMessage(
         {
-          sender: { sender_id: { open_id: item.sender?.id } },
+          sender: {
+            sender_id: { open_id: item.sender?.id },
+            sender_type: "user",
+          },
           message: {
             message_id: item.message_id,
             chat_id: item.chat_id,
@@ -569,18 +590,36 @@ export class FeishuProvider implements IMProvider {
   async send(options: FeishuSendOptions): Promise<boolean> {
     if (!this.client) return false;
 
-    const { topicId, text, mentionAll } = options;
+    const { topicId, text, mentionAll, sendAsUser } = options;
     const chatId = this.config.feishuChatId;
     if (!chatId) return false;
 
     try {
+      let userAccessToken: string | undefined;
+      let pendingUserMessage: string | undefined;
+      if (sendAsUser) {
+        userAccessToken = await this.userAuth.getAccessToken() || undefined;
+        if (!userAccessToken) {
+          log.error("User-authenticated Feishu send requested before authorization");
+          return false;
+        }
+        if (topicId && !topicId.startsWith("new:")) {
+          pendingUserMessage = this.markPendingUserMessage(topicId, text);
+        }
+      }
       if (topicId && !topicId.startsWith("new:")) {
-        const sent = await this.replyInThread(topicId, text, mentionAll);
+        const sent = await this.replyInThread(
+          topicId,
+          text,
+          mentionAll,
+          userAccessToken
+        );
+        this.finishPendingUserMessage(pendingUserMessage);
         if (sent) this.hotUntil.set(topicId, Date.now() + HOT_RECOVERY_WINDOW_MS);
         return sent;
       } else {
         // Send new message to group (will become the session root)
-        return await this.sendToGroup(chatId, text);
+        return await this.sendToGroup(chatId, text, userAccessToken);
       }
     } catch (err) {
       log.error({ err: summarizeError(err) }, "Send error");
@@ -665,20 +704,27 @@ export class FeishuProvider implements IMProvider {
   private async replyInThread(
     rootMessageId: string,
     text: string,
-    mentionAll = false
+    mentionAll = false,
+    userAccessToken?: string
   ): Promise<boolean> {
     if (!this.client) return false;
     try {
-      await this.client.im.message.reply({
-        path: { message_id: rootMessageId },
-        data: {
-          content: JSON.stringify({
-            text: mentionAll ? `<at user_id="all">所有人</at> ${text}` : text,
-          }),
-          msg_type: "text",
-          reply_in_thread: true,
+      const response = await this.client.im.message.reply(
+        {
+          path: { message_id: rootMessageId },
+          data: {
+            content: JSON.stringify({
+              text: mentionAll ? `<at user_id="all">所有人</at> ${text}` : text,
+            }),
+            msg_type: "text",
+            reply_in_thread: true,
+          },
         },
-      });
+        userAccessToken ? lark.withUserAccessToken(userAccessToken) : undefined
+      );
+      if (userAccessToken) {
+        this.rememberSentUserMessage(rootMessageId, response);
+      }
       return true;
     } catch (err) {
       log.error({ err: summarizeError(err) }, "Reply in thread error");
@@ -687,17 +733,28 @@ export class FeishuProvider implements IMProvider {
   }
 
   /** Send a new root message to a group. */
-  private async sendToGroup(chatId: string, text: string): Promise<boolean> {
+  private async sendToGroup(
+    chatId: string,
+    text: string,
+    userAccessToken?: string
+  ): Promise<boolean> {
     if (!this.client) return false;
     try {
-      await this.client.im.message.create({
-        params: { receive_id_type: "chat_id" },
-        data: {
-          receive_id: chatId,
-          content: JSON.stringify({ text }),
-          msg_type: "text",
+      const response = await this.client.im.message.create(
+        {
+          params: { receive_id_type: "chat_id" },
+          data: {
+            receive_id: chatId,
+            content: JSON.stringify({ text }),
+            msg_type: "text",
+          },
         },
-      });
+        userAccessToken ? lark.withUserAccessToken(userAccessToken) : undefined
+      );
+      if (userAccessToken) {
+        const messageId = (response as any)?.data?.message_id;
+        if (messageId) this.rememberSentUserMessage(messageId, response);
+      }
       return true;
     } catch (err) {
       log.error({ err: summarizeError(err) }, "Send to group error");
@@ -714,6 +771,39 @@ export class FeishuProvider implements IMProvider {
     // SDK doesn't expose a clean disconnect method
     this.wsClient = null;
     this.client = null;
+  }
+
+  private userMessageKey(rootMessageId: string, text: string): string {
+    return `${rootMessageId}\u0000${text}`;
+  }
+
+  private markPendingUserMessage(rootMessageId: string, text: string): string {
+    const key = this.userMessageKey(rootMessageId, text);
+    this.pendingUserMessages.add(key);
+    return key;
+  }
+
+  private consumePendingUserMessage(rootMessageId: string, text: string): boolean {
+    const key = this.userMessageKey(rootMessageId, text);
+    if (!this.pendingUserMessages.has(key)) return false;
+    this.pendingUserMessages.delete(key);
+    return true;
+  }
+
+  private finishPendingUserMessage(key: string | undefined): void {
+    if (!key) return;
+    this.pendingUserMessages.delete(key);
+  }
+
+  private rememberSentUserMessage(rootMessageId: string, response: unknown): void {
+    const data = (response as any)?.data;
+    const messageId = data?.message_id;
+    if (!messageId) return;
+    this.rememberMessage(messageId);
+    const createdAt = Number(data?.create_time);
+    if (Number.isFinite(createdAt)) {
+      this.recoverySource?.onMessageRecovered(rootMessageId, messageId, createdAt);
+    }
   }
 }
 

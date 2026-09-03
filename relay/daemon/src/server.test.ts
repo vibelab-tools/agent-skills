@@ -28,14 +28,24 @@ test("uses concise Feishu topic titles, reuses topics, and alerts only attention
   } as DaemonConfig;
   const sessionManager = new SessionManager(config);
   const created: Array<{ chatId: string; title: string }> = [];
-  const sent: Array<{ topicId?: string; text: string; mentionAll?: boolean }> = [];
+  const sent: Array<{
+    topicId?: string;
+    text: string;
+    mentionAll?: boolean;
+    sendAsUser?: boolean;
+  }> = [];
   const feishuProvider = {
     name: "feishu",
     sendNewRootMessage: async (chatId: string, title: string) => {
       created.push({ chatId, title });
       return created.length === 1 ? "om_session" : "om_claude";
     },
-    send: async (options: { topicId?: string; text: string; mentionAll?: boolean }) => {
+    send: async (options: {
+      topicId?: string;
+      text: string;
+      mentionAll?: boolean;
+      sendAsUser?: boolean;
+    }) => {
       sent.push(options);
       return true;
     },
@@ -80,9 +90,24 @@ test("uses concise Feishu topic titles, reuses topics, and alerts only attention
       { chatId: "oc_test", title: "🔗 demo" },
     ]);
     assert.deepEqual(sent, [
-      { topicId: "om_session", text: "first completion", mentionAll: true },
-      { topicId: "om_session", text: "continue", mentionAll: false },
-      { topicId: "om_session", text: "need input", mentionAll: true },
+      {
+        topicId: "om_session",
+        text: "first completion",
+        mentionAll: true,
+        sendAsUser: false,
+      },
+      {
+        topicId: "om_session",
+        text: "continue",
+        mentionAll: false,
+        sendAsUser: true,
+      },
+      {
+        topicId: "om_session",
+        text: "need input",
+        mentionAll: true,
+        sendAsUser: false,
+      },
     ]);
     assert.equal(
       sessionManager.findByTmuxSession("codex-demo-abc123")?.feishuRootMessageId,
@@ -121,6 +146,7 @@ test("uses concise Feishu topic titles, reuses topics, and alerts only attention
       topicId: "om_claude",
       text: "edit this",
       mentionAll: false,
+      sendAsUser: true,
     });
   } finally {
     server.stop();
@@ -141,10 +167,14 @@ test("relays local Codex prompts but not prompts injected from IM", async () => 
   const sessionManager = new SessionManager(config);
   sessionManager.bind(tmuxSession, "topic-1");
   const promptOrigins = new PromptOriginTracker();
-  const sent: Array<{ topicId?: string; text: string }> = [];
+  const sent: Array<{ topicId?: string; text: string; sendAsUser?: boolean }> = [];
   const telegramProvider = {
     name: "telegram",
-    send: async (options: { topicId?: string; text: string }) => {
+    send: async (options: {
+      topicId?: string;
+      text: string;
+      sendAsUser?: boolean;
+    }) => {
       sent.push(options);
       return true;
     },
@@ -257,8 +287,9 @@ test("relays Codex prompt images from the transcript to Feishu", async () => {
     assert.deepEqual(sent, [
       {
         topicId: "om_session",
-        text: "🧑‍💻 [Image #1] compare with [Image #2]",
+        text: "[Image #1] compare with [Image #2]",
         mentionAll: false,
+        sendAsUser: true,
       },
     ]);
 

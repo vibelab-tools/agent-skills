@@ -209,6 +209,7 @@ API and routes replies by conversation binding.
 | `feishu.app_id` | Yes, for Feishu | Feishu/Lark app ID. |
 | `feishu.app_secret` | Yes, for Feishu | Feishu/Lark app secret. |
 | `feishu.chat_id` | Yes, for Feishu | Target chat ID where relay creates session topic roots and receives topic replies. |
+| `runtime/feishu-user-token.json` | For user-authored prompts | Protected OAuth token state created by `make authorize-feishu-user`; do not edit manually. |
 | `feishu.proxy` | No | Per-channel proxy config. Keep disabled when Feishu should connect directly. |
 
 Feishu does not use the Cloudflare Worker. It connects through Feishu WebSocket

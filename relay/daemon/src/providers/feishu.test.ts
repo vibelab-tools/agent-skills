@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { DaemonConfig } from "../types";
+import { writeTokenState } from "../feishu-user-auth";
 import { FeishuProvider } from "./feishu";
 
 function recoveryTarget(rootMessageId: string, threadId: string) {
@@ -71,6 +72,99 @@ test("mentions everyone for an attention reply", async () => {
     JSON.stringify({ text: '<at user_id="all">所有人</at> done' })
   );
   assert.equal(request.data.reply_in_thread, true);
+});
+
+test("sends a local prompt with the authorized Feishu user identity", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-feishu-user-send-"));
+  const tokenPath = join(testDir, "feishu-user-token.json");
+  writeTokenState(tokenPath, {
+    access_token: "user-access-token",
+    refresh_token: "user-refresh-token",
+    expires_at: Date.now() + 60 * 60 * 1000,
+  });
+  const provider = new FeishuProvider({
+    feishuChatId: "oc_test",
+    feishuUserTokenPath: tokenPath,
+    feishuProxy: { enabled: false, url: "" },
+  } as DaemonConfig);
+  let request: unknown;
+  let requestOptions: Record<PropertyKey, unknown> | undefined;
+  let received = 0;
+  const recovered: Array<{ rootMessageId: string; messageId: string }> = [];
+
+  provider.onMessage(() => {
+    received += 1;
+  });
+  provider.startRecovery({
+    getTargets: () => [],
+    onThreadResolved: () => {},
+    onMessageRecovered: (rootMessageId, messageId) => {
+      recovered.push({ rootMessageId, messageId });
+    },
+  });
+
+  (provider as any).client = {
+    im: {
+      message: {
+        reply: async (value: unknown, options: Record<PropertyKey, unknown>) => {
+          request = value;
+          requestOptions = options;
+          await (provider as any).handleIncomingMessage(
+            {
+              sender: {
+                sender_type: "user",
+                sender_id: { open_id: "ou_user" },
+              },
+              message: {
+                message_id: "om_user_message",
+                chat_id: "oc_test",
+                chat_type: "group",
+                message_type: "text",
+                content: JSON.stringify({ text: "typed directly in Codex" }),
+                root_id: "om_root",
+                create_time: "1000",
+              },
+            },
+            "websocket"
+          );
+          return {
+            data: {
+              message_id: "om_user_message",
+              create_time: "1000",
+            },
+          };
+        },
+      },
+    },
+  };
+
+  try {
+    const sent = await provider.send({
+      topicId: "om_root",
+      text: "typed directly in Codex",
+      sendAsUser: true,
+    });
+
+    assert.equal(sent, true);
+    assert.deepEqual(request, {
+      path: { message_id: "om_root" },
+      data: {
+        content: JSON.stringify({ text: "typed directly in Codex" }),
+        msg_type: "text",
+        reply_in_thread: true,
+      },
+    });
+    const larkOptions = requestOptions?.lark as Record<PropertyKey, unknown>;
+    const tokenSymbol = Object.getOwnPropertySymbols(larkOptions)[0];
+    assert.equal(larkOptions[tokenSymbol], "user-access-token");
+    assert.equal(received, 0);
+    assert.deepEqual(recovered, [
+      { rootMessageId: "om_root", messageId: "om_user_message" },
+    ]);
+  } finally {
+    provider.disconnect();
+    rmSync(testDir, { recursive: true, force: true });
+  }
 });
 
 test("uploads prompt images and replies inside the session topic", async () => {

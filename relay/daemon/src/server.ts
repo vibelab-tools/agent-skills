@@ -150,15 +150,16 @@ export class Server {
 
     // 2026-03-18: Send message content directly without type prefix
     const text = body.text;
+    const singleIdentityText = formatSingleIdentityText(body.type, text);
 
     // 2026-03-18: Send to all configured providers with their respective IDs
     const results: boolean[] = [];
     let feishuRootMessageId: string | undefined;
     if (this.telegramProvider && binding?.topicId) {
-      results.push(await this.telegramProvider.send({ topicId: binding.topicId, text }));
+      results.push(await this.telegramProvider.send({ topicId: binding.topicId, text: singleIdentityText }));
     }
     if (this.dingtalkProvider && binding?.dingtalkConversationId) {
-      results.push(await this.dingtalkProvider.send({ topicId: binding.dingtalkConversationId, text }));
+      results.push(await this.dingtalkProvider.send({ topicId: binding.dingtalkConversationId, text: singleIdentityText }));
     }
     // Keep one Feishu topic per tmux session so replies remain grouped and
     // route back through a stable root message.
@@ -183,6 +184,7 @@ export class Server {
           topicId: rootMsgId,
           text,
           mentionAll: body.type === "stop" || body.type === "ask_user",
+          sendAsUser: body.type === "user_prompt",
         }));
       }
     }
@@ -365,6 +367,12 @@ export class Server {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ origin }));
   }
+}
+
+function formatSingleIdentityText(type: NotifyRequest["type"], text: string): string {
+  if (type === "user_prompt") return `🧑‍💻 ${text}`;
+  if (type === "stop" || type === "ask_user") return `🤖 ${text}`;
+  return text;
 }
 
 /** Read and parse JSON body from incoming request */

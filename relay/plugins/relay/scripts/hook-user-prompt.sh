@@ -61,15 +61,12 @@ fi
 # Truncate long prompts to avoid flooding IM
 PROMPT=$(echo "$PROMPT" | head -c 3000)
 
-# 2026-04-03: Prefix with sender indicator so IM readers can distinguish user vs assistant
-TEXT="🧑‍💻 ${PROMPT}"
-
 # POST to daemon
 curl -s -X POST "${DAEMON_URL}/notify" \
     -H "Content-Type: application/json" \
     -d "$(jq -n \
         --arg type "user_prompt" \
-        --arg text "$TEXT" \
+        --arg text "$PROMPT" \
         --arg tmuxSession "$TMUX_SESSION" \
         --arg transcriptPath "$TRANSCRIPT_PATH" \
         --arg turnId "$TURN_ID" \

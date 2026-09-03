@@ -20,7 +20,7 @@ NODE ?= node
 
 .DEFAULT_GOAL := build
 
-.PHONY: all build install install-all install-codex install-claude install-daemon install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service purge validate clean help
+.PHONY: all build install install-all install-codex install-claude install-daemon install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings authorize-feishu-user daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service purge validate clean help
 
 all: build
 
@@ -59,12 +59,12 @@ install-daemon:
 	cp daemon/package.json daemon/pnpm-lock.yaml daemon/pnpm-workspace.yaml "$(DAEMON_INSTALL_DIR)/"
 	cd "$(DAEMON_INSTALL_DIR)" && pnpm install --prod --frozen-lockfile
 	mkdir -p "$(BIN_DIR)" "$(RUNTIME_DIR)" "$(ASSETS_DIR)"
-	cp scripts/relay-daemon.mjs scripts/relay-service.mjs "$(BIN_DIR)/"
+	cp scripts/relay-daemon.mjs scripts/relay-service.mjs scripts/authorize-feishu-user.mjs "$(BIN_DIR)/"
 	cp scripts/codex-tmux.sh "$(BIN_DIR)/codex-tmux"
 	@if [ -f "$(APP_ICON_SOURCE)" ]; then \
 		cp "$(APP_ICON_SOURCE)" "$(ASSETS_DIR)/vibelab-agent-skills-avatar.png"; \
 	fi
-	chmod +x "$(BIN_DIR)/relay-daemon.mjs" "$(BIN_DIR)/relay-service.mjs" "$(BIN_DIR)/codex-tmux"
+	chmod +x "$(BIN_DIR)/relay-daemon.mjs" "$(BIN_DIR)/relay-service.mjs" "$(BIN_DIR)/authorize-feishu-user.mjs" "$(BIN_DIR)/codex-tmux"
 
 install-codex-plugin:
 	mkdir -p "$(CODEX_MARKETPLACE_ROOT)/plugins" "$(CODEX_MARKETPLACE_ROOT)/.agents/plugins"
@@ -103,6 +103,9 @@ install-settings:
 	mkdir -p "$(RUNTIME_DIR)"
 	node scripts/merge-relay-config.mjs "$(SERVICE_ROOT)"
 	node scripts/cleanup-legacy-relay-settings.mjs
+
+authorize-feishu-user:
+	$(NODE) scripts/authorize-feishu-user.mjs "$(SERVICE_ROOT)"
 
 install-service:
 	$(NODE) "$(BIN_DIR)/relay-service.mjs" install "$(SERVICE_ROOT)"
@@ -177,6 +180,7 @@ help:
 		"  make uninstall-codex  Remove Codex plugin surface only." \
 		"  make uninstall-claude Remove Claude plugin surface only." \
 		"  make start|stop|status|restart  Control the platform service." \
+		"  make authorize-feishu-user      Authorize Feishu user-authored messages." \
 		"  make validate         Validate plugin manifests." \
 		"" \
 		"Variables:" \

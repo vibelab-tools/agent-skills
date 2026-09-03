@@ -43,7 +43,7 @@ curl -s -X POST "${DAEMON_URL}/notify" \
     -H "Content-Type: application/json" \
     -d "$(jq -n \
         --arg type "ask_user" \
-        --arg text "🤖 $QUESTION" \
+        --arg text "$QUESTION" \
         --arg tmuxSession "$TMUX_SESSION" \
         '{type: $type, text: $text, tmuxSession: $tmuxSession}'
     )" >/dev/null 2>&1

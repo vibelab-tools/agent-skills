@@ -44,6 +44,15 @@ Open **Permissions Management** and enable the required message permissions:
 These are the four permissions used by the relay. Keep the permission set
 minimal instead of enabling every `im:message.*` permission.
 
+To show prompts typed locally in Codex as messages from the user's Feishu
+account, also enable these user-identity permissions:
+
+| Permission | Identifier | Purpose |
+| --- | --- | --- |
+| Read and send direct or group messages | `im:message` | Required base permission for user-authenticated sends |
+| Send messages as user | `im:message.send_as_user` | Send local prompts with the authorized user's identity |
+| Keep access to authorized data | `offline_access` | Return a rotating refresh token |
+
 ![Required Feishu permissions](assets/feishu-setup/permissions.jpg)
 
 ## Publish The First Version
@@ -81,6 +90,31 @@ Use a dedicated Feishu group for the production relay target:
 1. Open the group in the Feishu desktop client.
 2. Open **More > Settings > Group Bots**.
 3. Click **Add Bot**, search for the app name, and add it.
+
+## Authorize The User Identity
+
+When user-authored messages are enabled, add this exact redirect URL under
+**Security Settings > Redirect URLs**:
+
+```text
+http://127.0.0.1:3581/feishu/oauth/callback
+```
+
+Then run the authorization helper on the Relay host:
+
+```bash
+make authorize-feishu-user
+```
+
+Open the printed authorization URL in the user's browser and approve the three
+requested permissions. The helper stores the returned access and refresh tokens
+at `runtime/feishu-user-token.json` with mode `600`; it never prints them or
+places them in `config.json`. The daemon refreshes the short-lived access token
+before expiry and atomically persists each rotated refresh token.
+
+If the user authorization is absent, expired, or revoked, a local user prompt
+fails delivery instead of being sent under the bot identity. Run the helper
+again to authorize the user. Agent responses continue to use the bot identity.
 
 Feishu currently exposes this application-bot flow in the desktop client; the
 web client may show the group-bot page without the **Add Bot** action. Use a
