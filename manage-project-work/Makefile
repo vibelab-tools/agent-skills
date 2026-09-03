@@ -1,6 +1,7 @@
 SHELL := /bin/sh
 
 SKILL_NAME := manage-project-work
+LEGACY_SKILL_NAMES := git-commit manage-work-with-issues
 CODEX_HOME ?= $(HOME)/.codex
 CLAUDE_HOME ?= $(HOME)/.claude
 CODEX_INSTALL_DIR := $(CODEX_HOME)/skills/$(SKILL_NAME)
@@ -35,7 +36,11 @@ install-codex: validate
 		--exclude 'Makefile' \
 		--exclude '.DS_Store' \
 		./ "$(CODEX_INSTALL_DIR)/"
+	@for skill in $(LEGACY_SKILL_NAMES); do \
+		rm -rf "$(CODEX_HOME)/skills/$$skill"; \
+	done
 	@echo "Installed $(SKILL_NAME) to $(CODEX_INSTALL_DIR)"
+	@echo "Removed legacy skill entrypoints from $(CODEX_HOME)/skills"
 
 install-claude: validate
 	@mkdir -p "$(CLAUDE_INSTALL_DIR)"
@@ -44,7 +49,11 @@ install-claude: validate
 		--exclude 'Makefile' \
 		--exclude '.DS_Store' \
 		./ "$(CLAUDE_INSTALL_DIR)/"
+	@for skill in $(LEGACY_SKILL_NAMES); do \
+		rm -rf "$(CLAUDE_HOME)/skills/$$skill"; \
+	done
 	@echo "Installed $(SKILL_NAME) to $(CLAUDE_INSTALL_DIR)"
+	@echo "Removed legacy skill entrypoints from $(CLAUDE_HOME)/skills"
 
 uninstall: uninstall-codex uninstall-claude
 

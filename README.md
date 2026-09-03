@@ -38,6 +38,10 @@ Regular skills are installed into the native skill directories for each agent:
 - Codex: `~/.codex/skills/<skill-name>`
 - Claude Code: `~/.claude/skills/<skill-name>`
 
+Installing `manage-project-work` removes installed `git-commit` and
+`manage-work-with-issues` entrypoints for the same agent so the unified
+workflow is the only automatically discoverable replacement.
+
 Skills that need tool dependencies may also install a shared runtime under
 `~/.vibelab-tools/agent-skills/<skill-name>`. For example, `markitdown` installs
 `markitdown[all]` into `~/.vibelab-tools/agent-skills/markitdown/venv` and exposes a
