@@ -12,8 +12,7 @@ removed with the same target names.
 | Skill | Purpose | Details |
 | --- | --- | --- |
 | `markitdown` | Converts documents, media, archives, and supported URLs to Markdown with Microsoft MarkItDown before an agent reasons over them. | [markitdown/README.md](markitdown/README.md) |
-| `git-commit` | Drafts, reviews, validates, and creates Conventional Commits 1.0.0 messages from real repository changes. | [git-commit/README.md](git-commit/README.md) |
-| `manage-work-with-issues` | Tracks repository tasks through GitHub or GitLab issues and requires remotely visible issue-linked commits before closure. | [manage-work-with-issues/SKILL.md](manage-work-with-issues/SKILL.md) |
+| `manage-project-work` | Manages requirements and defects through provider issues, implementation, Conventional Commits, verified delivery, releases, and closure. | [manage-project-work/SKILL.md](manage-project-work/SKILL.md) |
 | `code-refactor` | Provides parser-backed code complexity, smell detection, and bounded refactoring planning through a packaged Java CLI. | [code-refactor/README.md](code-refactor/README.md) |
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
@@ -25,8 +24,7 @@ removed with the same target names.
 | Skill | Main dependencies |
 | --- | --- |
 | `markitdown` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `markitdown[all]` into an isolated runtime venv. |
-| `git-commit` | Git CLI in the target repository; no build-time runtime beyond shell tools used by installation. |
-| `manage-work-with-issues` | Git CLI plus `gh` for GitHub repositories or `glab` for GitLab repositories. |
+| `manage-project-work` | Git CLI plus `gh` for GitHub repositories or `glab` for GitLab repositories. |
 | `code-refactor` | JDK 21 and Maven for build/validation; Java 21-compatible runtime for the packaged JAR. |
 | `video-understanding` | Python 3.10+, `ffmpeg`, preferably `ffprobe`, provider API credentials for provider-backed modes, and `boto3` in the isolated runtime venv when OSS/S3-compatible video upload is enabled. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Manage Work with Issues"
-  short_description: "Track plans and screenshot evidence in provider issues"
-  default_prompt: "Use $manage-work-with-issues to track this repository task in GitHub or GitLab, including safe screenshot evidence when available, through linked commit and closure."

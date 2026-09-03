@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-SKILL_NAME := manage-work-with-issues
+SKILL_NAME := manage-project-work
 CODEX_HOME ?= $(HOME)/.codex
 CLAUDE_HOME ?= $(HOME)/.claude
 CODEX_INSTALL_DIR := $(CODEX_HOME)/skills/$(SKILL_NAME)
