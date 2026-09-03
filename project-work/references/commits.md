@@ -3,6 +3,11 @@
 Use this reference when drafting, reviewing, or creating Git commits, and when
 publishing issue-backed work.
 
+In commit-only work, do not create an Issue and do not infer staging,
+committing, or pushing from a request that asks only for a message draft or
+review. Issue references apply only when the commit actually belongs to an
+Issue-backed task.
+
 ## Inspect Before Writing
 
 1. Inspect `git diff --staged`. If nothing is staged and the request is only to
@@ -107,9 +112,13 @@ retains the reference.
 
 ## Publish Verified Work
 
-After focused checks pass and the diff is reviewed, commit and push through the
-repository's normal workflow unless the user prohibited that action. This
-default does not authorize force-pushing, bypassing branch protection,
+This section applies to Issue delivery, or when a commit-only request explicitly
+includes publication. After focused checks pass and the diff is reviewed,
+commit and push verified Issue-delivery work through the repository's normal
+workflow unless the user prohibited that action. A draft, review, or local
+commit request alone does not authorize a push.
+
+Publication never authorizes force-pushing, bypassing branch protection,
 publishing unrelated changes, or ignoring failed checks.
 
 Before pushing, read the delivery reference when CI/CD or environment changes

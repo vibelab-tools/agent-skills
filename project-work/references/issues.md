@@ -4,9 +4,14 @@ Use this reference for requirement or defect capture, execution-plan issues,
 provider comments, screenshot evidence, checklist reconciliation, and issue
 closure.
 
-Long-running sessions may outlive a skill installation. Before each provider
-mutation, reread the `Required Outcomes` section from the current installed
-copy of this skill rather than relying on an older in-context copy.
+Use only the Issue path selected in `SKILL.md`. Record-only, inspect-only, and
+Issue maintenance must not expand into implementation or delivery. Planning,
+decomposition, committing, publication, and automatic closure apply only to
+Issue delivery or when the user explicitly requests that specific operation.
+
+Read the installed `SKILL.md` once per turn. Reuse it for provider operations
+in that turn, and reread it only after a session resume, context compaction, or
+an installed-file change.
 
 ## Identify the Repository and Provider
 
@@ -44,7 +49,13 @@ providers and authority is unclear, ask before mutation.
 Do not replace a failed provider CLI with the other provider's CLI, a local
 TODO, or an untracked note.
 
-## Reuse or Create the Right Issue
+## Plan Issue-backed Delivery
+
+The planning and decomposition rules in this section apply only to Issue
+delivery or an explicit request to decompose work into Issues. Record-only may
+use the formatting and creation helpers without creating an implementation
+plan. Inspect-only makes no provider mutation. Issue maintenance performs only
+the requested mutation.
 
 If the user, branch, commit, pull request, or merge request identifies an
 issue:
@@ -216,7 +227,8 @@ detection.
 
 ## Keep the Issue Useful
 
-Add comments only for information that would be costly to lose:
+When the selected path authorizes a comment, add one only for information that
+would be costly to lose:
 
 - accepted scope or acceptance-criteria changes;
 - root cause or an architectural decision that controls the solution;
@@ -228,6 +240,9 @@ then inspect status, the current diff, and recent commits. Do not rely on
 recalled chat context when those sources differ.
 
 ## Reconcile and Close
+
+This section applies only when Issue delivery is complete or Issue maintenance
+explicitly requests closure. Record-only and inspect-only never close an Issue.
 
 Treat every task-list item as durable scope:
 

@@ -1,132 +1,107 @@
 ---
 name: project-work
-description: Manage Git repository work from requirement or defect capture through issue-backed planning, implementation, Conventional Commits, publication, delivery, release, and verified closure. Use whenever Codex or Claude Code analyzes, plans, implements, fixes, refactors, documents, tests, configures, builds, deploys, or releases work in a GitHub- or GitLab-hosted repository, and when it drafts or reviews a commit message for any Git repository. Preserve repository-specific workflows and authorization boundaries.
+description: Manage explicitly requested or repository-required GitHub and GitLab Issue workflows, commit-message work, and branch, delivery, or release operations. Use when the user asks to create, inspect, update, decompose, deliver, or close an Issue; supplies an Issue as the task authority; asks to draft, review, or create a commit; asks for branch, push, deployment, promotion, version, tag, or release work; or repository instructions require one of these workflows. Do not use merely because ordinary explanation, diagnosis, editing, testing, or building occurs in a Git repository.
 ---
 
 # Project Work
 
-Treat the repository's issue and delivery policy as the durable contract for
-the work. Keep chat concise while preserving the goal, scope, decisions,
-verification, delivery evidence, and final state in the systems that govern
-the project.
+Use this Skill only for a workflow explicitly requested by the user or required
+by the repository. Do not turn an ordinary repository task into an Issue,
+commit, or delivery workflow merely because the repository has a GitHub or
+GitLab remote.
 
-## Select the Relevant Guidance
+## Select One Path
 
-Read only the references needed for the current operation:
+Choose the narrowest path that satisfies the request. Do not promote a narrow
+request into a broader path without explicit direction.
 
-- For a GitHub or GitLab requirement, defect, execution plan, issue update,
-  screenshot, or closure, read [references/issues.md](references/issues.md).
+- **Record-only:** Create or record the requested Issue, verify the stored
+  result, and stop. Do not implement, commit, push, deploy, or close it.
+- **Inspect-only:** Read and analyze the identified Issue. Do not mutate the
+  provider or repository.
+- **Issue delivery:** Use an Issue as the authority for requested
+  implementation. Plan, implement, verify, commit, publish, deliver, and close
+  only to the extent required by that Issue and the user's request.
+- **Issue maintenance:** Perform only the requested Issue edit, comment, status
+  change, or closure. Do not begin implementation unless separately requested.
+- **Commit-only:** Draft, review, or create the requested commit from the actual
+  diff. Do not create an Issue or infer a push from a message-only request.
+- **Repository delivery:** Perform the requested branch, push, CI/CD,
+  deployment, promotion, version, tag, release, or rollback work. Do not create
+  an Issue unless the user or repository instructions require one.
+
+An Issue number or URL must be part of the requested work, not merely an
+incidental reference. If ordinary work grows enough to benefit from durable
+tracking, recommend an Issue; do not create one without authorization from the
+user or repository instructions.
+
+## Load Only the Needed Guidance
+
+- For any Issue path, read [references/issues.md](references/issues.md).
 - Before drafting, reviewing, or creating a commit, read
   [references/commits.md](references/commits.md).
-- Before creating or changing a work branch, pushing when CI/CD may run,
-  deploying, promoting, versioning, tagging, releasing, rolling back, or
-  claiming environment acceptance, read
-  [references/delivery.md](references/delivery.md).
+- Before creating or changing a branch, pushing when CI/CD may run, deploying,
+  promoting, versioning, tagging, releasing, rolling back, or claiming
+  environment acceptance, read [references/delivery.md](references/delivery.md).
 
-A message-only commit request does not require creating an issue. Inspect the
-actual diff and repository convention, then use the commit reference. A
-repository change follows the complete lifecycle below when its authoritative
-remote is GitHub or GitLab.
+Load each reference only when the selected path reaches that operation. Issue
+delivery may use all three references, but record-only and inspect-only should
+not load commit or delivery instructions.
 
-## Required Outcomes
+Read the installed `SKILL.md` once when this Skill activates in the current
+turn, then reuse it. Read it again after a session resume, context compaction,
+or an installed-file change. Do not reread it before every provider mutation in
+the same turn.
 
-1. Record a concrete incoming requirement or defect in a source issue when it
-   is not already tracked.
-2. Settle the requirement and technical design before turning the execution
-   plan into issues.
-3. Map every independently completable plan task to one authoritative issue
-   before editing files for that task.
-4. Implement only the current issue scope and verify its observable acceptance
-   criteria at the cheapest meaningful boundary.
-5. Reference the task issue from every associated commit. Use `Closes #123`
-   only on the final commit that completes it.
-6. Commit and publish verified issue work through the repository's normal
-   workflow unless the user explicitly prohibits the corresponding action.
-7. Preserve the exact commit or artifact identity through environment
-   acceptance whenever the project delivery contract depends on it.
-8. Keep the issue open until required code, remote, CI/CD, environment, and
-   product acceptance are complete.
-9. Before closure, reconcile every issue task-list item and verify that the
-   completion-bearing commit is visible on the authoritative remote.
+## Shared Boundaries
 
-## Establish Scope and Sources of Truth
+Inspect applicable `AGENTS.md`, repository state, remotes, Issue references,
+commit conventions, and CI/CD or release policy only as needed for the selected
+path. Repository-specific instructions take precedence for Issue templates,
+language, branches, commits, review, merge strategy, deployment, versions, and
+tags.
 
-Resolve the repository root and inspect its actual state before deciding what
-to do:
+Preserve unrelated worktree changes and keep credentials, private customer
+data, and sensitive logs out of Issues and commit messages. The user's request
+controls scope and authorization. Recording or inspecting an Issue does not
+authorize implementation; creating a commit does not automatically authorize a
+push; development delivery does not authorize production.
 
-```bash
-git rev-parse --show-toplevel
-git status --short --branch
-git remote -v
-git branch --show-current
-```
+Production promotion, deployment, rollback, and release tagging require the
+authorization applicable to that exact action in the current task. Never infer
+permission to force-push, bypass branch protection, merge without required
+review, resolve delivery conflicts automatically, or publish unrelated changes.
 
-Read applicable `AGENTS.md`, contributing guidance, issue templates, commit
-configuration, branch and release documentation, CI/CD configuration, and any
-issue named by the user, branch, commit, pull request, or merge request.
-Executable CI/CD configuration governs actual automation when documentation
-disagrees with it; report the inconsistency instead of silently choosing one.
+## Outcomes by Path
 
-Use configured remotes, not the directory name, to identify the provider. Use
-`gh` only for GitHub and `glab` only for GitLab. If the repository has no
-authoritative GitHub or GitLab remote, continue with normal Git work without
-inventing an issue tracker. Ask only when multiple remotes make authority
-materially ambiguous.
+For record-only, inspect-only, and Issue maintenance, perform only the selected
+provider operation and verify the result at that boundary.
 
-Repository-specific instructions override this skill's defaults for issue
-templates, language, branch names, commit style, review, merge strategy,
-deployment, versioning, and tags. The user's current request controls scope
-and authorization.
+For Issue delivery:
 
-## Capture the Requirement and Plan
+1. Reuse or create the authoritative Issue only when the request or repository
+   requires it.
+2. Settle the requirement and technical design before mapping independently
+   completable plan tasks to Issues.
+3. Implement only the current Issue scope and verify its observable acceptance
+   criteria.
+4. Reference the Issue from its commits. Publish verified work through the
+   repository's normal workflow unless the user prohibits the corresponding
+   action.
+5. Preserve any commit or artifact identity required by environment acceptance.
+6. Keep the Issue open until required implementation, remote visibility,
+   delivery, and product acceptance are complete.
+7. Reconcile every Issue task-list item before closure and verify the final
+   remote state.
 
-Use an existing matching issue when one exists. Otherwise record the incoming
-requirement or defect with an observable goal, context, verifiable acceptance
-criteria, material constraints, and relationships. Requirements analysis,
-repository discovery, and technical design may happen in the source issue
-before implementation issues exist.
+For commit-only, inspect the actual staged or unstaged change and perform only
+the requested draft, review, or commit action. Apply Issue footers only when the
+commit actually belongs to an Issue-backed task.
 
-When the design is ready for implementation, split the execution plan by
-independently completable and verifiable outcomes. A small change normally has
-one task and one issue. Do not create separate issues for mechanical steps
-such as reading a file, running a check, or creating the task's commit.
+For repository delivery, follow the project's executable CI/CD configuration
+and documented delivery contract. Verify the requested remote, pipeline,
+artifact, environment, or release result without introducing an Issue workflow
+unless one is required.
 
-Record only durable information in provider comments: accepted scope changes,
-decisions that control the solution, blockers with exact resume steps, and
-final verification or delivery evidence. Do not publish routine progress,
-credentials, private customer data, sensitive logs, or unrelated details.
-
-## Implement and Verify
-
-Preserve unrelated worktree changes. Change only what the current issue
-requires and keep any newly discovered task out of scope until it has been
-added to the plan and mapped to an issue.
-
-Verify behavior against the acceptance criteria. Prefer a small number of real
-boundary checks over internal or mock-driven checks. Review the final diff for
-correctness, unintended edits, and unnecessary complexity before committing.
-Record residual limitations honestly and leave their criteria open.
-
-## Commit, Publish, Deliver, and Close
-
-Stage only the current task's files. Follow the repository's commit convention
-and add the issue reference as a footer. Do not combine unrelated issues in a
-commit or create an empty commit for an investigation.
-
-Before pushing, determine whether the push triggers CI, a shared development
-environment, artifact publication, or production. Normal publication of
-verified task work is the default, but that default does not authorize
-production changes, force pushes, bypassing branch protection, merging without
-required review, destructive recovery, moving release tags, or publishing
-unrelated changes.
-
-Treat production promotion or deployment as a separate action requiring
-explicit authorization in the current task. Preserve and verify the artifact
-identity required by the project. A changed commit invalidates evidence tied
-to its previous SHA and must pass the required pipeline and acceptance again.
-
-Close an issue only after all required implementation, verification,
-publication, delivery, and product acceptance are complete. Reconcile the
-issue body, make the completion-bearing commit visible remotely, add concise
-final evidence, and verify the provider reports the issue closed. If later
-evidence shows a regression, reopen the issue or create a linked follow-up.
+In every path, report only checks and external state that were actually
+verified. Leave unfinished work open and state the exact remaining boundary.

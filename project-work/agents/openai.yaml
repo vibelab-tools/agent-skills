@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Work"
-  short_description: "Manage requirements through verified delivery"
-  default_prompt: "Use $project-work to manage this repository task from its requirement and issue through implementation, delivery, and closure."
+  short_description: "Handle explicit issue, commit, and delivery work"
+  default_prompt: "Use $project-work for this requested issue, commit, or delivery workflow without expanding its scope."

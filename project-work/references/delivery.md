@@ -4,6 +4,10 @@ Use this reference before branch creation or mutation, a push that may trigger
 CI/CD, environment deployment or promotion, version selection, release tags,
 rollback, or any claim that a release is accepted.
 
+Use it only for repository delivery or the delivery phase of Issue delivery.
+Do not create an Issue merely because delivery work occurs in a GitHub or
+GitLab repository; require an explicit Issue request or repository rule.
+
 This guidance captures reusable invariants from an exact-commit delivery
 workflow. It does not make one application's branch names, CI jobs, storage
 systems, namespaces, health endpoints, or tag format universal.
