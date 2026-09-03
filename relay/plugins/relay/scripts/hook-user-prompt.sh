@@ -62,7 +62,7 @@ fi
 PROMPT=$(echo "$PROMPT" | head -c 3000)
 
 # 2026-04-03: Prefix with sender indicator so IM readers can distinguish user vs assistant
-TEXT="👤 ${PROMPT}"
+TEXT="🧑‍💻 ${PROMPT}"
 
 # POST to daemon
 curl -s -X POST "${DAEMON_URL}/notify" \

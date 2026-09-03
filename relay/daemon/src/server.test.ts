@@ -179,7 +179,7 @@ test("relays local Codex prompts but not prompts injected from IM", async () => 
 
     await runUserPromptHook("typed directly in Codex", homeDir, binDir);
     assert.deepEqual(sent, [
-      { topicId: "topic-1", text: "👤 typed directly in Codex" },
+      { topicId: "topic-1", text: "🧑‍💻 typed directly in Codex" },
     ]);
   } finally {
     server.stop();
@@ -257,7 +257,7 @@ test("relays Codex prompt images from the transcript to Feishu", async () => {
     assert.deepEqual(sent, [
       {
         topicId: "om_session",
-        text: "👤 [Image #1] compare with [Image #2]",
+        text: "🧑‍💻 [Image #1] compare with [Image #2]",
         mentionAll: false,
       },
     ]);
