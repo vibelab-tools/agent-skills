@@ -19,8 +19,8 @@ Guide the user through VibeLab Relay setup. Check and configure the service-loca
 ### Steps
 
 1. Read `~/.vibelab-tools/agent-skills/relay/config.json` and check which fields are already set.
-2. For each missing field, ask the user to provide the value.
-3. Once all values are collected, show the user what will be added and ask for confirmation.
+2. Reuse values already supplied or configured. Ask once for the missing required fields together; use defaults for optional fields.
+3. Apply the requested configuration once the required values are available. The setup request authorizes these scoped edits; do not ask for a second confirmation. Summarize field names without exposing credential values.
 4. Update `~/.vibelab-tools/agent-skills/relay/config.json` by adding structured fields such as `telegram.bot_token`, `telegram.chat_id`, `worker.url`, and `daemon.port` (preserve existing settings).
 5. Remind user:
    - They need to restart the relay service for config changes to take effect

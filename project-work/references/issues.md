@@ -1,101 +1,31 @@
-# GitHub and GitLab Issue Workflow
+# Issue Workflow
 
-Use this reference for requirement or defect capture, execution-plan issues,
-provider comments, screenshot evidence, checklist reconciliation, and issue
-closure.
+Use this reference only for the Issue operation selected in `SKILL.md`.
+Record-only, inspect-only, and maintenance must not expand into implementation
+or delivery.
 
-Use only the Issue path selected in `SKILL.md`. Record-only, inspect-only, and
-Issue maintenance must not expand into implementation or delivery. Planning,
-decomposition, committing, publication, and automatic closure apply only to
-Issue delivery or when the user explicitly requests that specific operation.
+## Resolve the Repository and Provider
 
-Read the installed `SKILL.md` once per turn. Reuse it for provider operations
-in that turn, and reread it only after a session resume, context compaction, or
-an installed-file change.
+Use the supplied Issue URL or repository/provider identity already established
+in context. Inspect Git remotes only when that identity is missing; a provider-only
+Issue operation does not require a local worktree, diff, branch, or CI inspection.
 
-## Identify the Repository and Provider
+When resolving from Git, use the current branch's tracked remote, then the documented authoritative
+remote, then `origin`. Stop when GitHub versus GitLab ownership is ambiguous.
+Use `gh` only for GitHub and `glab` only for GitLab, pass the repository and
+hostname explicitly. Reuse working authentication; investigate it when a request
+fails for an authentication reason. If neither an explicit provider target nor
+a supported remote is available, do not invent an Issue tracker.
 
-Run read-only discovery first:
+## Capture a Requirement
 
-```bash
-git rev-parse --show-toplevel
-git status --short --branch
-git remote -v
-```
+Search for the same outcome before creating an Issue. Reuse a matching open
+Issue; use closed work as evidence and create a linked follow-up only when new
+work is required.
 
-For a normal checkout, require the resolved root's `.git` directory and
-inspect its local configuration:
-
-```bash
-git config --file <repo-root>/.git/config \
-  --get-regexp '^remote\..*\.url$'
-```
-
-A linked worktree or submodule may use a `.git` file. Verify it with
-`git rev-parse --git-dir` and inspect `git config --local` instead. Treat
-configured remote URLs, not a folder name or source archive, as proof that the
-project is connected to GitHub or GitLab.
-
-Select the remote tracked by the current branch when possible, then the
-documented authoritative remote, then `origin`. If remotes point to both
-providers and authority is unclear, ask before mutation.
-
-- Use `gh` for every GitHub issue operation.
-- Use `glab` for every GitLab issue operation.
-- Check the selected host's CLI authentication before mutating work.
-- If no authoritative GitHub or GitLab remote exists, continue without
-  inventing an issue tracker.
-
-Do not replace a failed provider CLI with the other provider's CLI, a local
-TODO, or an untracked note.
-
-## Plan Issue-backed Delivery
-
-The planning and decomposition rules in this section apply only to Issue
-delivery or an explicit request to decompose work into Issues. Record-only may
-use the formatting and creation helpers without creating an implementation
-plan. Inspect-only makes no provider mutation. Issue maintenance performs only
-the requested mutation.
-
-If the user, branch, commit, pull request, or merge request identifies an
-issue:
-
-1. View it with the matching provider CLI.
-2. Confirm that it belongs to the authoritative repository.
-3. Use it directly when it matches one independently completable task.
-4. If it is a larger source requirement or defect, create and link one issue
-   for each independently completable execution task.
-5. Reopen it or create a linked follow-up when more work is needed; do not add
-   unrelated work silently to a closed issue.
-
-For each unassigned task, search open issues for the same outcome before
-creating a duplicate. Use the repository's issue templates and existing
-labels when applicable. Do not invent labels solely for this workflow.
-
-Choose granularity by observable deliverable, not by command. A small change
-can use one task issue. Split work with independent outcomes, dependencies, or
-verification. Create all known implementation issues before the first code
-edit. If implementation reveals a new task, add it to the plan and create or
-map its issue before doing that work.
-
-Record the issue number, URL, dependency, and status beside every plan task.
-When a source issue expands into task issues, add their URLs to the source
-issue so the plan survives context compaction.
-
-## Language and Content
-
-Choose the issue language from the target project, in this order:
-
-1. Explicit repository instructions and issue templates.
-2. Recent issues.
-3. The dominant README and documentation language.
-
-Ask before the first issue only when a mixed-language project has no clear
-working language. Keep titles, bodies, plan links, comments, and closing notes
-consistent. Preserve identifiers and exact error text when translation would
-reduce accuracy. Determine commit-message language separately.
-
-A task issue should contain only durable context:
+Choose the target project's language from repository instructions and
+templates, then recent Issues, then project documentation. A new Issue keeps
+only durable context:
 
 ```markdown
 ## Goal
@@ -104,7 +34,7 @@ A task issue should contain only durable context:
 
 ## Context
 
-<problem, requirement, or reproduction evidence>
+<requirement, defect, or reproduction evidence>
 
 ## Acceptance criteria
 
@@ -113,174 +43,96 @@ A task issue should contain only durable context:
 
 ## Constraints
 
-<only constraints that affect implementation>
+<scope, exclusions, and decisions that affect implementation>
 
 ## Plan relationships
 
-- Source: <requirement, defect, or tracking issue URL when applicable>
-- Depends on: <issue URLs or "None">
+- Parent or source: <Issue URL or None>
+- Depends on: <Issue URLs or None>
 ```
 
-## Preserve Multiline Markdown
+Clarify material ambiguity before delivery. A small outcome uses one Issue.
+Split only outcomes that can be implemented and verified independently; never
+create separate Issues for reading files, writing one test, committing, or
+opening a review request.
 
-For every multiline create, edit, or comment, use
-`scripts/issue_markdown.py` from this skill. The helper reads actual Markdown
-from standard input, rejects literal `\n` by default, performs the provider
-mutation, reads the stored object back, and requires an exact Markdown match.
+For multi-Issue work, record each child's expected touch set, exclusive
+resources, exclusions, and dependencies. Create known children before coding
+and link their ordered list from the parent. New and reused children without a
+milestone inherit the parent's milestone before branch resolution. If an
+existing child belongs to another milestone, record a planning conflict and do
+not overwrite it silently.
 
-GitHub example:
+If delivery reveals another independent outcome, stop that new work, update the
+plan, and create or link its Issue before implementation. In isolated
+single-Issue mode, report the additional scope instead of creating a child.
+
+## Write and Verify Provider Content
+
+For every multiline create, edit, or comment, use the bundled helper. It reads
+Markdown from standard input, rejects literal `\n`, performs the mutation, and
+requires the stored provider content to match:
 
 ```bash
 python3 <skill-directory>/scripts/issue_markdown.py \
-  --provider github --action comment \
-  --repo <owner/repo> --issue <id> <<'MARKDOWN'
-Summary
-
-- First result
-- Second result
+  --provider github --action create \
+  --repo <owner/repo> --title <title> <<'MARKDOWN'
+<body>
 MARKDOWN
 ```
 
-GitLab example:
+For GitLab add `--hostname <host>` and use `<group/project>`. Supported actions
+are `create`, `edit`, and `comment`. Use `--allow-literal-newlines` only when
+the characters `\n` are intentional content.
 
-```bash
-python3 <skill-directory>/scripts/issue_markdown.py \
-  --provider gitlab --action comment --hostname <host> \
-  --repo <group/project> --issue <id> <<'MARKDOWN'
-Summary
-
-- First result
-- Second result
-MARKDOWN
-```
-
-Use `--action create --title <title>` for creation and
-`--action edit --issue <id>` for a body edit. Use
-`--allow-literal-newlines` only when the two characters `\n` are intentional
-content. Never bypass provider mode with a quoted `--raw-field`, `--message`,
-or equivalent value containing escaped newlines.
-
-For one-line read or state operations, use explicit repository selection:
-
-| Operation | GitHub | GitLab |
-| --- | --- | --- |
-| View | `gh issue view <id> --repo <owner/repo>` | `glab issue view <id> --repo <group/project>` |
-| Close | `gh issue close <id> --repo <owner/repo> --reason completed` | `glab issue close <id> --repo <group/project>` |
-
-## Attach Screenshot Evidence
-
-Treat screenshots supplied with a task as potential evidence, especially for
-defects, visual regressions, UI requirements, and environment-specific
-behavior. Do not attach decorative, redundant, or unrelated images.
-
-Before uploading:
-
-1. Confirm which task the screenshot supports and what it proves.
-2. Require an accessible local file or approved durable URL. Do not invent a
-   path for an image visible only in chat.
-3. Inspect for credentials, session data, personal or customer data, private
-   source, internal hostnames, and unrelated screen content. Request a
-   redacted copy or omit the image when needed.
-4. Check project visibility and attachment policy. A public issue attachment
-   is public; do not use an unapproved third-party host.
-5. Preserve legibility and aspect ratio. Add alt text and a short caption with
-   observed behavior, expected behavior, and relevant environment.
-
-GitLab supports native project uploads through `glab`:
-
-```bash
-glab api --method POST projects/:fullpath/uploads \
-  --form "file=@/absolute/path/to/screenshot.png"
-```
-
-Insert the returned `markdown` value into the issue through the helper, then
-read it back. Keep the provider URL; never substitute a local path.
-
-GitHub's issue CLI commands do not accept local attachment files. Use an
-existing approved durable URL, interactive native browser upload, or a
-project-approved image host. Otherwise record complete textual evidence and
-state that attachment is pending. Do not create a release, gist, commit, or
-unapproved upload solely to host a screenshot.
-
-Report an image as attached only after the issue contains a durable reference
-that is accessible in the relevant authenticated context.
-
-## Build Compatible GitLab Web URLs
-
-Prefer a non-empty URL returned by `glab` or the provider API. For a
-self-managed GitLab instance, pass it through the bundled helper rather than
-assuming the current GitLab.com route:
+Prefer provider-returned web URLs. For self-managed GitLab URL compatibility,
+use:
 
 ```bash
 python3 <skill-directory>/scripts/gitlab_web_url.py \
   --project-url "$(git remote get-url origin)" \
-  --kind commit \
-  --id "$(git rev-parse HEAD)"
+  --kind issue --id <iid>
 ```
 
-The helper accepts HTTP(S), SSH, and scp-style remotes. It queries the instance
-version and uses legacy project routes before GitLab 12 or `/-/` routes from
-GitLab 12 onward. If detection fails and no provider URL is available, it uses
-the redirect-compatible legacy route. It also respects the host's `glab`
-`api_protocol` setting. Never expose the token used by `glab` during
-detection.
+Attach a supplied screenshot only when it materially proves a defect, visual
+requirement, or environment result. Require an accessible file or approved URL,
+inspect it for unrelated sensitive content, preserve legibility, add useful alt
+text, and verify the stored Issue reference. GitLab may use its project uploads
+API. For GitHub use native UI or an approved durable URL; do not create a gist,
+release, commit, or unapproved upload merely to host an image.
 
-## Keep the Issue Useful
+## Maintain Durable State
 
-When the selected path authorizes a comment, add one only for information that
-would be costly to lose:
+Comment only for accepted scope changes, decisions controlling the solution,
+blockers with an exact resume step, and final verification or delivery evidence.
+After resume or compaction, recover only the live state needed for the selected
+operation. Read branches, reviews, CI, or worktrees when delivery depends on them.
 
-- accepted scope or acceptance-criteria changes;
-- root cause or an architectural decision that controls the solution;
-- a blocker and the exact next step required to resume;
-- final commit, verification, delivery evidence, and residual limitations.
+## Close the Requirement
 
-After context compaction or a resumed session, read the issue and its comments,
-then inspect status, the current diff, and recent commits. Do not rely on
-recalled chat context when those sources differ.
+Close only when the selected workflow authorizes it and all required work is
+remotely verifiable:
 
-## Reconcile and Close
+- change satisfied items from `[ ]` to `[x]` only with evidence;
+- preserve cancelled or superseded criteria as non-checkbox strikethrough text
+  with a reason;
+- leave the Issue open while any unchecked item, required review, CI,
+  environment check, or product acceptance remains;
+- verify the final commit or merged review request on the authoritative remote;
+- add one concise final note with the commit or review URL, checks, and residual
+  limitations.
 
-This section applies only when Issue delivery is complete or Issue maintenance
-explicitly requests closure. Record-only and inspect-only never close an Issue.
-
-Treat every task-list item as durable scope:
-
-- Change `[ ]` to `[x]` only after the criterion's evidence passes.
-- Preserve an inapplicable, superseded, or cancelled criterion as a
-  non-checkbox strikethrough bullet with a concise reason, for example
-  `- ~~Original criterion~~ — Removed: <reason>`.
-- Never silently delete a criterion or mark unfinished work complete.
-- Any unchecked task-list item anywhere in the issue body blocks closure.
-
-Edit the reconciled body with provider mode and `--check-closure`:
+Before an explicit closure, or a direct `Closes` push for which no post-push
+acceptance remains, validate the final body:
 
 ```bash
 python3 <skill-directory>/scripts/issue_markdown.py \
   --check-closure --provider github --action edit \
   --repo <owner/repo> --issue <id> <<'MARKDOWN'
-<complete reconciled issue body>
+<reconciled body>
 MARKDOWN
 ```
 
-Use the corresponding GitLab arguments for a GitLab issue. If the body needs
-no edit, pipe the provider body into the helper with `--check-closure` before
-closing.
-
-Run this gate before pushing a completion-bearing commit directly to the
-default branch, because `Closes #123` may close the issue automatically. In a
-branch-and-review workflow, run it after required review passes and before the
-merge that will apply the closing reference.
-
-Do not close an issue merely because a local commit exists. Make the final
-commit or merged review request visible on the authoritative remote and ensure
-required environment acceptance is complete. Add a concise final comment with
-the commit or review URL and checks run. Then close the issue if the provider
-did not close it automatically and verify its final state with the provider
-CLI.
-
-On a direct default-branch workflow, the final `Closes #123` commit may close
-the issue when pushed. On a branch-and-review workflow, keep it open until the
-pull request or merge request is merged and its surviving commit message still
-contains the closing reference. If credentials or review authority block
-publication, keep the issue open and report the exact remaining action.
+Use the corresponding GitLab arguments when needed. After closure, read the
+provider state back. Reopen a regression or create a clearly linked follow-up;
+never hide failed verification.

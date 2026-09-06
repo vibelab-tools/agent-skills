@@ -1,6 +1,6 @@
 ---
 name: markitdown
-description: Convert documents, archives, audio, and supported URLs to Markdown with Microsoft's MarkItDown. Use when an AI coding agent needs to extract or analyze PDF, Word/DOCX, PowerPoint/PPTX, Excel/XLS/XLSX, audio, HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, YouTube URLs, or other non-plain-text inputs, and only for standalone images when the user explicitly requests a converted Markdown/OCR artifact or batch OCR processing. Do not use for ordinary screenshots, photos, UI captures, or diagrams that Codex can inspect directly.
+description: Convert documents, archives, audio, and supported URLs to Markdown with Microsoft's MarkItDown. Use for extracting content from PDF, Office files, spreadsheets, presentations, audio, EPUB, Outlook messages, archives, or other inputs that need conversion, and for explicitly requested Markdown/OCR artifacts or batch OCR processing. Do not use for ordinary image inspection, directly readable text or structured data, or web content already available through a suitable reader.
 ---
 
 # MarkItDown
@@ -21,9 +21,9 @@ Official source: https://github.com/microsoft/markitdown
    - Use MarkItDown for a standalone image only when the user explicitly asks
      for a converted Markdown/OCR artifact, batch OCR processing, or asset
      packaging.
-   - Use MarkItDown for PDF, Office files, spreadsheets, presentations, audio,
-     HTML, CSV, JSON, XML, ZIP, EPUB, Outlook messages, and supported web/video
-     URLs.
+   - Use MarkItDown for compound or binary documents that need extraction.
+     HTML, CSV, JSON, XML, and URLs need conversion only when direct reading
+     does not provide the content or the user requests a Markdown artifact.
    - Read plain text, Markdown, source code, and small structured text files directly when conversion adds no value.
 
 2. Prefer the managed executable installed by this skill, then fall back to an
@@ -31,13 +31,12 @@ Official source: https://github.com/microsoft/markitdown
    ```bash
    MARKITDOWN="${MARKITDOWN:-$HOME/.vibelab-tools/agent-skills/markitdown/bin/markitdown}"
    MARKITDOWN_ASSETS="${MARKITDOWN_ASSETS:-$HOME/.vibelab-tools/agent-skills/markitdown/bin/markitdown-assets}"
-   if [ -x "$MARKITDOWN" ]; then
-     "$MARKITDOWN" --help
-   elif command -v markitdown >/dev/null 2>&1; then
+   if [ ! -x "$MARKITDOWN" ] && command -v markitdown >/dev/null 2>&1; then
      MARKITDOWN="$(command -v markitdown)"
-     "$MARKITDOWN" --help
    fi
    ```
+   Run the conversion directly. Consult `--help` only for an unfamiliar option
+   or a command error; do not probe or upgrade a working installation.
 
 3. If MarkItDown is missing, install it outside the project unless the user
    asked to add it as a dependency. Prefer the repository Makefile when working
@@ -48,7 +47,6 @@ Official source: https://github.com/microsoft/markitdown
    For one-off work outside this repository, use a temporary environment:
    ```bash
    python3 -m venv /tmp/agent-markitdown-venv
-   /tmp/agent-markitdown-venv/bin/python -m pip install -U pip
    /tmp/agent-markitdown-venv/bin/python -m pip install 'markitdown[all]'
    MARKITDOWN=/tmp/agent-markitdown-venv/bin/markitdown
    ```

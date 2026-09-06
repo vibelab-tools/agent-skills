@@ -17,7 +17,7 @@ Start the relay daemon using the platform service controller. Follow these steps
    PORT=$(jq -r '.daemon.port // 3580' ~/.vibelab-tools/agent-skills/relay/config.json 2>/dev/null)
    curl -s "http://127.0.0.1:${PORT:-3580}/status"
    ```
-   If it responds, tell the user it is already running.
+   If it responds successfully, report that it is already running and stop.
 
 2. Start the platform service:
    ```bash

@@ -1,112 +1,89 @@
-# Branch, Delivery, and Release Workflow
+# Branches, Delivery, and Release
 
-Use this reference before branch creation or mutation, a push that may trigger
-CI/CD, environment deployment or promotion, version selection, release tags,
-rollback, or any claim that a release is accepted.
+Use this reference only for delivery branch planning, a push that may trigger
+CI/CD, deployment, promotion, versioning, tagging, release, environment rollback,
+or environment acceptance. Routine Git inspection, synchronization, checkout,
+and discarding local changes do not need this reference.
 
-Use it only for repository delivery or the delivery phase of Issue delivery.
-Do not create an Issue merely because delivery work occurs in a GitHub or
-GitLab repository; require an explicit Issue request or repository rule.
+## Read the Delivery Contract
 
-This guidance captures reusable invariants from an exact-commit delivery
-workflow. It does not make one application's branch names, CI jobs, storage
-systems, namespaces, health endpoints, or tag format universal.
+Inspect only the parts of repository instructions, executable CI/CD
+configuration, branch and merge policy, release documentation, selected Issue
+and milestone, remote refs, and environment state that determine the requested
+operation or its effects. Executable automation describes
+actual effects; report documentation drift instead of silently changing scope.
+Determine whether a push deploys a shared environment or production before
+performing it.
 
-## Discover the Project Contract
+## Name and Start Issue Branches
 
-Inspect, in order:
+Explicit repository rules take precedence. Otherwise, read the Issue's current
+milestone from the provider and use this default:
 
-1. Applicable `AGENTS.md` and current user authorization.
-2. CI/CD configuration and scripts that perform the actual automation.
-3. Branch protection, merge strategy, deployment, and release documentation.
-4. The task issue, related issues, and existing release evidence.
-5. Current remote refs, pipeline state, artifact identity, and environment
-   state when they are in scope and accessible.
+| Condition | Branch | Starting point |
+| --- | --- | --- |
+| Issue has a milestone | `feature/<milestone-version-or-id>-<slug>` | Starting point required by the underlying work type |
+| New behavior or unclassified Issue | `feature/<issue>-<slug>` | Current remote default branch |
+| Normal defect | `bugfix/<issue>-<slug>` | Current remote default branch |
+| Urgent production defect | `hotfix/<issue>-<slug>` | Current production tag or deployed commit |
 
-Record a conflict between executable automation and documentation. Do not
-change delivery behavior merely to make the two agree unless that change is in
-the task scope.
+For a milestone key, prefer an explicit version or a title that is exactly a
+version such as `v0.3.0`; otherwise use the GitHub milestone number or GitLab
+milestone IID, then a provider ID only when no project-scoped number exists.
+Do not derive the key from an arbitrary title. The milestone changes the branch
+name, not hotfix starting-point or verification rules.
 
-Determine before writing whether a branch push deploys a shared environment,
-publishes artifacts, or starts production. A push with those effects is not
-merely a backup.
+Use project-scoped Issue numbers, lowercase hyphen-separated slugs, and unique
+branch names. Unclassified work falls back to `feature/<issue>-<slug>`. Branches
+must include a slug describing the work; even a milestone branch cannot consist
+of only a version number. Every Issue branch belongs to one Issue and its
+commits reference that Issue.
 
-## Branches and Development Delivery
+Fetch the remote and start from its current required base. For `origin/main`:
 
-Follow the repository's branch naming, starting-point, review, merge, and
-deletion rules. When the project requires issue-backed branches, include the
-issue identifier and describe the work rather than guessing a future version.
-Start from the current remote base required by the project, not a stale local
-branch.
+```bash
+git fetch origin
+git switch main
+git merge --ff-only origin/main
+git switch -c <resolved-issue-branch>
+```
 
-After implementation and local checks, push the work branch when normal task
-publication is authorized. For development acceptance, verify the observable
-contract that applies to the project:
+Use this `git switch` sequence only for single delivery in a clean checkout.
+Isolated and multi-Issue delivery create dedicated worktrees as described in
+`orchestration.md` and never switch the user's original checkout.
 
-- the expected jobs ran for that ref and all required jobs succeeded;
-- the environment uses the intended commit or immutable artifact;
-- health checks and dependencies report the expected release identity;
-- the issue's actual product behavior is accepted;
-- a shared environment has not been replaced by another branch before the
-  evidence was recorded.
+## Verify Development Delivery
 
-A commit amend, rebase, merge, or other rewrite changes the SHA. Re-run any
-pipeline and environment acceptance tied to the previous SHA. Do not carry
-evidence across identities merely because the source diff appears equivalent.
+After publication, verify the jobs expected for that ref, required CI, artifact
+or commit identity, workload health, dependencies, and the Issue's observable
+behavior. A shared environment may have been replaced by another branch, so
+verify current state rather than relying on an earlier run.
 
-## Production Promotion
+Amend, rebase, merge, or any other SHA change invalidates evidence tied to the
+previous commit. Repeat affected CI and environment acceptance.
 
-Production promotion or deployment requires explicit authorization in the
-current task. An earlier approval is not continuing permission.
+## Promote and Release
 
-Immediately before promotion:
+Production promotion or rollback requires current explicit authorization.
+Immediately before promotion, fetch the authoritative remote, confirm the
+accepted commit contains the required current base, and repeat validation if
+the base or commit changed. Promote the exact accepted artifact; when same-SHA
+promotion is required, do not squash or create a new merge commit. Never resolve
+a promotion conflict automatically.
 
-1. Fetch the authoritative remote state.
-2. Confirm the development-accepted commit contains the required current base
-   according to project policy.
-3. If the base advanced, integrate it using the allowed strategy and repeat
-   all pipeline and acceptance checks for the new commit.
-4. Promote the exact accepted commit or immutable artifact. If the project
-   requires same-SHA promotion, do not squash or create a new merge commit.
-5. Never resolve a promotion conflict automatically.
+After promotion, verify the expected production route, artifact identity,
+rollout, health, and required product behavior. Pipeline success does not prove
+separate data changes, migrations, or product acceptance.
 
-After promotion, verify that the production pipeline ran the expected route,
-used the accepted identity, completed within its defined timeout, left the
-workload healthy, and exposed the expected release identity. Pipeline success
-proves only the automated rollout contract; product acceptance, data changes,
-migrations outside normal startup, and other release-specific operations need
-their own evidence.
+Choose a version only after release contents are known. Follow repository
+version and tag rules; otherwise use Semantic Versioning and an annotated
+`release/v<major>.<minor>.<patch>` tag. Create a tag only after acceptance,
+verify its remote SHA, and never move or reuse it.
 
-## Versions and Tags
+On failure, keep unverified work out of production, preserve evidence, and fix
+through the documented branch path. Missing or mismatched immutable artifacts
+must be rebuilt or republished through that path, never replaced under the same
+identity. Retry or roll back production only with current authorization.
 
-Follow the repository's version source and tag format. Choose a version only
-when the shipped content is known. When the project uses Semantic Versioning,
-a backward-compatible fix normally increments patch, backward-compatible
-functionality increments minor, and a stable breaking change increments major;
-pre-1.0 compatibility rules remain project-specific.
-
-Create a release tag only after the target environment and product behavior
-are accepted, and only when tagging is part of the authorized release. Verify
-the remote tag resolves to the accepted commit. Treat release tags as
-immutable: do not move or reuse a tag for a failed, replaced, or corrected
-release. Use a new corrective commit and version.
-
-Do not assume package metadata, a branch name, or a tag triggers deployment;
-inspect the executable CI/CD routing.
-
-## Failure and Recovery
-
-- If development publication or deployment fails, keep the work out of
-  production and fix it on a permitted work branch.
-- If the expected immutable artifact is missing or mismatched, stop promotion
-  and rebuild or republish through the documented development route. Never
-  place different bytes under an existing immutable identity.
-- If the base branch advances, update the work branch and repeat acceptance.
-- If production deployment fails, preserve pipeline and rollout evidence.
-  Retry or roll back only with current production authorization.
-- Do not tag a failed release or move an earlier tag after rollback. Use the
-  project's corrective-release process.
-
-After final environment and product acceptance, reconcile and close the issue
-according to the issue reference. Remove the work branch only when repository
-policy and the issue lifecycle allow it.
+Delete an Issue branch only after required acceptance, Issue closure, and
+remote recoverability.

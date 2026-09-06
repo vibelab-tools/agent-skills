@@ -22,7 +22,10 @@ vision model or upload the video to object storage.
 
 The script prints JSON containing source metadata, video metadata, timestamped
 frame paths, subtitle segments, acquisition decisions, and instructions for the
-agent.
+agent. Summary requests use chronological coverage with closer inspection of
+relevant moments; exhaustive visual reviews inspect every sampled frame in the
+requested range. The agent must disclose sampled inspection. Frame extraction
+defaults remain unchanged.
 
 Generated evidence remains available while the agent reads it, then the agent
 must delete the returned `run_dir` before answering unless the user explicitly

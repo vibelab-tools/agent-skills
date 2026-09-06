@@ -12,7 +12,7 @@ removed with the same target names.
 | Skill | Purpose | Details |
 | --- | --- | --- |
 | `markitdown` | Converts documents, media, archives, and supported URLs to Markdown with Microsoft MarkItDown before an agent reasons over them. | [markitdown/README.md](markitdown/README.md) |
-| `project-work` | Handles explicitly requested Issue, commit, and delivery workflows without expanding ordinary repository tasks. | [project-work/SKILL.md](project-work/SKILL.md) |
+| `project-work` | Handles explicit Issue, commit, delivery, release, and isolated multi-worker orchestration without expanding ordinary repository tasks. | [project-work/SKILL.md](project-work/SKILL.md) |
 | `code-refactor` | Provides parser-backed code complexity, smell detection, and bounded refactoring planning through a packaged Java CLI. | [code-refactor/README.md](code-refactor/README.md) |
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |
@@ -24,7 +24,7 @@ removed with the same target names.
 | Skill | Main dependencies |
 | --- | --- |
 | `markitdown` | Python 3.10+ with working `venv`, `pip`, and `hashlib`; installs `markitdown[all]` into an isolated runtime venv. |
-| `project-work` | Git CLI plus `gh` for GitHub repositories or `glab` for GitLab repositories. |
+| `project-work` | Git CLI plus `gh` for GitHub or `glab` for GitLab; orchestration also requires delegated-agent capacity and permission to create worktrees, branches, and review requests. |
 | `code-refactor` | JDK 21 and Maven for build/validation; Java 21-compatible runtime for the packaged JAR. |
 | `video-understanding` | Python 3.10+, `ffmpeg`, preferably `ffprobe`, provider API credentials for provider-backed modes, and `boto3` in the isolated runtime venv when OSS/S3-compatible video upload is enabled. |
 | `relay` | Node.js 18+, `pnpm`, `tmux`, `jq`, `curl`, platform user-service tools, and credentials for the IM channels you enable. |
@@ -39,9 +39,9 @@ Regular skills are installed into the native skill directories for each agent:
 - Claude Code: `~/.claude/skills/<skill-name>`
 
 Installing `project-work` removes installed `git-commit`,
-`manage-work-with-issues`, and `manage-project-work` entrypoints for the same
-agent so the unified workflow is the only automatically discoverable
-replacement.
+`manage-work-with-issues`, `manage-project-work`, and
+`parallel-issue-orchestrator` entrypoints for the same agent so the unified
+workflow is the only replacement.
 
 Skills that need tool dependencies may also install a shared runtime under
 `~/.vibelab-tools/agent-skills/<skill-name>`. For example, `markitdown` installs

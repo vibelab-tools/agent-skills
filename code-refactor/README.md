@@ -100,10 +100,10 @@ See `EVALUATION.md` and `docs/TECHNICAL_PLAN.md` for the detailed rationale.
 
 ## New Session Quick Start
 
-When a new agent session starts in this directory, follow the read order in
-`AGENTS.md` for Codex or `CLAUDE.md` for Claude Code. Before changing parser coverage, also review
-`docs/LANGUAGE_SUPPORT.md`; before relying on detector behavior, run
-`mvn test`.
+Use `AGENTS.md` for Codex or `CLAUDE.md` for Claude Code to select documentation
+relevant to the task. Before changing parser coverage, review
+`docs/LANGUAGE_SUPPORT.md`; verify changed detector behavior with the focused
+Maven tests. Skill wording edits do not require a Java rebuild or detector suite.
 
 Current refinement work should improve real-repository precision. Zero findings
 is valid when structured evidence does not support a smell; do not trade

@@ -27,14 +27,13 @@ Do not edit files in live skill directories by hand. Make changes in this
 workspace, update `skill/code-quality-review`, run validation, and install the skill
 through the Makefile when replacing live copies is intended.
 
-## Read Order For New Sessions
+## Read Documentation As Needed
 
-1. Read `README.md`.
-2. Read `docs/PROJECT_BRIEF.md`.
-3. Read `docs/IO_CONTRACT.md`.
-4. Read `docs/TECHNICAL_PLAN.md`.
-5. Read `docs/IMPLEMENTATION_PLAN.md` before editing code.
-6. Use `EVALUATION.md` for the original ANTLR Java-vs-Python assessment.
+Use `README.md` for setup, `docs/IO_CONTRACT.md` for CLI/schema changes, and
+`docs/TECHNICAL_PLAN.md` for parser or architecture changes. Read
+`docs/PROJECT_BRIEF.md` or `docs/IMPLEMENTATION_PLAN.md` when scope or planned
+work is unclear. `EVALUATION.md` records the original parser assessment.
+Simple Git operations and Skill wording edits do not require the design docs.
 
 ## Technical Direction
 

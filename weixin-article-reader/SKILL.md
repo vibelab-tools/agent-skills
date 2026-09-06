@@ -22,7 +22,9 @@ Use the repository-owned reader instead of generic URL conversion for
      "https://mp.weixin.qq.com/s/example"
    ```
 
-4. Read `article.md` and `manifest.json` from the printed article directory.
+4. For CLI output, read `article.md` and `manifest.json` from the printed article
+   directory. When the MCP response already supplies the needed text and images,
+   use it directly; read local files only to fill a specific evidence gap.
 5. Inspect every relevant file under `assets/` with the normal local image
    viewer when the article carries meaning in images. Do not claim to
    understand an image merely because its URL or filename was extracted.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Work"
-  short_description: "Handle explicit issue, commit, and delivery work"
-  default_prompt: "Use $project-work for this requested issue, commit, or delivery workflow without expanding its scope."
+  short_description: "Handle issue, commit, delivery, and orchestration"
+  default_prompt: "Use $project-work for this requested issue, commit, delivery, or explicit orchestration workflow without expanding its scope."

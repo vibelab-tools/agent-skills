@@ -21,9 +21,10 @@ Exclude by default:
   test harness or the user explicitly requests test-code review;
 - files changed only by formatting or mechanical generation.
 
-## 2. Run The Complete Detector Pass
+## 2. Choose The Needed Analysis
 
-Run the changed-code review after every non-trivial implementation:
+Use a focused analyzer for a known file or hotspot. Run the changed-code wrapper
+when a diff-wide scan is requested or needed to resolve the review question:
 
 ```bash
 RUN_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/code-quality-review/current"
@@ -90,16 +91,16 @@ scripts/plan-refactor --json --max-findings 5 "$RUN_DIR/confirmed-smells.json"
 
 Read only the strategy cards for the chosen smell and first safe refactoring.
 
-## 5. Verify And Rescan
+## 5. Verify The Refactor
 
 After any accepted refactor:
 
 1. Run the narrowest meaningful behavior check.
-2. Rerun `scripts/review-changes` on the resulting diff.
+2. Repeat only the analysis needed to verify the affected concern, if any.
 3. Review the final diff for scope creep and accidental behavior changes.
 
-If the rescan reports another bounded set, validate it with the same rules. Do
-not keep refactoring merely to drive the detector count to zero.
+Stop when the requested concern is resolved and verified. Another candidate
+does not automatically justify another scan or refactor.
 
 The completion note should say either:
 

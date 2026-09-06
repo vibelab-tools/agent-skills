@@ -1,4 +1,4 @@
 interface:
   display_name: "Code Quality Review"
-  short_description: "Run all smell checks on changed code"
-  default_prompt: "Use $code-quality-review to scan this diff with all 24 smell detectors, validate the compact candidates, and refactor only confirmed issues."
+  short_description: "Investigate code smells and maintainability"
+  default_prompt: "Use $code-quality-review to assess this maintainability concern with the smallest useful analysis and recommend only justified refactors."

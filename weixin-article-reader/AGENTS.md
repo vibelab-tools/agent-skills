@@ -25,7 +25,9 @@ dependency on the reference `weixin-articles-mcp` repository or package.
 
 ## Verification
 
-Run `make validate` after source or Skill changes. For installer changes, also
+For Skill wording changes, validate Skill structure and referenced paths; do
+not reinstall runtime dependencies. Run `make validate` after runtime source
+changes. For installer changes, also
 exercise install, repeated install, `codex mcp get`, and uninstall with temporary
 `CODEX_HOME` and `TOOL_ROOT` directories; never use the real user configuration
 for installer tests.

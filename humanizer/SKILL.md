@@ -1,6 +1,6 @@
 ---
 name: humanizer
-description: Draft, rewrite, or review Chinese, English, and mixed-language prose so it sounds natural, specific, and easy for its intended readers to understand without changing its claims. Use when asked to write reader-facing explanations, handoffs, notices, documentation, or status updates; humanize text; remove AI or chatbot phrasing; reduce translationese; match a supplied voice; simplify needless jargon; improve reader-facing clarity; or edit prose that feels formulaic, inflated, generic, or mechanically structured.
+description: Draft, rewrite, or review Chinese, English, and mixed-language prose while preserving its claims. Use when writing is the requested deliverable, such as an article, notice, handoff, or documentation; when asked to humanize or polish text, match a supplied voice, or diagnose unclear writing. Do not activate for routine conversation, brief progress updates, or incidental prose during an engineering task.
 ---
 
 # Humanizer
@@ -17,7 +17,9 @@ Improve the writing, not its supposed authorship score. Draft naturally from the
 
 ## Establish the contract
 
-Before drafting or editing, identify:
+Infer the following from the request and available context; ask only when a
+missing detail would materially change the text. Short writing needs no
+separate plan or contract artifact:
 
 1. The source language or languages.
 2. The intended readers and what knowledge they can reasonably be expected to have.
@@ -40,7 +42,9 @@ Do not invent evidence, examples, anecdotes, sources, opinions, sensory details,
 
 Deep rewrites may reorder, merge, split, or remove redundant expression. They may not drop a distinct claim just because it sounds like framing or filler. After drafting, compare the result against the claim map, not merely against the source's sentence order.
 
-For fact-dense text, run `python3 scripts/check_anchors.py SOURCE REWRITE`. Treat it as a mechanical backstop for exact anchors, not as proof of semantic fidelity.
+For a long, fact-dense file rewrite where exact anchors are easy to lose,
+`python3 scripts/check_anchors.py SOURCE REWRITE` can supplement review. Do not
+create files solely to run it on a short answer. It does not prove semantic fidelity.
 
 ## Reduce reader effort
 
@@ -55,11 +59,14 @@ Aim for the shortest path from wording to meaning while retaining necessary prec
 
 When the audience is unspecified, write for an informed general reader while preserving essential domain terms and defining the non-obvious ones briefly.
 
-## Draft or rewrite in passes
+## Drafting and editing guidance
+
+Apply the relevant guidance while writing; these are not seven mandatory passes.
+A short, clear result needs only a brief check of meaning and wording.
 
 1. **Structure:** Give each paragraph one useful job. In compose mode, choose the shortest shape that answers the request. In rewrite modes, remove duplicated setup, repeated conclusions, empty sections, and predictable scaffolding. Keep lists when the content is genuinely list-shaped.
 2. **Claims:** Express the known facts or mapped claims in a natural order. Use specific supplied facts as anchors; never manufacture specificity.
-3. **Language:** For English, read [references/english.md](references/english.md). For Chinese, read [references/chinese.md](references/chinese.md). For mixed text, read both and preserve intentional code-switching.
+3. **Language:** Use [references/english.md](references/english.md) or [references/chinese.md](references/chinese.md) when a substantial rewrite or a specific language problem needs more guidance. Read only the relevant language; mixed text does not automatically require both. Preserve intentional code-switching.
 4. **Voice and register:** Match supplied samples and the document's purpose. Preserve meaningful quirks. Do not force contractions, first person, slang, humor, fragments, or informality.
 5. **Reader clarity:** Apply the reader-effort rules above after the domain meaning is stable.
 6. **Fidelity:** Audit every source claim and exact anchor. Restore anything lost; remove anything added.
@@ -88,16 +95,8 @@ One formal word, passive sentence, three-item list, em dash, idiom, or polished 
 - If the user asks for rationale, give a short explanation after the rewrite.
 - Never promise detector evasion, assign an “AI score,” or present style heuristics as objective authorship detection.
 
-## Final gate
+Before returning the text, check that its meaning, exact anchors, and required
+format survived. Stop when it meets the request; do not rewrite already good prose.
 
-Before delivery, confirm:
-
-- The result answers the same question and carries every known or source claim at the same strength.
-- Exact anchors and protected formatting survived.
-- No new fact, example, authority, opinion, or personal experience appeared.
-- The language sounds native, the register fits, and useful technical precision remains.
-- A reader in the target audience can decode necessary terms without needless jargon.
-- Edits respond to contextual problems rather than a punctuation quota or banned-word list.
-- Already good, distinctive writing was left alone.
-
-For the design rationale and the specific ideas adopted or rejected from reviewed public skills, read [references/source-review.md](references/source-review.md).
+Read [references/source-review.md](references/source-review.md) only when
+maintaining this Skill's design or investigating its source rationale.

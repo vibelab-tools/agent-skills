@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 
 SKILL_NAME := project-work
-LEGACY_SKILL_NAMES := git-commit manage-work-with-issues manage-project-work
+LEGACY_SKILL_NAMES := git-commit manage-work-with-issues manage-project-work parallel-issue-orchestrator
 CODEX_HOME ?= $(HOME)/.codex
 CLAUDE_HOME ?= $(HOME)/.claude
 CODEX_INSTALL_DIR := $(CODEX_HOME)/skills/$(SKILL_NAME)
@@ -31,10 +31,12 @@ install-all: install-codex install-claude
 
 install-codex: validate
 	@mkdir -p "$(CODEX_INSTALL_DIR)"
-	$(RSYNC) -a --delete \
+	$(RSYNC) -a --delete --delete-excluded \
 		--exclude '.git/' \
 		--exclude 'Makefile' \
 		--exclude '.DS_Store' \
+		--exclude '__pycache__/' \
+		--exclude '*.pyc' \
 		./ "$(CODEX_INSTALL_DIR)/"
 	@for skill in $(LEGACY_SKILL_NAMES); do \
 		rm -rf "$(CODEX_HOME)/skills/$$skill"; \
@@ -44,10 +46,12 @@ install-codex: validate
 
 install-claude: validate
 	@mkdir -p "$(CLAUDE_INSTALL_DIR)"
-	$(RSYNC) -a --delete \
+	$(RSYNC) -a --delete --delete-excluded \
 		--exclude '.git/' \
 		--exclude 'Makefile' \
 		--exclude '.DS_Store' \
+		--exclude '__pycache__/' \
+		--exclude '*.pyc' \
 		./ "$(CLAUDE_INSTALL_DIR)/"
 	@for skill in $(LEGACY_SKILL_NAMES); do \
 		rm -rf "$(CLAUDE_HOME)/skills/$$skill"; \
