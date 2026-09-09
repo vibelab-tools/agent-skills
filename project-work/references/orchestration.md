@@ -81,10 +81,12 @@ Before spawning, read [worker-contract.md](worker-contract.md) and provide every
 field. Workers may implement, test, review their diff, commit with `Refs`, push
 their assigned branch, then open or update exactly one review request. The
 controller verifies and merges that review; it does not create an empty review
-before the first pushed commit. Workers may not merge, close Issues, edit the
-ledger, touch another worker's state, expand scope, perform destructive cleanup,
-or modify the original checkout. On overlap or a new shared decision, stop that
-worker and preserve its worktree.
+before the first pushed commit. Workers fetch and merge the remote version of
+their assigned branch before pushing, following [delivery.md](delivery.md).
+They may not merge review requests, integrate into the target branch, close
+Issues, edit the ledger, touch another worker's state, expand scope, perform
+destructive cleanup, or modify the original checkout. On overlap or a new
+shared decision, stop that worker and preserve its worktree.
 
 ## Review and Integrate
 
@@ -93,7 +95,8 @@ criterion, pass applicable local checks and remote CI, satisfy approvals and
 protection, and contain no unrelated or sensitive files. A worker summary is a
 lead; the controller verifies the remote branch, diff, review, CI, and Issue.
 
-Only the controller merges, one review at a time in dependency and risk order.
+Only the controller integrates review requests, one at a time in dependency
+and risk order.
 Before each merge, fetch the latest base, update the branch using project
 policy, rerun invalidated checks, and reread CI and approvals. After a merge,
 refresh the DAG and revalidate queued work affected by the new base.

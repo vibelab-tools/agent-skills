@@ -12,7 +12,7 @@ removed with the same target names.
 | Skill | Purpose | Details |
 | --- | --- | --- |
 | `markitdown` | Converts documents, media, archives, and supported URLs to Markdown with Microsoft MarkItDown before an agent reasons over them. | [markitdown/README.md](markitdown/README.md) |
-| `project-work` | Handles explicit Issue, commit, delivery, release, and isolated multi-worker orchestration without expanding ordinary repository tasks. | [project-work/SKILL.md](project-work/SKILL.md) |
+| `project-work` | Manages Issue classification, boards, dependencies, delivery reconciliation, and milestones/releases; publishes completed coding on non-trunk branches after merging remote same-branch updates. | [project-work/SKILL.md](project-work/SKILL.md) |
 | `code-refactor` | Provides parser-backed code complexity, smell detection, and bounded refactoring planning through a packaged Java CLI. | [code-refactor/README.md](code-refactor/README.md) |
 | `video-understanding` | Analyzes local videos by sampling timestamped frames for agent inspection or sending sampled frames to configured OpenAI-compatible or Gemini vision endpoints. | [video-understanding/README.md](video-understanding/README.md) |
 | `relay` | Runs a shared IM relay service and installs Codex plus Claude Code plugin entry points for Telegram, DingTalk, and Feishu workflows. | [relay/README.md](relay/README.md) |

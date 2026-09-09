@@ -19,9 +19,13 @@ a supported remote is available, do not invent an Issue tracker.
 
 ## Capture a Requirement
 
-Search for the same outcome before creating an Issue. Reuse a matching open
-Issue; use closed work as evidence and create a linked follow-up only when new
-work is required.
+Search the target project for the same outcome before creating an Issue,
+including relevant closed Issues. Read candidate descriptions, acceptance
+criteria, relationships, and current state; matching keywords alone are not
+enough. Reuse a matching open Issue and add only missing durable context. Link
+related Issues as context or dependencies without combining distinct outcomes.
+For a regression of closed work, follow project convention to reopen it or
+create a linked follow-up; do not assume closure proves the defect is resolved.
 
 Choose the target project's language from repository instructions and
 templates, then recent Issues, then project documentation. A new Issue keeps
@@ -56,16 +60,35 @@ Split only outcomes that can be implemented and verified independently; never
 create separate Issues for reading files, writing one test, committing, or
 opening a review request.
 
+After creating or reusing the Issue, use [planning.md](planning.md) to apply
+the relevant classification, owner, board membership, and native relationships.
+Use the capability checks and calls in [provider-api.md](provider-api.md) only
+for operations needed by this task. Record-only work stops after capturing and
+verifying this planning state; it does not start implementation.
+
 For multi-Issue work, record each child's expected touch set, exclusive
 resources, exclusions, and dependencies. Create known children before coding
-and link their ordered list from the parent. New and reused children without a
-milestone inherit the parent's milestone before branch resolution. If an
-existing child belongs to another milestone, record a planning conflict and do
-not overwrite it silently.
+and link their ordered list from the parent.
 
 If delivery reveals another independent outcome, stop that new work, update the
 plan, and create or link its Issue before implementation. In isolated
 single-Issue mode, report the additional scope instead of creating a child.
+
+## Associate a Milestone
+
+Check milestone assignment when creating or reusing an Issue. Use an explicit
+target first, then the parent Issue's milestone, then an existing milestone
+whose documented scope or release plan includes the work. Read the provider's
+current milestone details before assigning it; do not choose solely because it
+is newest or open.
+
+Assign a clearly applicable existing milestone without waiting for the user to
+name it. New or reused children without a milestone inherit the parent's
+milestone before branch resolution. Preserve an existing assignment unless a
+move is requested or clearly required by the agreed plan; surface conflicting
+plans instead of silently overwriting the assignment. If no milestone fits,
+leave the Issue unassigned and state why. Do not invent a version or create a
+milestone merely to fill the field.
 
 ## Write and Verify Provider Content
 
@@ -84,6 +107,10 @@ MARKDOWN
 For GitLab add `--hostname <host>` and use `<group/project>`. Supported actions
 are `create`, `edit`, and `comment`. Use `--allow-literal-newlines` only when
 the characters `\n` are intentional content.
+
+After creating or updating an Issue, read back its title, Markdown, state,
+milestone, and any changed relationships. Verify metadata separately when it
+was set outside the Markdown helper.
 
 Prefer provider-returned web URLs. For self-managed GitLab URL compatibility,
 use:

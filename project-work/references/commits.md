@@ -1,7 +1,7 @@
 # Commits
 
-Use this reference only when drafting, reviewing, or creating a commit, or when
-Issue delivery reaches publication.
+Use this reference when drafting, reviewing, or creating a commit, including
+publication after coding on a non-trunk branch.
 
 ## Inspect First
 
@@ -48,10 +48,13 @@ ambiguous.
 ## Keep the Requested Boundary
 
 A message draft or review does not authorize staging, committing, or pushing.
-A local commit request does not authorize a push. In Issue delivery, publish
-verified work through the repository workflow unless the user prohibits that
-action. Never force-push, bypass protection, include unrelated changes, or
-ignore failed checks.
+A commit-only request does not authorize a push. After completed coding on a
+non-trunk branch, commit and push under the rule in `SKILL.md` without another
+confirmation. This also applies to small changes that need no Issue. Before
+pushing, fetch and merge remote same-branch updates as described in
+[delivery.md](delivery.md). In Issue delivery, publish verified work through
+the authorized repository workflow. Never force-push, bypass protection,
+include unrelated changes, or ignore failed checks.
 
 When reviewing a message, lead with `Valid` or `Invalid` and provide concrete
 corrections. When creating a commit, verify the staged diff immediately before
