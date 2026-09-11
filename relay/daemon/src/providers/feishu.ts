@@ -79,6 +79,7 @@ export class FeishuProvider implements IMProvider {
   private handledMessageIds = new Set<string>();
   private handledMessageOrder: string[] = [];
   private pendingUserMessages = new Set<string>();
+  private pendingUserImages = new Set<string>();
   private userAuth: FeishuUserAuth;
   // 2026-03-20: Temp directory for downloaded Feishu attachments
   private tmpDir: string;
@@ -223,6 +224,14 @@ export class FeishuProvider implements IMProvider {
         case "post": {
           // 2026-03-20: Extract text and embedded images from rich text post
           const postContent = this.extractPostContent(parsed);
+          if (
+            sender?.sender_type === "user" &&
+            postContent.imageKeys.length > 0 &&
+            postContent.imageKeys.every((key) => this.pendingUserImages.has(key))
+          ) {
+            this.rememberMessage(message_id);
+            return true;
+          }
           text = postContent.text;
           for (const imageKey of postContent.imageKeys) {
             const att = await this.downloadResource(
@@ -635,7 +644,13 @@ export class FeishuProvider implements IMProvider {
 
     let sent = 0;
     for (let index = 0; index < imagePaths.length; index += 1) {
+      let pendingImageKey: string | undefined;
       try {
+        const userAccessToken = await this.userAuth.getAccessToken();
+        if (!userAccessToken) {
+          log.error("User-authenticated Feishu image send requested before authorization");
+          return false;
+        }
         const uploaded = await this.client.im.image.create({
           data: {
             image_type: "message",
@@ -645,7 +660,9 @@ export class FeishuProvider implements IMProvider {
         const imageKey = (uploaded as any)?.image_key || (uploaded as any)?.data?.image_key;
         if (!imageKey) throw new Error("image_key missing in upload response");
 
-        await this.client.im.message.reply({
+        pendingImageKey = imageKey;
+        this.pendingUserImages.add(imageKey);
+        const response = await this.client.im.message.reply({
           path: { message_id: rootMessageId },
           data: {
             content: JSON.stringify({
@@ -660,13 +677,17 @@ export class FeishuProvider implements IMProvider {
             msg_type: "post",
             reply_in_thread: true,
           },
-        });
+        }, lark.withUserAccessToken(userAccessToken));
+        if (!response?.data?.message_id) throw new Error("message_id missing in image reply response");
+        this.rememberSentUserMessage(rootMessageId, response);
         sent += 1;
       } catch (err) {
         log.warn(
           { err: summarizeError(err), imageNumber: index + 1 },
           "Prompt image delivery failed"
         );
+      } finally {
+        if (pendingImageKey) this.pendingUserImages.delete(pendingImageKey);
       }
     }
 

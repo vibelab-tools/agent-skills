@@ -4,6 +4,7 @@
 // 2026-03-17: Implement local HTTP API for daemon control
 
 import * as http from "http";
+import { createHash } from "crypto";
 import { open, stat } from "fs/promises";
 import { isAbsolute } from "path";
 import { DaemonConfig, NotifyRequest, BindRequest, PromptOriginRequest } from "./types";
@@ -203,7 +204,8 @@ export class Server {
       void this.relayPromptImages(
         feishuRootMessageId,
         body.transcriptPath,
-        body.turnId
+        body.turnId,
+        body.promptFingerprint || createHash("sha256").update(body.text).digest("hex")
       ).catch((err) => {
         log.warn({ err: summarizeError(err) }, "Codex prompt image relay failed");
       });
@@ -213,14 +215,15 @@ export class Server {
   private async relayPromptImages(
     rootMessageId: string,
     transcriptPath: string,
-    turnId: string
+    turnId: string,
+    promptFingerprint: string
   ): Promise<void> {
     for (const delayMs of PROMPT_IMAGE_RETRY_DELAYS_MS) {
       if (delayMs > 0) {
         await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
 
-      const imagePaths = await readPromptImagePaths(transcriptPath, turnId);
+      const imagePaths = await readPromptImagePaths(transcriptPath, turnId, promptFingerprint);
       if (imagePaths.length > 0) {
         await this.feishuProvider?.sendPromptImages(rootMessageId, imagePaths);
         return;
@@ -423,7 +426,8 @@ function deriveProjectName(tmuxSession: string): string {
 
 async function readPromptImagePaths(
   transcriptPath: string,
-  turnId: string
+  turnId: string,
+  promptFingerprint: string
 ): Promise<string[]> {
   if (!isAbsolute(transcriptPath) || !turnId) return [];
 
@@ -440,7 +444,7 @@ async function readPromptImagePaths(
     if (offset > 0) lines.shift();
 
     for (let index = lines.length - 1; index >= 0; index -= 1) {
-      const imagePaths = extractPromptImagePaths(lines[index], turnId);
+      const imagePaths = extractPromptImagePaths(lines[index], turnId, promptFingerprint);
       if (imagePaths.length > 0) {
         return await existingLocalFiles(imagePaths);
       }
@@ -454,7 +458,7 @@ async function readPromptImagePaths(
   return [];
 }
 
-function extractPromptImagePaths(line: string, turnId: string): string[] {
+function extractPromptImagePaths(line: string, turnId: string, promptFingerprint: string): string[] {
   if (!line || !line.includes(turnId)) return [];
 
   let record: any;
@@ -469,7 +473,15 @@ function extractPromptImagePaths(line: string, turnId: string): string[] {
     record.payload?.turn_id === turnId &&
     record.payload?.item?.type === "UserMessage"
   ) {
-    return (record.payload.item.content || [])
+    const content = record.payload.item.content || [];
+    const prompt = content
+      .filter((item: any) => item?.type === "text")
+      .map((item: any) => item.text)
+      .join("\n")
+      .replace(/\n+$/, ""); // Shell command substitution strips trailing newlines.
+    if (createHash("sha256").update(prompt).digest("hex") !== promptFingerprint) return [];
+
+    return content
       .filter((item: any) => item?.type === "local_image")
       .map((item: any) => item.path)
       .filter((value: unknown): value is string => typeof value === "string");

@@ -70,9 +70,11 @@ curl -s -X POST "${DAEMON_URL}/notify" \
         --arg tmuxSession "$TMUX_SESSION" \
         --arg transcriptPath "$TRANSCRIPT_PATH" \
         --arg turnId "$TURN_ID" \
+        --arg promptFingerprint "$PROMPT_FINGERPRINT" \
         '{type: $type, text: $text, tmuxSession: $tmuxSession}
           + (if $transcriptPath != "" then {transcriptPath: $transcriptPath} else {} end)
-          + (if $turnId != "" then {turnId: $turnId} else {} end)'
+          + (if $turnId != "" then {turnId: $turnId} else {} end)
+          + (if $promptFingerprint != "" then {promptFingerprint: $promptFingerprint} else {} end)'
     )" >/dev/null 2>&1
 
 exit 0

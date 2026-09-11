@@ -167,7 +167,9 @@ make clean
 1. Start Codex with `codex-tmux`.
 2. When you submit a prompt, the `UserPromptSubmit` hook syncs the local input
    to the configured IM channels. Images included in a Codex prompt are also
-   uploaded into the matching Feishu Topic.
+   uploaded into the matching Feishu Topic and sent as the authorized user,
+   like the prompt text. Images are matched to the submitted prompt as well as
+   its turn ID so follow-up input during an active turn keeps its own images.
 3. When a Codex turn ends, the `Stop` hook sends the final assistant reply.
 4. Replies in a Telegram Topic, DingTalk group, or the latest Feishu relay
    Topic are injected back into the matching `codex-...` tmux session.

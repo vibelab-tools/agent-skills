@@ -94,6 +94,7 @@ export interface NotifyRequest {
   text: string;
   transcriptPath?: string;
   turnId?: string;
+  promptFingerprint?: string;
 }
 
 /** POST /prompt-origin request from the UserPromptSubmit hook */
