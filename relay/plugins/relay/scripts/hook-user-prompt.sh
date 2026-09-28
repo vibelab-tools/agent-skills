@@ -31,6 +31,7 @@ if [ -z "$PROMPT" ] || [ ${#PROMPT} -lt 1 ]; then
 fi
 
 TMUX_SESSION="$(relay_detect_tmux_session)"
+[ -n "$TMUX_SESSION" ] || exit 0
 
 # Prompts injected from IM are already visible there. Consume their short-lived
 # origin marker so only prompts typed directly in Codex are relayed back.

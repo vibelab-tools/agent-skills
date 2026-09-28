@@ -30,6 +30,7 @@ if [ -z "$SUMMARY" ] || [ ${#SUMMARY} -lt 5 ]; then
 fi
 
 TMUX_SESSION="$(relay_detect_tmux_session)"
+[ -n "$TMUX_SESSION" ] || exit 0
 
 # POST to daemon
 curl -s -X POST "${DAEMON_URL}/notify" \

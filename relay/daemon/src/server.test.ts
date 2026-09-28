@@ -2,14 +2,14 @@
 // ABOUTME: Verifies Feishu notifications reuse one session topic with selective alerts.
 
 import assert from "node:assert/strict";
-import { appendFileSync, chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import * as lark from "@larksuiteoapi/node-sdk";
 import axios from "axios";
 import { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import test from "node:test";
 import { SessionManager } from "./session-manager";
 import { Server } from "./server";
@@ -22,6 +22,7 @@ const USER_PROMPT_HOOK = join(
   __dirname,
   "../../plugins/relay/scripts/hook-user-prompt.sh"
 );
+const STOP_HOOK = join(__dirname, "../../plugins/relay/scripts/hook-stop.sh");
 
 test("uses concise Feishu topic titles, reuses topics, and alerts only attention events", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-server-test-"));
@@ -162,8 +163,8 @@ test("uses concise Feishu topic titles, reuses topics, and alerts only attention
 test("relays local Codex prompts but not prompts injected from IM", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-prompt-origin-test-"));
   const homeDir = join(testDir, "home");
-  const binDir = join(testDir, "bin");
   const tmuxSession = "codex-demo-abc123";
+  const tmux = startTmuxFixture([tmuxSession]);
   const config = {
     port: 0,
     hostname: "gpu.example.com",
@@ -202,22 +203,18 @@ test("relays local Codex prompts but not prompts injected from IM", async () => 
       join(relayHome, "config.json"),
       JSON.stringify({ daemon: { port: address.port } })
     );
-    mkdirSync(binDir, { recursive: true });
-    const tmuxPath = join(binDir, "tmux");
-    writeFileSync(tmuxPath, `#!/bin/sh\nprintf '%s' '${tmuxSession}'\n`);
-    chmodSync(tmuxPath, 0o755);
-
     const remotePrompt = "sent from Feishu";
     promptOrigins.record(tmuxSession, remotePrompt);
-    await runUserPromptHook(remotePrompt, homeDir, binDir);
+    await runUserPromptHook(remotePrompt, homeDir, tmux.environment(tmuxSession));
     assert.deepEqual(sent, []);
 
-    await runUserPromptHook("typed directly in Codex", homeDir, binDir);
+    await runUserPromptHook("typed directly in Codex", homeDir, tmux.environment(tmuxSession));
     assert.deepEqual(sent, [
       { topicId: "topic-1", text: "🧑‍💻 typed directly in Codex" },
     ]);
   } finally {
     server.stop();
+    tmux.close();
     rmSync(testDir, { recursive: true, force: true });
   }
 });
@@ -225,8 +222,8 @@ test("relays local Codex prompts but not prompts injected from IM", async () => 
 test("relays the current same-turn prompt's four images as the user without echoing them", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-prompt-image-test-"));
   const homeDir = join(testDir, "home");
-  const binDir = join(testDir, "bin");
   const tmuxSession = "codex-demo-abc123";
+  const tmux = startTmuxFixture([tmuxSession]);
   const turnId = "turn-image";
   const transcriptPath = join(testDir, "rollout.jsonl");
   const imagePaths = [1, 2, 3, 4].map((number) => join(testDir, `${number}.png`));
@@ -369,10 +366,6 @@ test("relays the current same-turn prompt's four images as the user without echo
       join(relayHome, "config.json"),
       JSON.stringify({ daemon: { port: address.port } })
     );
-    mkdirSync(binDir, { recursive: true });
-    const tmuxPath = join(binDir, "tmux");
-    writeFileSync(tmuxPath, `#!/bin/sh\nprintf '%s' '${tmuxSession}'\n`);
-    chmodSync(tmuxPath, 0o755);
     imagePaths.forEach((path, index) => writeFileSync(path, imageBytes[index]));
     writeFileSync(transcriptPath,
       transcriptRecord(previousPrompt, imagePaths.slice(0, 2)) +
@@ -382,7 +375,7 @@ test("relays the current same-turn prompt's four images as the user without echo
     await runUserPromptHook(
       currentPrompt,
       homeDir,
-      binDir,
+      tmux.environment(tmuxSession),
       { transcript_path: transcriptPath, turn_id: turnId }
     );
     assert.deepEqual(texts, [Buffer.from(currentPrompt).subarray(0, 3000).toString()]);
@@ -402,7 +395,7 @@ test("relays the current same-turn prompt's four images as the user without echo
 
     // An absent matching record must exhaust the bounded wait without using
     // the previous prompt's images.
-    await runUserPromptHook(currentPrompt + " unavailable", homeDir, binDir,
+    await runUserPromptHook(currentPrompt + " unavailable", homeDir, tmux.environment(tmuxSession),
       { transcript_path: transcriptPath, turn_id: turnId });
     await new Promise((resolve) => setTimeout(resolve, 1800));
     assert.deepEqual(uploaded, [1, 2, 3, 4]);
@@ -412,24 +405,97 @@ test("relays the current same-turn prompt's four images as the user without echo
     feishuProvider.disconnect();
     feishuApi.closeAllConnections();
     await new Promise<void>((resolve) => feishuApi.close(() => resolve()));
+    tmux.close();
     rmSync(testDir, { recursive: true, force: true });
   }
 });
 
-function runUserPromptHook(
-  prompt: string,
+test("Stop hook sends each reply to its pane's session and drops missing or stale pane identities", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-stop-routing-test-"));
+  const homeDir = join(testDir, "home");
+  const tmux = startTmuxFixture(["codex-a", "codex-b"]);
+  const config = {
+    port: 0,
+    hostname: "gpu.example.com",
+    feishuChatId: "oc_test",
+    bindingsPath: join(testDir, "bindings.json"),
+  } as DaemonConfig;
+  const sessionManager = new SessionManager(config);
+  sessionManager.bindFeishu("codex-a", "topic-a");
+  sessionManager.bindFeishu("codex-b", "topic-b");
+  const sent: Array<{ topicId?: string; text: string }> = [];
+  const feishuProvider = {
+    name: "feishu",
+    send: async (options: { topicId?: string; text: string }) => {
+      sent.push(options);
+      return true;
+    },
+    getRecoveryStatus: () => ({}),
+  };
+  const server = new Server(config, sessionManager, new PromptOriginTracker(), null, null, feishuProvider as any);
+
+  try {
+    await server.start();
+    const address = (server as any).httpServer.address() as AddressInfo;
+    const relayHome = join(homeDir, ".vibelab-tools/agent-skills/relay");
+    mkdirSync(relayHome, { recursive: true });
+    writeFileSync(join(relayHome, "config.json"), JSON.stringify({ daemon: { port: address.port } }));
+
+    // B was created most recently; A remains a live background session.
+    await runHook(STOP_HOOK, { last_assistant_message: "reply from A" }, homeDir, tmux.environment("codex-a"));
+    await runHook(STOP_HOOK, { last_assistant_message: "reply from B" }, homeDir, tmux.environment("codex-b"));
+    await runHook(STOP_HOOK, { last_assistant_message: "reply from A again" }, homeDir, tmux.environment("codex-a"));
+    assert.deepEqual(sent.map(({ topicId, text }) => ({ topicId, text })), [
+      { topicId: "topic-a", text: "reply from A" },
+      { topicId: "topic-b", text: "reply from B" },
+      { topicId: "topic-a", text: "reply from A again" },
+    ]);
+
+    const valid = tmux.environment("codex-a");
+    await runHook(STOP_HOOK, { last_assistant_message: "missing pane" }, homeDir, { TMUX: valid.TMUX, TMUX_PANE: "" });
+    await runHook(STOP_HOOK, { last_assistant_message: "stale pane" }, homeDir, { TMUX: valid.TMUX, TMUX_PANE: "%999999" });
+    await runHook(STOP_HOOK, { last_assistant_message: "malformed pane" }, homeDir, { TMUX: valid.TMUX, TMUX_PANE: "%1x" });
+    await runHook(STOP_HOOK, { last_assistant_message: "missing tmux" }, homeDir, { TMUX: "", TMUX_PANE: valid.TMUX_PANE });
+    assert.equal(sent.length, 3);
+  } finally {
+    server.stop();
+    tmux.close();
+    rmSync(testDir, { recursive: true, force: true });
+  }
+});
+
+function startTmuxFixture(sessionNames: string[]) {
+  const socketDir = mkdtempSync(join(tmpdir(), "relay-tmux-"));
+  const socket = join(socketDir, "socket");
+  const panes = new Map<string, string>();
+  for (const session of sessionNames) {
+    const pane = execFileSync("tmux", ["-f", "/dev/null", "-S", socket, "new-session", "-d", "-s", session, "-P", "-F", "#{pane_id}"], {
+      encoding: "utf8",
+    }).trim();
+    panes.set(session, pane);
+  }
+  return {
+    environment(session: string) {
+      const pane = panes.get(session);
+      assert.ok(pane, `missing tmux pane for ${session}`);
+      return { TMUX: `${socket},0,0`, TMUX_PANE: pane };
+    },
+    close() {
+      execFileSync("tmux", ["-f", "/dev/null", "-S", socket, "kill-server"]);
+      rmSync(socketDir, { recursive: true, force: true });
+    },
+  };
+}
+
+function runHook(
+  hookPath: string,
+  input: Record<string, string>,
   homeDir: string,
-  binDir: string,
-  extraInput: Record<string, string> = {}
+  tmuxEnv: Record<string, string>
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const child = spawn("bash", [USER_PROMPT_HOOK], {
-      env: {
-        ...process.env,
-        HOME: homeDir,
-        PATH: `${binDir}:${process.env.PATH || ""}`,
-        TMUX: "/tmp/tmux-test/default,1,0",
-      },
+    const child = spawn("bash", [hookPath], {
+      env: { ...process.env, HOME: homeDir, ...tmuxEnv },
       stdio: ["pipe", "ignore", "pipe"],
     });
     let stderr = "";
@@ -445,8 +511,17 @@ function runUserPromptHook(
         reject(new Error(`hook exited ${code}: ${stderr}`));
       }
     });
-    child.stdin.end(JSON.stringify({ prompt, ...extraInput }));
+    child.stdin.end(JSON.stringify(input));
   });
+}
+
+function runUserPromptHook(
+  prompt: string,
+  homeDir: string,
+  tmuxEnv: Record<string, string>,
+  extraInput: Record<string, string> = {}
+): Promise<void> {
+  return runHook(USER_PROMPT_HOOK, { prompt, ...extraInput }, homeDir, tmuxEnv);
 }
 
 async function waitFor(predicate: () => boolean): Promise<void> {

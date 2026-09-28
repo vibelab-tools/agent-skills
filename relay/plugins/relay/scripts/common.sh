@@ -108,14 +108,18 @@ relay_proxy_url() {
 }
 
 relay_detect_tmux_session() {
-    if [ -n "$TMUX" ]; then
-        tmux display-message -p '#{session_name}' 2>/dev/null
-        return
-    fi
+    local socket pane_session
 
-    tmux list-sessions -F '#{session_name}' 2>/dev/null |
-        grep -E '^(claude|codex)-' |
-        head -1
+    [ -n "${TMUX:-}" ] || return 1
+    [[ "${TMUX_PANE:-}" =~ ^%[0-9]+$ ]] || return 1
+
+    socket="${TMUX%%,*}"
+    [ -n "$socket" ] || return 1
+    pane_session=$(tmux -S "$socket" display-message -p -t "$TMUX_PANE" '#{pane_id}:#{session_name}' 2>/dev/null) || return 1
+    case "$pane_session" in
+        "$TMUX_PANE":?*) printf '%s' "${pane_session#"$TMUX_PANE":}" ;;
+        *) return 1 ;;
+    esac
 }
 
 relay_agent_from_session() {
