@@ -13,7 +13,7 @@ DAEMON_URL="$(relay_daemon_url)"
 BOT_TOKEN="$(relay_env_value TELEGRAM_BOT_TOKEN)"
 CHAT_ID="$(relay_env_value TELEGRAM_CHAT_ID)"
 
-TMUX_SESSION="$(relay_detect_tmux_session)"
+TMUX_SESSION="${1:-$(relay_detect_tmux_session)}"
 if [ -z "$TMUX_SESSION" ]; then
     exit 0
 fi

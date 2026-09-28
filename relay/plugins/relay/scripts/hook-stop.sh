@@ -11,9 +11,6 @@ SCRIPT_DIR="$(dirname "$0")"
 
 DAEMON_URL="$(relay_daemon_url)"
 
-# 2026-03-17: Auto-ensure binding before sending notification
-"$SCRIPT_DIR/ensure-binding.sh" 2>/dev/null
-
 # Read hook input from stdin
 if [ -t 0 ]; then
     HOOK_INPUT=""
@@ -29,8 +26,10 @@ if [ -z "$SUMMARY" ] || [ ${#SUMMARY} -lt 5 ]; then
     exit 0
 fi
 
-TMUX_SESSION="$(relay_detect_tmux_session)"
+TMUX_SESSION="$(relay_detect_tmux_session "$HOOK_INPUT")"
 [ -n "$TMUX_SESSION" ] || exit 0
+
+"$SCRIPT_DIR/ensure-binding.sh" "$TMUX_SESSION" 2>/dev/null
 
 # POST to daemon
 curl -s -X POST "${DAEMON_URL}/notify" \

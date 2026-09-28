@@ -410,10 +410,14 @@ test("relays the current same-turn prompt's four images as the user without echo
   }
 });
 
-test("Stop hook sends each reply to its pane's session and drops missing or stale pane identities", async () => {
+test("routes direct and shared app-server hooks without guessing ambiguous sessions", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-stop-routing-test-"));
   const homeDir = join(testDir, "home");
-  const tmux = startTmuxFixture(["codex-a", "codex-b"]);
+  const projectA = join(testDir, "project-a");
+  const projectB = join(testDir, "project-b");
+  mkdirSync(projectA);
+  mkdirSync(projectB);
+  const tmux = startTmuxFixture(["codex-a", "codex-b"], [projectA, projectB]);
   const config = {
     port: 0,
     hostname: "gpu.example.com",
@@ -457,6 +461,25 @@ test("Stop hook sends each reply to its pane's session and drops missing or stal
     await runHook(STOP_HOOK, { last_assistant_message: "malformed pane" }, homeDir, { TMUX: valid.TMUX, TMUX_PANE: "%1x" });
     await runHook(STOP_HOOK, { last_assistant_message: "missing tmux" }, homeDir, { TMUX: "", TMUX_PANE: valid.TMUX_PANE });
     assert.equal(sent.length, 3);
+
+    // Shared app-server hooks inherit its pane, not the requesting TUI's pane.
+    const sharedEnv = tmux.environment("codex-b");
+    await runUserPromptHook("shared server prompt A", homeDir, sharedEnv, { cwd: projectA });
+    await runHook(STOP_HOOK, { cwd: projectA, last_assistant_message: "shared server reply A" }, homeDir,
+      { ...sharedEnv, TMUX_PANE: "%999999" });
+    await runHook(STOP_HOOK, { cwd: projectB, last_assistant_message: "shared server reply B" }, homeDir,
+      tmux.environment("codex-a"));
+    assert.deepEqual(sent.slice(3).map(({ topicId, text }) => ({ topicId, text })), [
+      { topicId: "topic-a", text: "shared server prompt A" },
+      { topicId: "topic-a", text: "shared server reply A" },
+      { topicId: "topic-b", text: "shared server reply B" },
+    ]);
+
+    // A valid inherited pane cannot disambiguate two TUIs in the same directory.
+    execFileSync("tmux", ["-S", sharedEnv.TMUX.split(",")[0], "new-session", "-d", "-s", "codex-a-copy", "-c", projectA]);
+    await runHook(STOP_HOOK, { cwd: projectA, last_assistant_message: "ambiguous reply" }, homeDir,
+      tmux.environment("codex-a"));
+    assert.equal(sent.length, 6);
   } finally {
     server.stop();
     tmux.close();
@@ -464,12 +487,13 @@ test("Stop hook sends each reply to its pane's session and drops missing or stal
   }
 });
 
-function startTmuxFixture(sessionNames: string[]) {
+function startTmuxFixture(sessionNames: string[], directories: string[] = []) {
   const socketDir = mkdtempSync(join(tmpdir(), "relay-tmux-"));
   const socket = join(socketDir, "socket");
   const panes = new Map<string, string>();
-  for (const session of sessionNames) {
-    const pane = execFileSync("tmux", ["-f", "/dev/null", "-S", socket, "new-session", "-d", "-s", session, "-P", "-F", "#{pane_id}"], {
+  for (const [index, session] of sessionNames.entries()) {
+    const cwdArgs = directories[index] ? ["-c", directories[index]] : [];
+    const pane = execFileSync("tmux", ["-f", "/dev/null", "-S", socket, "new-session", "-d", "-s", session, ...cwdArgs, "-P", "-F", "#{pane_id}"], {
       encoding: "utf8",
     }).trim();
     panes.set(session, pane);

@@ -108,14 +108,39 @@ relay_proxy_url() {
 }
 
 relay_detect_tmux_session() {
-    local socket pane_session
+    local socket pane_session hook_cwd panes matches session pane_dir
+    local tmux_args=()
+
+    socket="${TMUX%%,*}"
+    [ -z "$socket" ] || tmux_args=(-S "$socket")
+    hook_cwd=$(printf '%s' "${1:-}" | jq -r '.cwd | select(type == "string" and length > 0)' 2>/dev/null)
+
+    # A shared Codex app-server inherits its own (possibly stale) tmux pane.
+    # The hook's session cwd is authoritative; only a unique session can match.
+    if [ -n "$hook_cwd" ]; then
+        hook_cwd=$(cd -- "$hook_cwd" 2>/dev/null && pwd -P) || return 1
+        panes=$(tmux "${tmux_args[@]}" list-panes -a -F $'#{session_name}\t#{pane_current_path}' 2>/dev/null) || return 1
+        matches=$(
+            while IFS=$'\t' read -r session pane_dir; do
+                case "$session" in codex-*|claude-*) ;; *) continue ;; esac
+                pane_dir=$(cd -- "$pane_dir" 2>/dev/null && pwd -P) || continue
+                [ "$pane_dir" != "$hook_cwd" ] || printf '%s\n' "$session"
+            done <<< "$panes" | sort -u
+        )
+        if [ -n "$matches" ] && [[ "$matches" != *$'\n'* ]]; then
+            printf '%s' "$matches"
+            return 0
+        fi
+        printf 'Relay skipped notification: no unique tmux session for hook cwd %s\n' "$hook_cwd" >&2
+        if [ -d "$HOME/.vibelab-tools/agent-skills/relay/runtime" ]; then
+            (umask 077; printf '%s WARN no unique tmux session for hook cwd %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$hook_cwd" >> "$HOME/.vibelab-tools/agent-skills/relay/runtime/hook-routing.log")
+        fi
+        return 1
+    fi
 
     [ -n "${TMUX:-}" ] || return 1
     [[ "${TMUX_PANE:-}" =~ ^%[0-9]+$ ]] || return 1
-
-    socket="${TMUX%%,*}"
-    [ -n "$socket" ] || return 1
-    pane_session=$(tmux -S "$socket" display-message -p -t "$TMUX_PANE" '#{pane_id}:#{session_name}' 2>/dev/null) || return 1
+    pane_session=$(tmux "${tmux_args[@]}" display-message -p -t "$TMUX_PANE" '#{pane_id}:#{session_name}' 2>/dev/null) || return 1
     case "$pane_session" in
         "$TMUX_PANE":?*) printf '%s' "${pane_session#"$TMUX_PANE":}" ;;
         *) return 1 ;;

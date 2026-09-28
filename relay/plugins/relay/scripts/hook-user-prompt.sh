@@ -30,7 +30,7 @@ if [ -z "$PROMPT" ] || [ ${#PROMPT} -lt 1 ]; then
     exit 0
 fi
 
-TMUX_SESSION="$(relay_detect_tmux_session)"
+TMUX_SESSION="$(relay_detect_tmux_session "$HOOK_INPUT")"
 [ -n "$TMUX_SESSION" ] || exit 0
 
 # Prompts injected from IM are already visible there. Consume their short-lived
@@ -57,7 +57,7 @@ if [ -n "$TMUX_SESSION" ] && [ -n "$PROMPT_FINGERPRINT" ]; then
 fi
 
 # Auto-ensure a binding only when a local prompt will be relayed.
-"$SCRIPT_DIR/ensure-binding.sh" 2>/dev/null
+"$SCRIPT_DIR/ensure-binding.sh" "$TMUX_SESSION" 2>/dev/null
 
 # Truncate long prompts to avoid flooding IM
 PROMPT=$(echo "$PROMPT" | head -c 3000)
