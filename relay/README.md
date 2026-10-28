@@ -55,6 +55,11 @@ Runtime dependencies:
 - `tmux` for bidirectional reply injection. Codex should be launched through
   `~/.vibelab-tools/agent-skills/relay/bin/codex-tmux`; Claude Code sessions
   should also run inside tmux.
+- Bash and Python 3.11+ with `curses` for Codex's shared resume picker and
+  tmux capacity-error continuation. Use `make install-codex-wrapper` in this
+  directory to update the launchers and helpers without reinstalling the
+  Relay service. See [Codex Setup](docs/codex-setup.md) for direct launches,
+  provider profiles, and immediate capacity retries.
 - `curl` and `jq` for hook scripts and slash-command helpers.
 - A platform user-service manager:
   - macOS: `launchctl`

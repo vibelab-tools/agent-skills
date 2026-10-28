@@ -7,8 +7,9 @@ and Feishu messaging through the shared local daemon.
 
 Codex uses three relay surfaces:
 
-- `scripts/codex-tmux.sh` creates or reuses a `codex-<project>-<hash>` tmux
-  session for the current project directory.
+- `scripts/codex-tmux.sh` creates or reuses a tmux session for the current
+  project directory and explicit profile. Its sibling Python helpers provide
+  a shared session picker and capacity-error recovery.
 - Codex lifecycle hooks, `UserPromptSubmit` and `Stop`, call the shared hook
   scripts under `plugins/relay/scripts/`.
 - The local daemon sends IM notifications, polls replies, and injects remote
@@ -91,6 +92,10 @@ A common setup is to proxy Telegram only and keep DingTalk and Feishu direct.
 
 ## Install
 
+The Codex launchers require Bash, tmux, Codex CLI, and Python 3.11 or later
+with the standard-library `curses` module. The shell launcher works on macOS
+and Linux; on Windows use WSL or another environment that provides these tools.
+
 From the relay project directory:
 
 ```bash
@@ -100,7 +105,8 @@ make install-codex
 This installs:
 
 - daemon files: `~/.vibelab-tools/agent-skills/relay/daemon`
-- Codex wrapper: `~/.vibelab-tools/agent-skills/relay/bin/codex-tmux`
+- Codex tools in `~/.vibelab-tools/agent-skills/relay/bin`: `codex-tmux`,
+  `codex-direct`, `codex-resume-picker.py`, and `codex-capacity-retry.py`
 - shared relay config: `~/.vibelab-tools/agent-skills/relay/config.json`
 - runtime state and logs: `~/.vibelab-tools/agent-skills/relay/runtime`
 - Codex plugin marketplace: `~/.vibelab-tools/agent-skills/relay/codex-marketplace`
@@ -110,6 +116,22 @@ This installs:
 The Windows service controller is implemented by `relay-service.mjs`. The hook
 scripts are currently Bash scripts, so Windows Native usage should run them via
 WSL or Git Bash until PowerShell hook equivalents are added.
+
+To update only the Codex tools from this checkout:
+
+```bash
+make install-codex-wrapper
+# Optional installation prefix:
+make install-codex-wrapper SERVICE_ROOT="$HOME/.vibelab-tools/agent-skills/relay"
+```
+
+This target copies all four tools together, without building or restarting
+the Relay daemon, registering plugins, or changing credentials, profiles,
+model catalogs, or session history. Keep shell aliases and any legacy local
+entrypoints pointed at this installed `bin` directory so another script copy
+does not drift from the repository version. New launcher invocations use the
+updated files; an already-running capacity monitor retains its loaded code
+until that monitor restarts.
 
 ## Start Codex
 
@@ -123,6 +145,74 @@ Optional shell alias:
 
 ```bash
 alias codex-tmux="$HOME/.vibelab-tools/agent-skills/relay/bin/codex-tmux"
+```
+
+The launcher keeps separate tmux sessions for each directory and explicit
+profile. `-C`/`--cd` selects the project directory. An existing tmux session is
+reused; inside tmux, Codex runs in the current pane. Put `--no-tmux` first to
+skip creating or attaching to a tmux session. Non-interactive calls and
+management commands keep their ordinary CLI behavior.
+
+The normal launcher preserves the invoking shell's proxy variables and
+explicitly unsets missing proxy variables in a newly created pane, avoiding
+stale proxy settings from the tmux server. `codex-direct` removes the HTTP,
+HTTPS, and SOCKS proxy variables and adds `--no-daemon` so an existing
+proxy-backed Codex daemon is not reused. Direct sessions have their own tmux
+session names and use the same Codex session storage.
+
+### Profiles and shared history
+
+Profiles remain user-owned files under `~/.codex` (or the existing
+`CODEX_HOME`). After configuring profiles named `kimi` and `deepseek`, aliases
+can select them explicitly:
+
+```bash
+alias codex-kimi="$HOME/.vibelab-tools/agent-skills/relay/bin/codex-direct --profile kimi"
+alias codex-deepseek="$HOME/.vibelab-tools/agent-skills/relay/bin/codex-direct --profile deepseek"
+```
+
+The launcher does not assign a profile based on the project directory. Keep
+`CODEX_HOME` unchanged to share the original session storage across providers.
+Provider definitions needed by saved sessions should remain available in the
+base user configuration as well as any profile-specific selection.
+
+Interactive `resume` without an explicit session ID uses a shared list across
+providers, filtered to the current directory. `resume --all` includes other
+directories, and `resume --last` selects the latest matching session. Select
+with the arrow keys and Enter, type to search, or press Esc to cancel. The
+selected session opens with the current invocation's provider and model, using
+an independent Codex process to release the session writer when it exits.
+Explicit session IDs, remote invocations, and unsupported CLI combinations
+continue through the native CLI; Codex's in-session `/resume` keeps its native
+filtering. Sharing storage does not convert provider-specific historical tool
+records into another provider's format.
+
+### Capacity-error continuation
+
+Interactive launches register their tmux pane with one capacity monitor per
+tmux server. It checks about once per second and sends `请继续` plus Enter
+immediately when it detects an idle, empty composer after Codex's
+`Selected model is at capacity. Please try a different model.` error. It also
+recognizes this error during remote compaction and permits subsequent
+subagent-completion notifications or the background-terminal status line.
+
+There is no retry delay or exponential backoff. An unchanged visible error is
+sent once; a fresh capacity error can trigger another continuation. Draft
+input, active work, copy mode, and other errors are skipped, and the monitor
+checks the pane again immediately before sending. Logs contain the timestamp,
+pane ID, and retry count in `~/.codex/log/tmux-capacity-retry.log`.
+
+Disable automatic continuation for the current pane:
+
+```bash
+tmux set-option -p @codex-capacity-retry off
+```
+
+A later launcher invocation registers its pane again. To enable it manually
+in an existing tmux pane, run the installed helper there:
+
+```bash
+~/.vibelab-tools/agent-skills/relay/bin/codex-capacity-retry.py register
 ```
 
 ## Hook Trust

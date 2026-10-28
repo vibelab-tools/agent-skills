@@ -28,7 +28,16 @@ Three components:
 - `scripts/relay-daemon.mjs` — daemon launcher that reads the service-local relay config
 - `plugins/relay/scripts/ensure-binding.sh` — Auto-creates Telegram topic and binds on first hook trigger
 - `plugins/relay/scripts/hook-stop.sh` — Extracts `last_assistant_message` from Claude/Codex hook input and sends to IM
-- `scripts/codex-tmux.sh` — Codex tmux wrapper, creates `codex-<project>-<hash>` sessions
+- `scripts/codex-tmux.sh` — Codex tmux wrapper, reuses sessions by directory and explicit profile
+- `scripts/codex-direct.sh` — direct launcher, clears proxies and bypasses the shared Codex daemon
+- `scripts/codex-resume-picker.py` — local cross-provider history list for terminal `resume`
+- `scripts/codex-capacity-retry.py` — per-tmux-server monitor, immediately continues eligible capacity errors without overwriting drafts
+
+`make install-codex-wrapper` installs these four tools together under the
+service's `bin` directory without rebuilding or restarting Relay. Keep this
+repository as the maintained source; local aliases should target that installed
+directory. Profiles, model catalogs, credentials, and session history remain
+in the user's Codex configuration and are not installed by this target.
 
 ## Environment Variables
 

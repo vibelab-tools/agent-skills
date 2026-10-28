@@ -20,7 +20,7 @@ NODE ?= node
 
 .DEFAULT_GOAL := build
 
-.PHONY: all build install install-all install-codex install-claude install-daemon install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings authorize-feishu-user daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service purge validate clean help
+.PHONY: all build install install-all install-codex install-claude install-daemon install-codex-wrapper install-service install-codex-plugin install-codex-hooks install-claude-plugin install-settings authorize-feishu-user daemon start stop status restart uninstall uninstall-codex uninstall-claude uninstall-service purge validate clean help
 
 all: build
 
@@ -53,18 +53,24 @@ install-claude:
 	$(MAKE) install-settings
 	$(MAKE) install-service
 
-install-daemon:
+install-daemon: install-codex-wrapper
 	mkdir -p "$(DAEMON_INSTALL_DIR)"
 	rsync -a --delete daemon/dist/ "$(DAEMON_INSTALL_DIR)/dist/"
 	cp daemon/package.json daemon/pnpm-lock.yaml daemon/pnpm-workspace.yaml "$(DAEMON_INSTALL_DIR)/"
 	cd "$(DAEMON_INSTALL_DIR)" && pnpm install --prod --frozen-lockfile
 	mkdir -p "$(BIN_DIR)" "$(RUNTIME_DIR)" "$(ASSETS_DIR)"
 	cp scripts/relay-daemon.mjs scripts/relay-service.mjs scripts/authorize-feishu-user.mjs "$(BIN_DIR)/"
-	cp scripts/codex-tmux.sh "$(BIN_DIR)/codex-tmux"
 	@if [ -f "$(APP_ICON_SOURCE)" ]; then \
 		cp "$(APP_ICON_SOURCE)" "$(ASSETS_DIR)/vibelab-agent-skills-avatar.png"; \
 	fi
-	chmod +x "$(BIN_DIR)/relay-daemon.mjs" "$(BIN_DIR)/relay-service.mjs" "$(BIN_DIR)/authorize-feishu-user.mjs" "$(BIN_DIR)/codex-tmux"
+	chmod +x "$(BIN_DIR)/relay-daemon.mjs" "$(BIN_DIR)/relay-service.mjs" "$(BIN_DIR)/authorize-feishu-user.mjs"
+
+install-codex-wrapper:
+	mkdir -p "$(BIN_DIR)"
+	cp scripts/codex-tmux.sh "$(BIN_DIR)/codex-tmux"
+	cp scripts/codex-direct.sh "$(BIN_DIR)/codex-direct"
+	cp scripts/codex-resume-picker.py scripts/codex-capacity-retry.py "$(BIN_DIR)/"
+	chmod +x "$(BIN_DIR)/codex-tmux" "$(BIN_DIR)/codex-direct" "$(BIN_DIR)/codex-resume-picker.py" "$(BIN_DIR)/codex-capacity-retry.py"
 
 install-codex-plugin:
 	mkdir -p "$(CODEX_MARKETPLACE_ROOT)/plugins" "$(CODEX_MARKETPLACE_ROOT)/.agents/plugins"
@@ -174,6 +180,7 @@ help:
 		"  make                  Build the daemon." \
 		"  make install          Install Codex + Claude plugin surfaces and start service." \
 		"  make install-codex    Install Codex surface and start shared service." \
+		"  make install-codex-wrapper  Update Codex launchers and helpers only." \
 		"  make install-claude   Install Claude surface and start shared service." \
 		"  make uninstall        Stop service and remove plugin/service files; preserve config.json." \
 		"  make purge            Run uninstall and remove config.json." \
