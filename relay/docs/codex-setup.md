@@ -265,3 +265,51 @@ make clean
    Topic are injected back into the matching `codex-...` tmux session.
 
 Telegram Topic names use `<project>` for both Codex and Claude Code.
+
+## Automatic tmux progress sidebar
+
+Codex 0.166 rejects resuming an existing thread under a different provider.
+The shared picker therefore resumes same-provider selections directly and uses
+the native `thread/fork` API for cross-provider selections. The original thread
+is preserved; the target provider receives a new thread ID with inherited
+history. The picker prints that ID before opening it. Inherited goals are not
+automatically continued by the fork operation.
+
+Interactive wrapper launches automatically open a read-only progress sidebar
+on the right, using 20% of the pane width. This applies to new sessions and
+resume, including Kimi and DeepSeek profiles. The wrapper hides the tmux status
+bar for its session; other tmux sessions retain their settings. Interactive
+launches use `--no-daemon`, as the shared resume picker already did, so each
+sidebar can identify the CLI's session from its open writer locks rather than
+guessing from the working directory. macOS uses the system `lsof`; Linux reads
+`/proc`. Management commands and noninteractive runs keep native behavior.
+
+The sidebar starts with a waiting message until Codex creates or loads its
+session. Closing Codex also closes its automatic sidebar. Selecting the sidebar
+and pressing `q` closes only the sidebar, without reopening it during that run.
+
+To open a sidebar manually for an existing session, pass the exact parent
+session ID (shown by `/status`) and tmux pane ID (`tmux list-panes -a`). Run this
+from a shell on the same tmux server:
+
+```bash
+~/.vibelab-tools/agent-skills/relay/bin/codex-progress.py show \
+  --pane %3 --thread <session-id>
+```
+
+The preview refreshes every two seconds and reads only the selected session's
+family of local rollout files. It shows recorded turn state, latest tool or
+command, recent output, and time since the last record. Descendants are found
+through their parent thread metadata, not by matching project directories.
+No model requests, thread resumes, history edits, or prompt injection occur.
+Updates depend on when Codex flushes its local records; an old record does not
+prove a process is stalled. Unavailable/encrypted arguments are not decoded.
+
+The sidebar uses 20% of the pane width and opens without changing keyboard focus.
+Colored task cards wrap commands and output for the narrow sidebar. Select the progress
+pane and press `q` to close it; the Codex pane keeps running. Repeating `show`
+for the same Codex pane reuses the existing preview. Enlarge the pane to see more
+agents; completed and interrupted threads are hidden, and running and recently
+updated children appear first. An idle family shows a single no-running-tasks
+message. For a one-time
+text inspection, replace `show --pane %3` with `snapshot`.

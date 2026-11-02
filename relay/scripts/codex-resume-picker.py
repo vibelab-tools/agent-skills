@@ -276,6 +276,32 @@ def choose(screen, threads, selection, provider, model):
             selected = 0
 
 
+def launch_codex(codex_bin, arguments, thread_id=None):
+    if sys.stdin.isatty() and sys.stdout.isatty() and os.environ.get("TMUX_PANE"):
+        # Independent CLI ownership makes the sidebar unambiguous even when
+        # several profiles run in the same directory. Resume already uses this.
+        if "--no-daemon" not in arguments:
+            arguments = ["--no-daemon", *arguments]
+        if thread_id is None and "resume" in arguments:
+            for arg in arguments[arguments.index("resume") + 1:]:
+                if re.fullmatch(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}", arg):
+                    thread_id = arg
+                    break
+        progress = [sys.executable, str(Path(__file__).with_name("codex-progress.py")),
+                    "show", "--owner-pid", str(os.getpid())]
+        if thread_id:
+            progress.extend(["--thread", thread_id])
+        try:
+            subprocess.run(["tmux", "set-option", "-t", os.environ["TMUX_PANE"], "status", "off"],
+                           capture_output=True, timeout=2, check=False)
+            subprocess.run(progress,
+                           stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, timeout=4, check=False)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    os.execv(codex_bin, [codex_bin, *arguments])
+
+
 def main(arguments):
     if len(arguments) < 2 or arguments[0] != "--codex-bin" or not os.path.isabs(arguments[1]):
         raise SystemExit("Usage: codex-resume-picker.py --codex-bin /path/to/codex -- [codex arguments]")
@@ -292,7 +318,7 @@ def main(arguments):
             pass
     selection = parse_resume(native)
     if selection is None or not sys.stdin.isatty() or not sys.stdout.isatty():
-        os.execv(codex_bin, [codex_bin, *native])
+        launch_codex(codex_bin, native)
     server = AppServer(codex_bin, selection)
     try:
         server.request("initialize", {"clientInfo": {"name": "local_resume_picker", "version": "1"}})
@@ -308,13 +334,29 @@ def main(arguments):
     locale.setlocale(locale.LC_ALL, "")
     session_id = threads[0]["id"] if selection.last else curses.wrapper(choose, threads, selection, provider, model)
     if session_id:
+        original = next(thread for thread in threads if thread["id"] == session_id)
+        if original.get("modelProvider", "openai") != provider:
+            server = AppServer(codex_bin, selection)
+            try:
+                server.request("initialize", {"clientInfo": {"name": "local_resume_picker", "version": "1"},
+                                              "capabilities": {"experimentalApi": True}})
+                server.send({"method": "initialized"})
+                fork = server.request("thread/fork", {
+                    "threadId": session_id, "modelProvider": provider, "model": model,
+                    "excludeTurns": True, "deferGoalContinuation": True,
+                })
+                session_id = fork["thread"]["id"]
+            finally:
+                server.close()
+            print(f"Cross-provider resume: original preserved; opening {provider} fork {session_id}.",
+                  file=sys.stderr, flush=True)
         launch = [*selection.arguments]
         if not selection.no_daemon:
             launch.append("--no-daemon")
         launch.extend(["-c", "model_provider=" + json.dumps(provider)])
         if selection.model is None:
             launch.extend(["--model", model])
-        os.execv(codex_bin, [codex_bin, *launch, session_id])
+        launch_codex(codex_bin, [*launch, session_id], session_id)
 
 
 if __name__ == "__main__":

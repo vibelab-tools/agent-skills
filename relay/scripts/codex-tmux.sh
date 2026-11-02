@@ -52,15 +52,6 @@ if [[ -n $direct_host ]]; then
     export no_proxy="${no_proxy:+$no_proxy,}$direct_host"
 fi
 
-codex_command=("$codex_bin")
-if [[ -t 0 && -t 1 ]]; then
-    codex_command=(python3 "$script_dir/codex-resume-picker.py" --codex-bin "$codex_bin" --)
-fi
-
-if $no_tmux || [[ -n ${TMUX-} || ! -t 0 || ! -t 1 ]]; then
-    exec "${codex_command[@]}" "$@"
-fi
-
 # Management commands and automation must keep their ordinary CLI behavior.
 expect_value=false
 for arg in "$@"; do
@@ -75,6 +66,15 @@ for arg in "$@"; do
         *) break ;;
     esac
 done
+
+codex_command=("$codex_bin")
+if [[ -t 0 && -t 1 ]]; then
+    codex_command=(python3 "$script_dir/codex-resume-picker.py" --codex-bin "$codex_bin" --)
+fi
+
+if $no_tmux || [[ -n ${TMUX-} || ! -t 0 || ! -t 1 ]]; then
+    exec "${codex_command[@]}" "$@"
+fi
 
 tmux_bin=$(type -P tmux) || { printf 'tmux is not on PATH.\n' >&2; exit 127; }
 name=${cwd##*/}
@@ -91,6 +91,7 @@ session="$session_prefix-${name:-root}-${hash:0:6}"
 if [[ -n $profile ]]; then session+="-$profile"; fi
 
 if "$tmux_bin" has-session -t "=$session" 2>/dev/null; then
+    "$tmux_bin" set-option -t "$session" status off
     exec "$tmux_bin" attach-session -t "=$session"
 fi
 

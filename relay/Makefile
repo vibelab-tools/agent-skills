@@ -69,8 +69,8 @@ install-codex-wrapper:
 	mkdir -p "$(BIN_DIR)"
 	cp scripts/codex-tmux.sh "$(BIN_DIR)/codex-tmux"
 	cp scripts/codex-direct.sh "$(BIN_DIR)/codex-direct"
-	cp scripts/codex-resume-picker.py scripts/codex-capacity-retry.py "$(BIN_DIR)/"
-	chmod +x "$(BIN_DIR)/codex-tmux" "$(BIN_DIR)/codex-direct" "$(BIN_DIR)/codex-resume-picker.py" "$(BIN_DIR)/codex-capacity-retry.py"
+	cp scripts/codex-resume-picker.py scripts/codex-capacity-retry.py scripts/codex-progress.py "$(BIN_DIR)/"
+	chmod +x "$(BIN_DIR)/codex-tmux" "$(BIN_DIR)/codex-direct" "$(BIN_DIR)/codex-resume-picker.py" "$(BIN_DIR)/codex-capacity-retry.py" "$(BIN_DIR)/codex-progress.py"
 
 install-codex-plugin:
 	mkdir -p "$(CODEX_MARKETPLACE_ROOT)/plugins" "$(CODEX_MARKETPLACE_ROOT)/.agents/plugins"
