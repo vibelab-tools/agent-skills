@@ -39,6 +39,7 @@ interface Input {
   text: string;
   state: "received" | "submitting" | "submitted" | "uncertain";
   createdAt: number;
+  reactionPending?: boolean;
 }
 
 interface Outgoing {
@@ -58,6 +59,7 @@ interface ProgressState {
 }
 
 interface Sender {
+  acknowledgeInput(messageId: string): Promise<boolean>;
   send(options: { topicId: string; text: string; mentionAll?: boolean; uuid?: string }): Promise<boolean>;
 }
 
@@ -226,6 +228,20 @@ export class FeishuProgress {
       }
       this.save(); // Cursor and generated messages commit together before network I/O.
       if (this.now() < this.nextSendAt) return;
+      const reaction = Object.entries(this.state.inputs).find(([, input]) =>
+        input.state === "submitted" && input.reactionPending &&
+        this.sessions.findByFeishuRootMessage(input.root)?.tmuxSession === input.session
+      );
+      if (reaction) {
+        const [messageId, input] = reaction;
+        // Persist before the API call: never repeat an uncertain addition after
+        // a crash or timeout, because re-adding a reaction may notify the user.
+        delete input.reactionPending;
+        this.save();
+        this.nextSendAt = this.now() + 1_000;
+        await this.sender.acknowledgeInput(messageId);
+        return;
+      }
       const blockedRoots = new Set<string>();
       const outgoing = this.state.outbox.find((item) => {
         if (this.sessions.findByFeishuRootMessage(item.root)?.tmuxSession !== this.state.topics[item.root]?.session) return false;
@@ -269,7 +285,9 @@ export class FeishuProgress {
     const submitted = injectRemotePrompt(this.origins, input.session, input.text, (_session, text) => injectText(pane, text));
     input.state = submitted ? "submitted" : "uncertain";
     input.text = "";
-    if (!submitted) {
+    if (submitted) {
+      input.reactionPending = true;
+    } else {
       this.enqueue(`input:${id}`, input.root,
         "Relay 向会话提交时发生错误，是否完整提交无法确认。为避免重复执行，未自动重发。", true);
     }
@@ -337,7 +355,7 @@ export class FeishuProgress {
 
   private save(): void {
     fs.mkdirSync(path.dirname(this.statePath), { recursive: true, mode: 0o700 });
-    const finished = Object.entries(this.state.inputs).filter(([, input]) => input.state === "submitted");
+    const finished = Object.entries(this.state.inputs).filter(([, input]) => input.state === "submitted" && !input.reactionPending);
     for (const [id] of finished.slice(0, Math.max(0, finished.length - 500))) delete this.state.inputs[id];
     const temporary = `${this.statePath}.tmp`;
     fs.writeFileSync(temporary, JSON.stringify(this.state), { mode: 0o600 });

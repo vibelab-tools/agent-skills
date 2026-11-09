@@ -593,6 +593,28 @@ export class FeishuProvider implements IMProvider {
     }
   }
 
+  /** Acknowledge submitted input on its original message, without a text reply. */
+  async acknowledgeInput(messageId: string): Promise<boolean> {
+    if (!this.client) {
+      log.warn({ messageId }, "Feishu input reaction skipped: client is not connected; not retried");
+      return false;
+    }
+    try {
+      const response = await this.client.im.messageReaction.create({
+        path: { message_id: messageId },
+        data: { reaction_type: { emoji_type: "OK" } },
+      });
+      if (response.code !== 0) {
+        log.warn({ messageId, code: response.code }, "Feishu rejected input reaction; not retried to avoid repeat notifications");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      log.warn({ messageId, err: summarizeError(error) }, "Feishu input reaction failed; not retried to avoid repeat notifications");
+      return false;
+    }
+  }
+
   /**
    * Send a message. topicId is the root message ID for topic replies.
    * If topicId is empty or starts with "new:", send a new group message.

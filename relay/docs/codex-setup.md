@@ -277,7 +277,13 @@ last observed turn state, reply and timestamp, input-target checks, pending
 inputs, uncertain submissions, and pending outbound notifications. A live tmux
 session does not prove Codex is making progress; silence does not prove a hang.
 
-For ordinary Feishu input, Relay saves the input before submitting it silently.
+For ordinary Feishu input, Relay saves the input before submitting it. After a
+successful submission it adds one `OK` reaction to the original message, without
+a text receipt. This means submission, not task completion or model understanding.
+Reaction attempts are persisted before the API call and are not repeated after
+failure, timeout or restart, to avoid repeated notifications. Failed reactions
+are logged and do not resend the input or fall back to a text reply. Old already
+submitted inputs are not backfilled.
 If no unique Codex/Claude pane is present, input remains pending without a reply;
 it is submitted when a unique assistant pane returns. Previously queued routine
 receipts are discarded on startup. Submission does not change Feishu's native

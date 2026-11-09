@@ -83,6 +83,8 @@ async function fixture(t: TestContext) {
   const accepted: Reply[] = [];
   const attempts: Reply[] = [];
   const apiErrors: unknown[] = [];
+  const reactions: string[] = [];
+  let failReaction = false;
   let failText: string | undefined;
   let now = 1_000_000;
   let server: Server | undefined;
@@ -109,6 +111,15 @@ async function fixture(t: TestContext) {
       const reply = req.url?.match(/^\/open-apis\/im\/v1\/messages\/([^/]+)\/reply$/);
       if (req.url === "/open-apis/auth/v3/tenant_access_token/internal") {
         response = { code: 0, tenant_access_token: "progress-test-token", expire: 7200 };
+      } else if (req.url?.endsWith("/reactions")) {
+        assert.equal(req.headers.authorization, "Bearer progress-test-token");
+        assert.equal(req.method, "POST");
+        assert.deepEqual(body, { reaction_type: { emoji_type: "OK" } });
+        const id = req.url.split("/").at(-2)!;
+        assert.equal(JSON.parse(readFileSync(statePath, "utf8")).inputs[id].state, "submitted");
+        reactions.push(id);
+        response = failReaction ? { code: 999_001, msg: "temporary reaction outage" } :
+          { code: 0, data: { reaction_id: `reaction_${reactions.length}` } };
       } else if (reply) {
         assert.equal(req.headers.authorization, "Bearer progress-test-token");
         assert.equal(body.reply_in_thread, true);
@@ -229,7 +240,8 @@ async function fixture(t: TestContext) {
   assert.equal(accepted.length, 0);
 
   return {
-    accepted, attempts, sessions, roots, rollouts, statePath,
+    accepted, attempts, reactions, sessions, roots, rollouts, statePath,
+    failReaction() { failReaction = true; },
     get progress() { return progress; },
     get now() { return now; },
     set now(value: number) { now = value; },
@@ -334,6 +346,7 @@ test("routes busy-session inputs and coalesced progress across two topics, with 
   assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[0]).length, 0);
   assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[1]).length, 0);
   assert.equal(f.accepted.some((reply) => reply.text.includes("A:") || reply.text.includes("B:")), false);
+  assert.deepEqual(f.reactions, ["input-a-1", "input-a-2", "input-b-1"]);
   f.now = began + 10_000;
   appendFileSync(f.rollouts[0], message("A: preparing changes", "partial_answer"));
   await f.progress.tick();
@@ -374,6 +387,7 @@ test("routes busy-session inputs and coalesced progress across two topics, with 
 
 test("recovers an actual failed Feishu final delivery from disk after fresh service instances without reinjecting inputs", async (t) => {
   const f = await fixture(t);
+  f.failReaction();
   await f.incoming(0, "durable-input", "once across restart");
   await waitFor(() => f.captured(0).length === 1);
   assert.deepEqual(await f.post("/prompt-origin", {
@@ -381,6 +395,7 @@ test("recovers an actual failed Feishu final delivery from disk after fresh serv
   }), { origin: "im" });
   await f.pump(1); // Successful input must not send a receipt.
   assert.equal(f.attempts.length, 0);
+  assert.deepEqual(f.reactions, ["durable-input"]);
   appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "durable-turn" }) +
     message("durable final", "final_answer") + record("event_msg", {
       type: "task_complete", turn_id: "durable-turn", last_agent_message: "durable final",
@@ -413,6 +428,7 @@ test("recovers an actual failed Feishu final delivery from disk after fresh serv
   assert.deepEqual(f.captured(0), ["once across restart"]);
   assert.deepEqual(f.captured(1), []);
   assert.equal(JSON.parse(readFileSync(f.statePath, "utf8")).outbox.length, 0);
+  assert.deepEqual(f.reactions, ["durable-input"], "failed reaction must not repeat after restart or block final reply");
   assert.ok(f.progress.status(f.roots[0]).includes("本轮已结束"));
 });
 
@@ -423,6 +439,7 @@ test("holds inputs away from replacement shells and preserves batched progress a
   await f.pump(2);
   assert.deepEqual(f.captured(0), [], "a live shell must never receive the model prompt");
   assert.equal(f.attempts.length, 0, "waiting for an assistant must remain silent");
+  assert.deepEqual(f.reactions, []);
   assert.ok(f.progress.status(f.roots[0]).includes("待提交输入：1"));
   // An upgrade must not send obsolete receipts already persisted by the old daemon.
   const oldJournal = JSON.parse(readFileSync(f.statePath, "utf8"));
@@ -440,13 +457,18 @@ test("holds inputs away from replacement shells and preserves batched progress a
   await f.pump(2);
   assert.deepEqual(f.captured(0), [], "multiple Codex windows must keep the target ambiguous");
   assert.deepEqual(extraWindow.captured(), []);
+  assert.deepEqual(f.reactions, [], "ambiguous assistant must not get a reaction");
   assert.equal(JSON.parse(readFileSync(f.statePath, "utf8")).inputs["shell-recovery-input"].state, "received");
   extraWindow.close();
   await f.pump(1);
   await waitFor(() => f.captured(0).length === 1);
   assert.deepEqual(f.captured(0), ["preserved until Codex returns"]);
   await f.pump(1);
-  assert.equal(f.attempts.length, 0, "recovered submission must remain silent");
+  assert.equal(f.attempts.length, 0, "recovered submission must not send text");
+  assert.deepEqual(f.reactions, ["shell-recovery-input"]);
+  await f.restart();
+  await f.pump(1);
+  assert.deepEqual(f.reactions, ["shell-recovery-input"], "restart must not repeat reaction");
 
   // Attach after the final already exists, then let task_complete arrive.
   f.rollouts[0] = `${f.rollouts[0]}.attached`;
