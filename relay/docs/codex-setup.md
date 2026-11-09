@@ -303,6 +303,8 @@ Queued notifications are sent at most once per second across topics, with
 per-topic ordering and no idle heartbeat messages. Long replies are split at
 Unicode character boundaries. Failed notifications retry after 5 seconds with
 exponential backoff capped at 5 minutes and remain queued across restart.
+Tmux discovery and pane checks force UTF-8 output (`tmux -u`), since launchd
+may have no locale and tmux otherwise replaces tab separators with underscores.
 An unavailable topic can delay subsequent notifications in that topic; inspect
 the local journal/status and restore its binding or app permissions. Feishu
 API call quotas still apply to sending and editing messages; no quota increase

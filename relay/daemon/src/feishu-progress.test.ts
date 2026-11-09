@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
@@ -20,23 +20,28 @@ import { DaemonConfig } from "./types";
 
 interface Reply { root: string; text: string; uuid?: string; }
 
-async function waitFor(check: () => boolean): Promise<void> {
-  const deadline = Date.now() + 5_000;
+async function waitFor(check: () => boolean, description = "real tmux input", timeout = 5_000): Promise<void> {
+  const deadline = Date.now() + timeout;
   while (!check()) {
-    assert.ok(Date.now() < deadline, "timed out waiting for real tmux input");
+    assert.ok(Date.now() < deadline, `timed out waiting for ${description}`);
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
 }
 
 async function fixture(t: TestContext) {
   const directory = mkdtempSync(join(tmpdir(), "relay-progress-"));
-  const socket = join(directory, "tmux.sock");
+  const socketDirectory = join(directory, `tmux-${process.getuid!()}`);
+  mkdirSync(socketDirectory, { mode: 0o700 });
+  const socket = join(socketDirectory, "default");
   const statePath = join(directory, "progress.json");
+  const codexHome = join(directory, "codex-home");
   const sessions = ["codex-progress-a", "codex-progress-b"];
   const roots = ["om_progress_a", "om_progress_b"];
   const inputs = sessions.map((_, index) => join(directory, `input-${index}.jsonl`));
   const rollouts = sessions.map((_, index) => join(directory, `rollout-${index}.jsonl`));
   const ready = sessions.map((_, index) => join(directory, `ready-${index}`));
+  const locks = sessions.map((_, index) => join(codexHome, "thread-writer-locks", `progress-thread-${index}.lock`));
+  mkdirSync(join(codexHome, "thread-writer-locks"), { recursive: true });
   const source = join(directory, "codex-stdin.c");
   const executable = join(directory, "codex");
   // A real executable named codex exercises pane ownership checks as well as
@@ -46,7 +51,9 @@ async function fixture(t: TestContext) {
     "#include <stdlib.h>",
     "#include <unistd.h>",
     "int main(int argc, char **argv) {",
-    "  if (argc != 3) return 1;",
+    "  if (argc != 4) return 1;",
+    "  FILE *writer_lock = fopen(argv[3], \"a\");",
+    "  if (!writer_lock) return 1;",
     "  FILE *ready = fopen(argv[2], \"w\");",
     "  if (!ready) return 1;",
     "  fclose(ready);",
@@ -66,8 +73,13 @@ async function fixture(t: TestContext) {
   ].join("\n"));
   inputs.forEach((path) => writeFileSync(path, ""));
   rollouts.forEach((path) => writeFileSync(path, ""));
+  writeFileSync(rollouts[0], message("historical reply must stay private"));
   const oldTmux = process.env.TMUX;
+  const oldTmuxPane = process.env.TMUX_PANE;
+  const oldTmuxTmpdir = process.env.TMUX_TMPDIR;
   const oldCodexHome = process.env.CODEX_HOME;
+  const localeKeys = ["LANG", "LC_ALL", "LC_CTYPE"] as const;
+  const oldLocale = Object.fromEntries(localeKeys.map((key) => [key, process.env[key]]));
   const accepted: Reply[] = [];
   const attempts: Reply[] = [];
   const apiErrors: unknown[] = [];
@@ -75,7 +87,7 @@ async function fixture(t: TestContext) {
   let now = 1_000_000;
   let server: Server | undefined;
   let provider: FeishuProvider;
-  let progress: FeishuProgress;
+  let progress!: FeishuProgress;
   let manager: SessionManager;
   let baseUrl = "";
   const config = {
@@ -135,20 +147,43 @@ async function fixture(t: TestContext) {
     } finally {
       if (oldTmux === undefined) delete process.env.TMUX;
       else process.env.TMUX = oldTmux;
+      if (oldTmuxPane === undefined) delete process.env.TMUX_PANE;
+      else process.env.TMUX_PANE = oldTmuxPane;
+      if (oldTmuxTmpdir === undefined) delete process.env.TMUX_TMPDIR;
+      else process.env.TMUX_TMPDIR = oldTmuxTmpdir;
       if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
       else process.env.CODEX_HOME = oldCodexHome;
+      for (const key of localeKeys) {
+        if (oldLocale[key] === undefined) delete process.env[key];
+        else process.env[key] = oldLocale[key];
+      }
       rmSync(directory, { recursive: true, force: true });
     }
     assert.deepEqual(apiErrors, []);
   });
 
+  // Match launchd: no locale or inherited tmux UTF-8 client flags. A private
+  // default socket also keeps implicit service tmux commands off user servers.
+  localeKeys.forEach((key) => delete process.env[key]);
+  delete process.env.TMUX;
+  delete process.env.TMUX_PANE;
+  process.env.TMUX_TMPDIR = directory;
+  process.env.CODEX_HOME = codexHome;
+  execFileSync("python3", ["-c", [
+    "import json, sqlite3, sys",
+    "connection = sqlite3.connect(sys.argv[1])",
+    "connection.execute('CREATE TABLE threads (id TEXT PRIMARY KEY, source TEXT, rollout_path TEXT)')",
+    "connection.executemany('INSERT INTO threads VALUES (?, ?, ?)', json.loads(sys.argv[2]))",
+    "connection.commit()",
+    "connection.close()",
+  ].join("\n"), join(codexHome, "state_5.sqlite"), JSON.stringify(sessions.map((_, index) => [
+    `progress-thread-${index}`, "cli", rollouts[index],
+  ]))], { stdio: "pipe" });
   execFileSync("cc", [source, "-o", executable], { stdio: "pipe" });
   for (const [index, session] of sessions.entries()) {
     execFileSync("tmux", ["-f", "/dev/null", "-S", socket, "new-session", "-d", "-s", session,
-      executable, inputs[index], ready[index]], { stdio: "ignore" });
+      executable, inputs[index], ready[index], locks[index]], { stdio: "ignore" });
   }
-  process.env.TMUX = `${socket},0,0`;
-  process.env.CODEX_HOME = join(directory, "empty-codex-home");
   assert.deepEqual(execFileSync("tmux", ["list-sessions", "-F", "#{session_name}"], { encoding: "utf8" }).trim().split("\n").sort(), sessions);
   await waitFor(() => ready.every(existsSync));
   for (const session of sessions) {
@@ -184,6 +219,14 @@ async function fixture(t: TestContext) {
     baseUrl = `http://127.0.0.1:${((server as any).httpServer.address() as AddressInfo).port}`;
   }
   await restart();
+  progress.start();
+  await waitFor(() => {
+    const journal = JSON.parse(readFileSync(statePath, "utf8"));
+    return roots.every((root, index) => journal.topics[root]?.transcript === rollouts[index] && journal.topics[root]?.ownerConfirmed === true);
+  }, "real Codex writer-lock and SQLite transcript discovery", 10_000);
+  progress.stop();
+  assert.equal(JSON.parse(readFileSync(statePath, "utf8")).outbox.length, 0);
+  assert.equal(accepted.length, 0);
 
   return {
     accepted, attempts, sessions, roots, rollouts, statePath,
@@ -209,7 +252,7 @@ async function fixture(t: TestContext) {
       rmSync(ready[index], { force: true });
       const pane = execFileSync("tmux", ["-S", socket, "list-panes", "-t", `=${sessions[index]}`, "-F", "#{pane_id}"], { encoding: "utf8" }).trim();
       execFileSync("tmux", ["-S", socket, "respawn-pane", "-k", "-t", pane,
-        executable, inputs[index], ready[index]], { stdio: "pipe" });
+        executable, inputs[index], ready[index], locks[index]], { stdio: "pipe" });
       await waitFor(() => existsSync(ready[index]));
       assert.equal(execFileSync("tmux", ["list-panes", "-t", `=${sessions[index]}`, "-F", "#{pane_current_command}"], { encoding: "utf8" }).trim(), "codex");
     },
@@ -218,7 +261,7 @@ async function fixture(t: TestContext) {
       const windowReady = join(directory, `extra-ready-${index}`);
       writeFileSync(input, "");
       const window = execFileSync("tmux", ["-S", socket, "new-window", "-d", "-t", `${sessions[index]}:`,
-        "-n", "second-codex", "-P", "-F", "#{window_id}", executable, input, windowReady], { encoding: "utf8" }).trim();
+        "-n", "second-codex", "-P", "-F", "#{window_id}", executable, input, windowReady, locks[index]], { encoding: "utf8" }).trim();
       await waitFor(() => existsSync(windowReady));
       assert.deepEqual(execFileSync("tmux", ["list-panes", "-s", "-t", `=${sessions[index]}`, "-F", "#{pane_current_command}"], { encoding: "utf8" }).trim().split("\n"), ["codex", "codex"]);
       return {
@@ -264,7 +307,6 @@ const message = (text: string, phase = "commentary") => record("response_item", 
 
 test("routes busy-session inputs and coalesced progress across two topics, with local status and final hook deduplication", async (t) => {
   const f = await fixture(t);
-  writeFileSync(f.rollouts[0], message("historical reply must stay private"));
   await f.incoming(0, "input-a-1", "first live prompt");
   await waitFor(() => f.busy(0));
   await f.incoming(0, "input-a-2", "second prompt while busy");
@@ -395,6 +437,7 @@ test("holds inputs away from replacement shells and preserves batched progress a
   assert.ok(f.accepted.some((reply) => reply.root === f.roots[0] && reply.text.includes("已提交到会话")));
 
   // Attach after the final already exists, then let task_complete arrive.
+  f.rollouts[0] = `${f.rollouts[0]}.attached`;
   writeFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "attached-final" }) +
     message("attached final result", "final_answer"));
   await f.post("/prompt-origin", {

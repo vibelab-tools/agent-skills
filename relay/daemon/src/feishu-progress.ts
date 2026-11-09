@@ -346,7 +346,7 @@ export class FeishuProgress {
     if (!helper) return;
     let panes: string;
     try {
-      panes = (await execFileAsync("tmux", ["list-panes", "-a", "-F", "#{session_name}\t#{pane_pid}"], { encoding: "utf8", timeout: 3_000 })).stdout;
+      panes = (await execFileAsync("tmux", ["-u", "list-panes", "-a", "-F", "#{session_name}\t#{pane_pid}"], { encoding: "utf8", timeout: 3_000 })).stdout;
     } catch { return; }
     for (const binding of this.sessions.getAll()) {
       if (!binding.feishuRootMessageId) continue;
@@ -372,7 +372,7 @@ export class FeishuProgress {
 
   private agentPane(session: string): string | undefined {
     try {
-      const output = execFileSync("tmux", ["list-panes", "-s", "-t", `=${session}`, "-F", "#{pane_id}\t#{pane_current_command}"], { encoding: "utf8", timeout: 3_000, stdio: ["ignore", "pipe", "ignore"] });
+      const output = execFileSync("tmux", ["-u", "list-panes", "-s", "-t", `=${session}`, "-F", "#{pane_id}\t#{pane_current_command}"], { encoding: "utf8", timeout: 3_000, stdio: ["ignore", "pipe", "ignore"] });
       const panes = output.trim().split("\n").map((line) => line.split("\t"))
         .filter(([, command]) => /^(?:codex|claude)(?:-[\w.-]+)?(?:\.exe)?$/i.test(command || ""));
       return panes.length === 1 ? panes[0][0] : undefined;
