@@ -101,6 +101,7 @@ export interface NotifyRequest {
 export interface PromptOriginRequest {
   tmuxSession: string;
   fingerprint: string;
+  transcriptPath?: string;
 }
 
 /** POST /bind request */

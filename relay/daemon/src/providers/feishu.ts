@@ -31,6 +31,7 @@ export type FeishuMessageHandler = (
 interface FeishuSendOptions extends SendOptions {
   mentionAll?: boolean;
   sendAsUser?: boolean;
+  uuid?: string;
 }
 
 interface FeishuRecoverySource {
@@ -621,7 +622,8 @@ export class FeishuProvider implements IMProvider {
           topicId,
           text,
           mentionAll,
-          userAccessToken
+          userAccessToken,
+          options.uuid
         );
         this.finishPendingUserMessage(pendingUserMessage);
         if (sent) this.hotUntil.set(topicId, Date.now() + HOT_RECOVERY_WINDOW_MS);
@@ -726,7 +728,8 @@ export class FeishuProvider implements IMProvider {
     rootMessageId: string,
     text: string,
     mentionAll = false,
-    userAccessToken?: string
+    userAccessToken?: string,
+    uuid?: string
   ): Promise<boolean> {
     if (!this.client) return false;
     try {
@@ -739,10 +742,15 @@ export class FeishuProvider implements IMProvider {
             }),
             msg_type: "text",
             reply_in_thread: true,
+            ...(uuid ? { uuid } : {}),
           },
         },
         userAccessToken ? lark.withUserAccessToken(userAccessToken) : undefined
       );
+      if (response?.code && response.code !== 0) {
+        log.warn({ code: response.code }, "Feishu rejected the topic reply");
+        return false;
+      }
       if (userAccessToken) {
         this.rememberSentUserMessage(rootMessageId, response);
       }
