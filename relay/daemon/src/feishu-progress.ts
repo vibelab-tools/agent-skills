@@ -1,4 +1,4 @@
-// ABOUTME: Durable Feishu receipts, Codex progress, and topic-local status queries.
+// ABOUTME: Durable Feishu input, Codex progress, and topic-local status queries.
 // ABOUTME: Reads exact owned transcripts and retries outbound messages without model calls.
 
 import * as fs from "node:fs";
@@ -82,6 +82,11 @@ export class FeishuProgress {
       if (error.code !== "ENOENT") throw error; // Never silently discard a corrupt delivery journal.
       this.state = { topics: {}, inputs: {}, outbox: [], delivered: [] };
     }
+    // Drop routine receipts from older versions, retaining uncertain-submission warnings.
+    this.state.outbox = this.state.outbox.filter((item) =>
+      !item.id.startsWith("received:") &&
+      !(item.id.startsWith("input:") && !item.attention)
+    );
     for (const [id, input] of Object.entries(this.state.inputs)) {
       if (input.state === "submitting") {
         input.state = "uncertain";
@@ -258,18 +263,16 @@ export class FeishuProgress {
     const input = this.state.inputs[id];
     if (this.sessions.findByFeishuRootMessage(input.root)?.tmuxSession !== input.session) return;
     const pane = this.agentPane(input.session);
-    if (!pane) {
-      this.enqueue(`received:${id}`, input.root, "Relay 已收到这条消息。尚未确认唯一的助手输入窗格，输入已保存，等待会话恢复后提交。", false);
-      return;
-    }
+    if (!pane) return;
     input.state = "submitting";
     this.save();
     const submitted = injectRemotePrompt(this.origins, input.session, input.text, (_session, text) => injectText(pane, text));
     input.state = submitted ? "submitted" : "uncertain";
     input.text = "";
-    this.enqueue(`input:${id}`, input.root, submitted
-      ? "Relay 已收到这条消息，并已提交到会话，等待助手回应。"
-      : "Relay 已收到这条消息，但向会话提交时发生错误，是否完整提交无法确认。为避免重复执行，未自动重发。", !submitted);
+    if (!submitted) {
+      this.enqueue(`input:${id}`, input.root,
+        "Relay 向会话提交时发生错误，是否完整提交无法确认。为避免重复执行，未自动重发。", true);
+    }
     this.save();
   }
 

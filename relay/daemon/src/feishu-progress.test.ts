@@ -331,8 +331,8 @@ test("routes busy-session inputs and coalesced progress across two topics, with 
   appendFileSync(f.rollouts[1], record("event_msg", { type: "task_started", turn_id: "turn-b" }) + message("B: isolated work"));
   const began = f.now;
   await f.pump(3);
-  assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[0]).length, 2);
-  assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[1]).length, 1);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[0]).length, 0);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("已收到这条消息") && reply.root === f.roots[1]).length, 0);
   assert.equal(f.accepted.some((reply) => reply.text.includes("A:") || reply.text.includes("B:")), false);
   f.now = began + 10_000;
   appendFileSync(f.rollouts[0], message("A: preparing changes", "partial_answer"));
@@ -379,7 +379,8 @@ test("recovers an actual failed Feishu final delivery from disk after fresh serv
   assert.deepEqual(await f.post("/prompt-origin", {
     tmuxSession: f.sessions[0], fingerprint: fingerprintPrompt("once across restart"), transcriptPath: f.rollouts[0],
   }), { origin: "im" });
-  await f.pump(1); // Receipt reaches the real SDK/API before the outage.
+  await f.pump(1); // Successful input must not send a receipt.
+  assert.equal(f.attempts.length, 0);
   appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "durable-turn" }) +
     message("durable final", "final_answer") + record("event_msg", {
       type: "task_complete", turn_id: "durable-turn", last_agent_message: "durable final",
@@ -421,8 +422,19 @@ test("holds inputs away from replacement shells and preserves batched progress a
   await f.incoming(0, "shell-recovery-input", "preserved until Codex returns");
   await f.pump(2);
   assert.deepEqual(f.captured(0), [], "a live shell must never receive the model prompt");
-  assert.ok(f.accepted.some((reply) => reply.root === f.roots[0] && reply.text.includes("输入已保存")));
+  assert.equal(f.attempts.length, 0, "waiting for an assistant must remain silent");
   assert.ok(f.progress.status(f.roots[0]).includes("待提交输入：1"));
+  // An upgrade must not send obsolete receipts already persisted by the old daemon.
+  const oldJournal = JSON.parse(readFileSync(f.statePath, "utf8"));
+  oldJournal.outbox.push(
+    { id: "received:shell-recovery-input:0", root: f.roots[0], text: "old pending receipt", attention: false, due: f.now, attempts: 0 },
+    { id: "input:old-submitted:0", root: f.roots[0], text: "old success receipt", attention: false, due: f.now, attempts: 0 },
+  );
+  writeFileSync(f.statePath, JSON.stringify(oldJournal));
+  await f.restart();
+  await f.pump(2);
+  assert.equal(f.attempts.length, 0, "upgrade must discard queued routine receipts");
+  assert.equal(JSON.parse(readFileSync(f.statePath, "utf8")).inputs["shell-recovery-input"].state, "received");
   await f.restoreCodex(0);
   const extraWindow = await f.extraCodexWindow(0);
   await f.pump(2);
@@ -434,7 +446,7 @@ test("holds inputs away from replacement shells and preserves batched progress a
   await waitFor(() => f.captured(0).length === 1);
   assert.deepEqual(f.captured(0), ["preserved until Codex returns"]);
   await f.pump(1);
-  assert.ok(f.accepted.some((reply) => reply.root === f.roots[0] && reply.text.includes("已提交到会话")));
+  assert.equal(f.attempts.length, 0, "recovered submission must remain silent");
 
   // Attach after the final already exists, then let task_complete arrive.
   f.rollouts[0] = `${f.rollouts[0]}.attached`;

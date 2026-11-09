@@ -269,7 +269,7 @@ make clean
 
 Telegram Topic names use `<project>` for both Codex and Claude Code.
 
-### Feishu receipts and status
+### Feishu input and status
 
 Reply `/relay status` (or `/relay-status`) inside the existing Feishu topic to
 query Relay directly, without sending a prompt to Codex. The reply includes the
@@ -277,10 +277,12 @@ last observed turn state, reply and timestamp, input-target checks, pending
 inputs, uncertain submissions, and pending outbound notifications. A live tmux
 session does not prove Codex is making progress; silence does not prove a hang.
 
-For ordinary Feishu input, Relay saves the input before submitting it and queues
-a receipt. `已提交到会话` means a paste and submit key reached the selected
-assistant pane, not that the model understood or followed the instruction.
-If no unique Codex/Claude pane is present, input remains pending. If Relay exits
+For ordinary Feishu input, Relay saves the input before submitting it silently.
+If no unique Codex/Claude pane is present, input remains pending without a reply;
+it is submitted when a unique assistant pane returns. Previously queued routine
+receipts are discarded on startup. Submission does not change Feishu's native
+read indicator; no public bot API for marking incoming messages read has been
+identified. If Relay exits
 during submission, the result is reported as uncertain after restart; it is not
 automatically reinjected, because that could execute an instruction twice.
 
@@ -294,7 +296,7 @@ need its next hook event before its transcript is registered.
 
 On first observation or a transcript switch, Relay restores recent turn context
 and starts at EOF; old conversation text is not replayed to Feishu. Pending
-progress, byte cursors, input receipts, and outbound notifications are stored
+progress, byte cursors, input states, and outbound notifications are stored
 together in the service's private `runtime/feishu-progress.json` journal. A
 missing/corrupt journal must not be replaced to resolve a delivery problem:
 corruption fails startup rather than silently discarding accepted work.
