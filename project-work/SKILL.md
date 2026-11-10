@@ -85,7 +85,6 @@ effects and required review remain subject to the delivery boundaries.
 | Prepare release notes | Release preparation | Derive a draft from the actual release contents; publishing follows release authorization |
 | Implement one Issue | Single delivery | Follow the lifecycle below in the current agent |
 | `$project-work issue_id=<issue>` | Isolated delivery | One worker, branch, worktree, and review request |
-| `$project-work parent_issue_id=<issue>` | Multi-Issue delivery | Decompose when needed and run only safe work in parallel |
 | Draft, review, or create a commit | Commit-only | Do not create an Issue or infer a push |
 | Plan delivery branches, push, deploy, promote, version, tag, release, or roll back an environment | Repository delivery | Reuse relevant tracking; create an Issue only for an outcome that warrants one |
 
@@ -105,7 +104,7 @@ authorize changes outside the target project.
 - Commit operations: [references/commits.md](references/commits.md)
 - Delivery branch planning, environments, and releases:
   [references/delivery.md](references/delivery.md)
-- Isolated or multi-Issue delivery only:
+- Isolated single-Issue delivery only:
   [references/orchestration.md](references/orchestration.md)
 - Immediately before spawning a worker:
   [references/worker-contract.md](references/worker-contract.md)
@@ -129,13 +128,12 @@ Issue open for the remaining delivery or acceptance work.
    steps. When branch creation is in scope, resolve its name and starting point
    from live repository and provider state.
 3. **Implement:** Change only the current Issue scope. Preserve unrelated
-   worktree changes. For concurrent work, give every writer its own branch and
-   worktree. Update the mapped board status at meaningful transitions using
-   `planning.md`.
+   worktree changes. Update the mapped board status at meaningful transitions
+   using `planning.md`.
 4. **Verify and integrate:** Prefer the cheapest real boundary that proves the
    acceptance criteria and review the diff. When delivery is authorized,
    publish through the project workflow, require remote CI or approvals when
-   applicable, and integrate concurrent work one review request at a time.
+   applicable.
    Use `reconciliation.md` to reconcile the Issue with current delivery evidence.
 5. **Close:** Confirm the completed commit is visible remotely and all required
    code, CI, environment, and product acceptance is complete. Reconcile every

@@ -66,10 +66,6 @@ Use the capability checks and calls in [provider-api.md](provider-api.md) only
 for operations needed by this task. Record-only work stops after capturing and
 verifying this planning state; it does not start implementation.
 
-For multi-Issue work, record each child's expected touch set, exclusive
-resources, exclusions, and dependencies. Create known children before coding
-and link their ordered list from the parent.
-
 If delivery reveals another independent outcome, stop that new work, update the
 plan, and create or link its Issue before implementation. In isolated
 single-Issue mode, report the additional scope instead of creating a child.
