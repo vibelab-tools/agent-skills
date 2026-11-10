@@ -18,12 +18,15 @@ else
     HOOK_INPUT=$(cat)
 fi
 
-# Remove internal memory citations before truncation can split their tags.
+# Remove internal memory citations before forwarding the full reply.
 SUMMARY=$(printf '%s' "$HOOK_INPUT" | jq -r '
     (.last_assistant_message // .message // .text // empty)
     | gsub("<oai-mem-citation>[\\s\\S]*?</oai-mem-citation>"; "")
     | select(test("\\S"))
-' 2>/dev/null | head -c 3000)
+' 2>/dev/null)
+
+TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
+TURN_ID=$(echo "$HOOK_INPUT" | jq -r '.turn_id // empty' 2>/dev/null)
 
 # Skip notification if no meaningful content
 if [ -z "$SUMMARY" ] || [ ${#SUMMARY} -lt 5 ]; then
@@ -42,7 +45,9 @@ curl -s -X POST "${DAEMON_URL}/notify" \
         --arg type "stop" \
         --arg text "$SUMMARY" \
         --arg tmuxSession "$TMUX_SESSION" \
-        '{type: $type, text: $text, tmuxSession: $tmuxSession}'
+        --arg transcriptPath "$TRANSCRIPT_PATH" \
+        --arg turnId "$TURN_ID" \
+        '{type: $type, text: $text, tmuxSession: $tmuxSession, transcriptPath: $transcriptPath, turnId: $turnId}'
     )" >/dev/null 2>&1
 
 exit 0

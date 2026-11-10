@@ -410,7 +410,7 @@ test("relays the current same-turn prompt's four images as the user without echo
   }
 });
 
-test("omits memory citations before truncating Stop replies sent to Feishu", async () => {
+test("omits memory citations from full Stop replies sent to Feishu", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-stop-citation-test-"));
   const homeDir = join(testDir, "home");
   const tmuxSession = "citation-test-abc123";

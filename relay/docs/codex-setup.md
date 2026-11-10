@@ -260,11 +260,73 @@ make clean
    uploaded into the matching Feishu Topic and sent as the authorized user,
    like the prompt text. Images are matched to the submitted prompt as well as
    its turn ID so follow-up input during an active turn keeps its own images.
-3. When a Codex turn ends, the `Stop` hook sends the final assistant reply.
+3. Feishu also receives user-facing intermediate Codex replies, coalesced over
+   30 seconds. Raw tools, reasoning, search arguments, and command output are
+   excluded. Questions and final replies flush pending progress immediately.
+   The `Stop` hook remains a final-reply fallback and still serves other IMs.
 4. Replies in a Telegram Topic, DingTalk group, or the latest Feishu relay
    Topic are injected back into the matching `codex-...` tmux session.
 
 Telegram Topic names use `<project>` for both Codex and Claude Code.
+
+### Feishu input and status
+
+Reply `/relay status` (or `/relay-status`) inside the existing Feishu topic to
+query Relay directly, without sending a prompt to Codex. The reply includes the
+last observed turn state, reply and timestamp, input-target checks, pending
+inputs, uncertain submissions, and pending outbound notifications. A live tmux
+session does not prove Codex is making progress; silence does not prove a hang.
+
+For ordinary Feishu input, Relay saves the input before submitting it. After a
+successful submission it adds one `OK` reaction to the original message, without
+a text receipt. This means submission, not task completion or model understanding.
+Reaction attempts are persisted before the API call and are not repeated after
+failure, timeout or restart, to avoid repeated notifications. Failed reactions
+are logged and do not resend the input or fall back to a text reply. Old already
+submitted inputs are not backfilled.
+If no unique Codex/Claude pane is present, input remains pending without a reply;
+it is submitted when a unique assistant pane returns. Previously queued routine
+receipts are discarded on startup. Submission does not change Feishu's native
+read indicator; no public bot API for marking incoming messages read has been
+identified. If Relay exits
+during submission, the result is reported as uncertain after restart; it is not
+automatically reinjected, because that could execute an instruction twice.
+
+The daemon reads exact transcript paths supplied by prompt/Stop hooks. Remote
+prompt origin checks register the path before suppressing the prompt echo.
+Existing standalone CLI sessions can also be discovered through their writer
+locks using `codex-progress.py resolve --owner-pid <pane-pid>`. Discovery never
+selects by project directory and does not resume a conversation. Ambiguous
+ownership is not guessed. A shared-daemon CLI or a different `CODEX_HOME` may
+need its next hook event before its transcript is registered.
+
+On first observation or a transcript switch, Relay restores recent turn context
+and starts at EOF; old conversation text is not replayed to Feishu. Pending
+progress, byte cursors, input states, and outbound notifications are stored
+together in the service's private `runtime/feishu-progress.json` journal. A
+missing/corrupt journal must not be replaced to resolve a delivery problem:
+corruption fails startup rather than silently discarding accepted work.
+
+Queued notifications are sent at most once per second across topics, with
+per-topic ordering and no idle heartbeat messages. Long replies are split at
+Unicode character boundaries. Failed notifications retry after 5 seconds with
+exponential backoff capped at 5 minutes and remain queued across restart.
+Tmux discovery and pane checks force UTF-8 output (`tmux -u`), since launchd
+may have no locale and tmux otherwise replaces tab separators with underscores.
+An unavailable topic can delay subsequent notifications in that topic; inspect
+the local journal/status and restore its binding or app permissions. Feishu
+API call quotas still apply to sending and editing messages; no quota increase
+or periodic card updates are assumed.
+
+Stable UUIDs reduce duplicate sends in Feishu's one-hour deduplication window.
+They do not provide an unlimited exactly-once guarantee if Feishu accepted a
+message but Relay exited before saving that success. Replaced/truncated
+transcripts are rebaselined without replay; same-inode rewrites that regrow
+past the saved byte position between polls cannot always be detected.
+
+Installing updated daemon/plugin files and trusting changed hooks is required
+before this behavior is active. Repository tests simulate the external Feishu
+service; they do not replace acceptance in the intended live Feishu topic.
 
 ## Automatic tmux progress sidebar
 

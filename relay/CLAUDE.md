@@ -32,6 +32,8 @@ Three components:
 - `scripts/codex-direct.sh` — direct launcher, clears proxies and bypasses the shared Codex daemon
 - `scripts/codex-resume-picker.py` — local cross-provider history list for terminal `resume`
 - `scripts/codex-capacity-retry.py` — per-tmux-server monitor, immediately continues eligible capacity errors without overwriting drafts
+- `daemon/src/feishu-progress.ts` — durable input receipts, topic-local status, and coalesced Codex replies with restart recovery
+- `daemon/src/codex-rollout.ts` — exact-path incremental reader; forwards user-facing messages and lifecycle events only
 
 `make install-codex-wrapper` installs these four tools together under the
 service's `bin` directory without rebuilding or restarting Relay. Keep this
