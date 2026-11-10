@@ -336,7 +336,7 @@ def tmux(*args, check=True):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("show", "watch", "snapshot"))
+    parser.add_argument("action", choices=("show", "watch", "snapshot", "resolve"))
     parser.add_argument("--thread", help="Exact root Codex thread ID")
     parser.add_argument("--owner-pid", type=int, help="Follow the standalone CLI owning these writer locks")
     parser.add_argument("--pane", default=os.environ.get("TMUX_PANE"))
@@ -344,6 +344,18 @@ def main():
     home = Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser().resolve()
     if not args.thread and not args.owner_pid:
         parser.error("需要 --thread 或 --owner-pid")
+    if args.action == "resolve":
+        # Resolve ownership only; do not read conversation text or select by cwd.
+        ids = owned_threads(args.owner_pid, home) if args.owner_pid else {args.thread}
+        with sqlite3.connect((home / "state_5.sqlite").as_uri() + "?mode=ro", uri=True, timeout=1) as connection:
+            connection.row_factory = sqlite3.Row
+            roots = [row for thread in ids for row in connection.execute(
+                "SELECT id,source,rollout_path FROM threads WHERE id=?", (thread,))
+                if not row["source"].startswith("{")]
+        if len(roots) != 1:
+            raise RuntimeError("无法唯一确定 Codex 会话；未改选其他会话")
+        print(json.dumps({"threadId": roots[0]["id"], "transcriptPath": roots[0]["rollout_path"]}))
+        return
     monitor = Monitor(home, args.thread, args.owner_pid)
     if args.action == "snapshot":
         for activity in monitor.refresh():

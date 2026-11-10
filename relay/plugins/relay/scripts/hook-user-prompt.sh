@@ -49,7 +49,8 @@ if [ -n "$TMUX_SESSION" ] && [ -n "$PROMPT_FINGERPRINT" ]; then
         -d "$(jq -n \
             --arg tmuxSession "$TMUX_SESSION" \
             --arg fingerprint "$PROMPT_FINGERPRINT" \
-            '{tmuxSession: $tmuxSession, fingerprint: $fingerprint}'
+            --arg transcriptPath "$TRANSCRIPT_PATH" \
+            '{tmuxSession: $tmuxSession, fingerprint: $fingerprint, transcriptPath: $transcriptPath}'
         )" 2>/dev/null | jq -r '.origin // "local"' 2>/dev/null)
     if [ "$ORIGIN" = "im" ]; then
         exit 0
