@@ -18,8 +18,12 @@ else
     HOOK_INPUT=$(cat)
 fi
 
-# 2026-03-17: Extract last_assistant_message directly from hook input
-SUMMARY=$(echo "$HOOK_INPUT" | jq -r '.last_assistant_message // .message // .text // empty' 2>/dev/null | head -c 3000)
+# Remove internal memory citations before truncation can split their tags.
+SUMMARY=$(printf '%s' "$HOOK_INPUT" | jq -r '
+    (.last_assistant_message // .message // .text // empty)
+    | gsub("<oai-mem-citation>[\\s\\S]*?</oai-mem-citation>"; "")
+    | select(test("\\S"))
+' 2>/dev/null | head -c 3000)
 
 # Skip notification if no meaningful content
 if [ -z "$SUMMARY" ] || [ ${#SUMMARY} -lt 5 ]; then

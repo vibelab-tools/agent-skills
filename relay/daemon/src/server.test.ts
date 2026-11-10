@@ -410,6 +410,108 @@ test("relays the current same-turn prompt's four images as the user without echo
   }
 });
 
+test("omits memory citations before truncating Stop replies sent to Feishu", async () => {
+  const testDir = mkdtempSync(join(tmpdir(), "relay-stop-citation-test-"));
+  const homeDir = join(testDir, "home");
+  const tmuxSession = "citation-test-abc123";
+  const tmux = startTmuxFixture([tmuxSession]);
+  const config = {
+    port: 0,
+    feishuChatId: "oc_test",
+    bindingsPath: join(testDir, "bindings.json"),
+  } as DaemonConfig;
+  const sessionManager = new SessionManager(config);
+  sessionManager.bindFeishu(tmuxSession, "om_session");
+  const feishuProvider = new FeishuProvider(config);
+  const replies: string[] = [];
+  const failures: unknown[] = [];
+  // Simulate only Feishu's API; run the hook, daemon, provider, and SDK normally.
+  const feishuApi = createServer(async (req, res) => {
+    try {
+      let result: unknown;
+      if (req.url === "/open-apis/auth/v3/tenant_access_token/internal") {
+        result = { code: 0, tenant_access_token: "test-app-token", expire: 7200 };
+      } else {
+        assert.equal(req.url, "/open-apis/im/v1/messages/om_session/reply");
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) chunks.push(Buffer.from(chunk));
+        const data = JSON.parse(Buffer.concat(chunks).toString());
+        assert.equal(data.reply_in_thread, true);
+        assert.equal(data.msg_type, "text");
+        replies.push(JSON.parse(data.content).text);
+        result = { code: 0, data: { message_id: `om_reply_${replies.length}` } };
+      }
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      failures.push(err);
+      res.writeHead(500);
+      res.end();
+    }
+  });
+  const server = new Server(config, sessionManager, new PromptOriginTracker(), null, null, feishuProvider);
+
+  try {
+    await new Promise<void>((resolve) => feishuApi.listen(0, "127.0.0.1", resolve));
+    const apiAddress = feishuApi.address() as AddressInfo;
+    const httpInstance = axios.create({ proxy: false });
+    httpInstance.interceptors.request.use((request) => {
+      request.url = `http://127.0.0.1:${apiAddress.port}${new URL(request.url!).pathname}`;
+      return request;
+    });
+    httpInstance.interceptors.response.use((response) => response.data);
+    (feishuProvider as any).client = new lark.Client({
+      appId: "test-app",
+      appSecret: "test-app-secret",
+      httpInstance: httpInstance as any,
+      loggerLevel: lark.LoggerLevel.error,
+    });
+    await server.start();
+    const address = (server as any).httpServer.address() as AddressInfo;
+    const relayHome = join(homeDir, ".vibelab-tools/agent-skills/relay");
+    mkdirSync(relayHome, { recursive: true });
+    writeFileSync(join(relayHome, "config.json"), JSON.stringify({ daemon: { port: address.port } }));
+
+    const answer = "已处理。\n\n- **版本**：`0.18.3`\n- [Issue #52](https://github.com/vibelab-tools/agent-skills/issues/52)\n- <custom-tag>保留普通标记</custom-tag>";
+    const citation = (entries: string) => [
+      "<oai-mem-citation>",
+      "<citation_entries>",
+      entries,
+      "</citation_entries>",
+      "<rollout_ids>",
+      "00000000-0000-0000-0000-000000000000",
+      "</rollout_ids>",
+      "</oai-mem-citation>",
+    ].join("\n");
+    const shortCitation = citation("MEMORY.md:1-2|note=[verification context]");
+    const longCitation = citation("MEMORY.md:1-2|note=[verification context]\n".repeat(100));
+    for (const input of [
+      { last_assistant_message: answer },
+      { last_assistant_message: `${answer}\n\n${shortCitation}` },
+      { message: `${answer}\n\n${longCitation}\n\n后续正文保留。` },
+      { text: `${shortCitation}${answer}\n\n${shortCitation}` },
+      { last_assistant_message: `  \n${shortCitation}\n   ` },
+    ]) {
+      await runHook(STOP_HOOK, input, homeDir, tmux.environment(tmuxSession));
+    }
+    assert.deepEqual(failures, []);
+    const mention = '<at user_id="all">所有人</at> ';
+    assert.deepEqual(replies, [
+      mention + answer,
+      mention + answer,
+      mention + answer + "\n\n\n\n后续正文保留。",
+      mention + answer,
+    ]);
+  } finally {
+    server.stop();
+    feishuProvider.disconnect();
+    feishuApi.closeAllConnections();
+    await new Promise<void>((resolve) => feishuApi.close(() => resolve()));
+    tmux.close();
+    rmSync(testDir, { recursive: true, force: true });
+  }
+});
+
 test("routes direct and shared app-server hooks without guessing ambiguous sessions", async () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-stop-routing-test-"));
   const homeDir = join(testDir, "home");
