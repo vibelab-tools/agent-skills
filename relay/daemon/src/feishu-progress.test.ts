@@ -385,6 +385,38 @@ test("routes busy-session inputs and coalesced progress across two topics, with 
   assert.deepEqual(f.captured(1), ["other topic prompt"]);
 });
 
+test("filters transcript and hook memory citations before chunking without duplicate or empty Feishu replies", async (t) => {
+  const f = await fixture(t);
+  const answer = "已处理。\n\n- **版本**：`0.18.3`\n- [Issue #52](https://github.com/vibelab-tools/agent-skills/issues/52)";
+  const citation = "<oai-mem-citation>\n<citation_entries>\n" +
+    "MEMORY.md:1-2|note=[verification context]\n".repeat(300) +
+    "</citation_entries>\n<rollout_ids>\n00000000-0000-0000-0000-000000000000\n</rollout_ids>\n</oai-mem-citation>";
+  // No turn IDs: deduplicate the cleaned hook against the raw transcript text.
+  appendFileSync(f.rollouts[0], message(answer + "\n\n" + citation, "final_answer"));
+  await f.pump(5);
+  await f.post("/notify", { type: "stop", tmuxSession: f.sessions[0], text: answer });
+  await f.pump(3);
+  assert.deepEqual(f.accepted.map(({ root, text }) => ({ root, text })), [
+    { root: f.roots[0], text: '<at user_id="all">所有人</at> ' + answer + "\n\n" },
+  ]);
+
+  const longAnswer = "完整正文保留。".repeat(600);
+  await f.post("/notify", { type: "stop", tmuxSession: f.sessions[1], text: longAnswer + citation });
+  await f.pump(6);
+  assert.equal(f.accepted.filter((reply) => reply.root === f.roots[1])
+    .map((reply) => reply.text.replace(/^<at user_id="all">所有人<\/at> /, "")).join(""), longAnswer);
+
+  const delivered = f.accepted.length;
+  appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "citation-only" }) +
+    message(citation, "final_answer") + record("event_msg", { type: "task_complete", turn_id: "citation-only" }));
+  await f.post("/notify", { type: "stop", tmuxSession: f.sessions[1], text: citation, turnId: "citation-only-hook" });
+  await f.pump(4);
+  await f.restart();
+  await f.pump(3);
+  assert.equal(f.accepted.length, delivered, "metadata-only replies must not produce blank messages or completion fallbacks");
+  assert.equal(f.attempts.some((reply) => /oai-mem-citation|MEMORY\.md|rollout_ids/.test(reply.text)), false);
+});
+
 test("recovers an actual failed Feishu final delivery from disk after fresh service instances without reinjecting inputs", async (t) => {
   const f = await fixture(t);
   f.failReaction();

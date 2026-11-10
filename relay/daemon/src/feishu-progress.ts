@@ -345,6 +345,8 @@ export class FeishuProgress {
   }
 
   private enqueue(id: string, root: string, text: string, attention: boolean): void {
+    text = stripMemoryCitations(text);
+    if (!text.trim()) return;
     const characters = Array.from(text);
     for (let offset = 0; offset < characters.length; offset += CHUNK_LENGTH) {
       const key = `${id}:${offset}`;
@@ -403,7 +405,11 @@ export class FeishuProgress {
 
 function hash(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 
+function stripMemoryCitations(text: string): string {
+  return text.replace(/<oai-mem-citation>[\s\S]*?<\/oai-mem-citation>/g, "");
+}
+
 function sameFinalText(previous: string | undefined, text: string): boolean {
   // Shell command substitution removes trailing newlines from Stop hook text.
-  return previous !== undefined && previous.replace(/\n+$/, "") === text.replace(/\n+$/, "");
+  return previous !== undefined && stripMemoryCitations(previous).replace(/\n+$/, "") === stripMemoryCitations(text).replace(/\n+$/, "");
 }
