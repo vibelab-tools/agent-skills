@@ -130,10 +130,11 @@ export function readCodexRollout(filePath: string, cursor: CodexCursor): CodexEv
           delete cursor.finalOffset;
           emit("started", offset, timestamp);
         } else if (payload.type === "task_complete") {
-          if (cursor.finalOffset === undefined && typeof payload.last_agent_message === "string" && payload.last_agent_message.trim()) {
+          const failed = payload.error !== undefined && payload.error !== null;
+          if (!failed && cursor.finalOffset === undefined && typeof payload.last_agent_message === "string" && payload.last_agent_message.trim()) {
             emit("final", offset, timestamp, payload.last_agent_message);
           }
-          cursor.status = "complete";
+          cursor.status = failed ? "failed" : "complete";
           emit("terminal", offset, timestamp);
         } else if (payload.type === "turn_aborted") {
           cursor.status = "aborted";

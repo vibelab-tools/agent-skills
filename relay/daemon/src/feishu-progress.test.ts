@@ -317,6 +317,47 @@ const message = (text: string, phase = "commentary") => record("response_item", 
   type: "message", role: "assistant", phase, content: [{ type: "output_text", text }],
 });
 
+test("notifies terminal failures and interruptions in order, retries across restart, then delivers a successful turn", async (t) => {
+  const f = await fixture(t);
+  appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "failed-turn" }) +
+    message("work before the failure") +
+    // Codex 0.167.1 persists exhausted model errors in task_complete.error.
+    record("event_msg", { type: "task_complete", turn_id: "failed-turn", last_agent_message: "stale fallback", error: {
+      message: "private upstream error must stay in the terminal", codex_error_info: "other",
+    } }));
+  f.fail("本轮因错误结束");
+  await f.pump(2);
+  assert.ok(f.progress.status(f.roots[0]).includes("本轮因错误结束"));
+  assert.deepEqual(f.accepted.map((reply) => reply.text), ["work before the failure"]);
+  const failedAttempt = f.attempts.find((reply) => reply.text.includes("本轮因错误结束"));
+  assert.ok(failedAttempt, "terminal failure must follow preceding progress promptly");
+  assert.equal(failedAttempt.root, f.roots[0]);
+  assert.equal(f.attempts.some((reply) => /private upstream|stale fallback/.test(reply.text)), false);
+
+  await f.restart();
+  f.fail();
+  await f.pump(6);
+  const deliveredFailure = f.accepted.filter((reply) => reply.text.includes("本轮因错误结束"));
+  assert.equal(deliveredFailure.length, 1);
+  assert.equal(deliveredFailure[0].uuid, failedAttempt.uuid, "retry retains the durable delivery identity");
+
+  appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "interrupted-turn" }) +
+    record("event_msg", { type: "turn_aborted", turn_id: "interrupted-turn", reason: "interrupted" }));
+  await f.pump(2);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("本轮已中断")).length, 1);
+  await f.restart();
+  appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "recovered-turn" }) +
+    message("successful later turn", "final_answer") +
+    record("event_msg", { type: "task_complete", turn_id: "recovered-turn", last_agent_message: "successful later turn", error: null }));
+  await f.pump(4);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("本轮已中断")).length, 1);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("本轮因错误结束")).length, 1);
+  assert.equal(f.accepted.filter((reply) => reply.text.includes("successful later turn")).length, 1);
+  assert.ok(f.accepted.every((reply) => reply.root === f.roots[0]), "never notify the other session topic");
+  assert.equal(JSON.parse(readFileSync(f.statePath, "utf8")).outbox.length, 0);
+  assert.ok(f.progress.status(f.roots[0]).includes("最近记录：本轮已结束"));
+});
+
 test("routes busy-session inputs and coalesced progress across two topics, with local status and final hook deduplication", async (t) => {
   const f = await fixture(t);
   await f.incoming(0, "input-a-1", "first live prompt");

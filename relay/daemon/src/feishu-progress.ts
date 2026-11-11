@@ -190,7 +190,7 @@ export class FeishuProgress {
   status(root: string): string {
     const topic = this.state.topics[root];
     if (!topic) return "Relay 尚未记录此话题的 Codex 进展。";
-    const labels: Record<string, string> = { started: "本轮已开始", progress: "有新的过程回复", waiting: "等待你的回答", final: "已生成本轮最终回复", complete: "本轮已结束", aborted: "本轮已中断" };
+    const labels: Record<string, string> = { started: "本轮已开始", progress: "有新的过程回复", waiting: "等待你的回答", final: "已生成本轮最终回复", complete: "本轮已结束", aborted: "本轮已中断", failed: "本轮因错误结束" };
     const queued = Object.values(this.state.inputs).filter((input) => input.root === root && input.state === "received").length;
     const uncertain = Object.values(this.state.inputs).filter((input) => input.root === root && input.state === "uncertain").length;
     const pending = this.state.outbox.filter((item) => item.root === root).length;
@@ -327,7 +327,10 @@ export class FeishuProgress {
       if (topic.finalText && !topic.finalTurn) topic.finalTurn = event.turnId;
       if (event.status === "aborted") {
         this.flushProgress(root, topic);
-        this.enqueue(event.id, root, "Codex 本轮已中断。最近记录不代表任务目标已完成。", true);
+        this.enqueue(event.id, root, "⚠️ Codex 本轮已中断，未正常完成。如需继续，可发送“请继续”。", true);
+      } else if (event.status === "failed") {
+        this.flushProgress(root, topic);
+        this.enqueue(event.id, root, "⚠️ Codex 本轮因错误结束，未正常完成。请查看终端错误信息，确认后再发送“请继续”。", true);
       } else if (!topic.finalText) {
         this.flushProgress(root, topic);
         this.enqueue(event.id, root, "Codex 本轮已结束，尚未记录最终回复。这不代表任务目标已完成。", true);
