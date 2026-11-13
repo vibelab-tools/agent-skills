@@ -8,7 +8,6 @@ worker one complete prompt; do not rely on shared chat context.
 ```text
 Role: implementation worker; the parent agent is the only integrator.
 
-Mode: <parent_issue_id or issue_id>
 Repository: <absolute repository root>
 Authoritative remote: <remote name and URL>
 Provider: <GitHub or GitLab and hostname>
@@ -16,7 +15,6 @@ Default branch: <name>
 Base SHA: <remote default-branch SHA>
 
 Selected issue: <URL and IID>
-Parent issue: <URL or None in issue_id mode>
 Implementation issue: <URL and IID>
 Dependencies: <merged Issue or review URLs or None>
 Acceptance criteria: <verbatim durable criteria>
@@ -64,7 +62,7 @@ worktree path.
 
 Treat the worker's summary as a lead, not proof. The controller independently
 inspects the remote branch, review request, diff, CI, and Issue state before
-placing it in the merge-ready queue.
+merging the review request.
 
 Review added tests against the concrete regression and acceptance criteria.
 Reject mock-only adapter assertions as acceptance evidence; passing test counts

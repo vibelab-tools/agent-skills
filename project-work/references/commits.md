@@ -41,7 +41,7 @@ Refs #123
 Use `Closes #123` only when publishing the commit itself completes every
 closure criterion and no post-push CI, deployment, or product acceptance
 remains. Otherwise use `Refs #123` and close explicitly after remote
-verification. Isolated and multi-Issue worker commits and review requests
+verification. Isolated worker commits and review requests
 always use `Refs`. Use a cross-project reference or full URL when `#123` is
 ambiguous.
 

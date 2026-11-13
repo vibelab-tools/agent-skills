@@ -80,8 +80,8 @@ git switch -c <resolved-issue-branch>
 ```
 
 Use this `git switch` sequence only for single delivery in a clean checkout.
-Isolated and multi-Issue delivery create dedicated worktrees as described in
-`orchestration.md` and never switch the user's original checkout.
+Isolated single-Issue delivery creates a dedicated worktree as described in
+`orchestration.md` and never switches the user's original checkout.
 
 ## Verify Development Delivery
 
