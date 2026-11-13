@@ -11,7 +11,7 @@ import { DaemonConfig } from "./types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-test("skips missing Feishu bindings and removes them only after the grace period", () => {
+test("expires missing Feishu bindings after grace but retains flagged history", () => {
   const testDir = mkdtempSync(join(tmpdir(), "relay-session-test-"));
   const config = { bindingsPath: join(testDir, "bindings.json") } as DaemonConfig;
 
@@ -19,6 +19,8 @@ test("skips missing Feishu bindings and removes them only after the grace period
     const manager = new SessionManager(config);
     manager.bindFeishu("live", "om_live", 500);
     manager.bindFeishu("missing", "om_missing", 500);
+    manager.bindFeishu("history", "om_history", 500);
+    manager.findByTmuxSession("history")!.feishuKeepHistory = true;
     manager.initializeFeishuRecovery(1000);
 
     assert.deepEqual(
@@ -33,6 +35,12 @@ test("skips missing Feishu bindings and removes them only after the grace period
     manager.reconcileFeishuBindings(new Set(["live"]), 2000 + DAY_MS);
     assert.equal(manager.findByTmuxSession("missing"), undefined);
     assert.ok(manager.findByTmuxSession("live"));
+    const reloaded = new SessionManager(config);
+    assert.deepEqual(reloaded.reconcileFeishuBindings(new Set(), 2000 + 3 * DAY_MS), []);
+    assert.equal(reloaded.findByTmuxSession("history")?.feishuRootMessageId, "om_history");
+    assert.equal(reloaded.findByTmuxSession("history")?.feishuKeepHistory, true);
+    assert.deepEqual(reloaded.reconcileFeishuBindings(new Set(["history"]), 2001 + 3 * DAY_MS).map((item) => item.rootMessageId), ["om_history"]);
+    assert.equal(reloaded.findByTmuxSession("history")?.feishuMissingSince, undefined);
   } finally {
     rmSync(testDir, { recursive: true, force: true });
   }

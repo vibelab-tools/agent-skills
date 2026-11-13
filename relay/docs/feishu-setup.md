@@ -199,6 +199,27 @@ Feishu uses one stable topic root per session to keep messages grouped and routa
 No manual topic creation is required. Each Claude Code or Codex session creates
 its topic automatically and keeps using that binding.
 
+### Codex interruptions and errors
+
+Relay's Codex progress reader sends an attention notification in the existing
+topic when the tracked transcript records `turn_aborted` or a `task_complete`
+with a non-null `error`. The latter is a failed turn, even though the event
+name contains "complete". Successful completions with a null or absent error
+keep their normal reply behavior.
+
+The notifications say “⚠️ Codex 本轮已中断” or “⚠️ Codex 本轮因错误结束”.
+They describe the current turn; they do not claim that the whole session exited.
+Raw upstream error details stay in the terminal. Pending progress is delivered
+first, and terminal notifications use the existing durable retry queue and
+restart deduplication. Relay does not submit a continuation automatically.
+
+This requires Relay to be running and tracking the correct Codex transcript.
+Codex CLI 0.167.1 was verified to record the terminal's “Conversation interrupted”
+message as `turn_aborted`, and an exhausted model request error as
+`task_complete.error`. Silence, a transient reconnection, or a process crash
+without a persisted terminal event does not trigger an interruption notice.
+Use `/relay status` in the topic to inspect the last observed state.
+
 ## Platform Comparison
 
 | Feature | Telegram | DingTalk | Feishu |

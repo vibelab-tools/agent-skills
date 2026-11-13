@@ -10,6 +10,7 @@ Bidirectional IM relay for [Claude Code](https://docs.anthropic.com/en/docs/clau
 - **Unified daemon**: Single background process manages all sessions and IM connections
 - **Claude + Codex support**: Claude Code plugin hooks and Codex lifecycle hooks reuse the same daemon
 - **Per-project isolation**: Each agent/project gets its own Telegram Topic and/or DingTalk group
+- **Optional OmniLume incidents**: [Authenticated task alerts](docs/task-alerts.md) persist and coalesce failures, then submit to an existing idle Feishu-bound Codex session
 
 ## How It Works
 

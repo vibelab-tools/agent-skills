@@ -16,6 +16,7 @@ import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
 import { PromptOriginTracker } from "./prompt-origin";
+import { FeishuProgress } from "./feishu-progress";
 
 const log = createLogger("server");
 const TRANSCRIPT_TAIL_BYTES = 2 * 1024 * 1024;
@@ -39,7 +40,8 @@ export class Server {
     promptOrigins: PromptOriginTracker,
     telegramProvider: IMProvider | null,
     dingtalkProvider?: IMProvider | null,
-    feishuProvider?: FeishuProvider | null
+    feishuProvider?: FeishuProvider | null,
+    private feishuProgress?: FeishuProgress | null
   ) {
     this.config = config;
     this.sessionManager = sessionManager;
@@ -149,9 +151,12 @@ export class Server {
       return;
     }
 
+    if (body.type === "user_prompt") this.feishuProgress?.observeLocalPrompt(tmuxSession);
+
     // 2026-03-18: Send message content directly without type prefix
     const text = body.text;
-    const singleIdentityText = formatSingleIdentityText(body.type, text);
+    const singleIdentityText = formatSingleIdentityText(body.type,
+      body.type === "stop" ? Buffer.from(text).subarray(0, 3000).toString("utf8") : text);
 
     // 2026-03-18: Send to all configured providers with their respective IDs
     const results: boolean[] = [];
@@ -181,12 +186,16 @@ export class Server {
       if (rootMsgId) {
         feishuRootMessageId = rootMsgId;
         binding = this.sessionManager.findByTmuxSession(tmuxSession);
-        results.push(await this.feishuProvider.send({
+        if (this.feishuProgress && body.type !== "user_prompt") {
+          this.feishuProgress.notify(rootMsgId, { ...body, tmuxSession });
+          results.push(true); // Accepted into the durable delivery journal.
+        } else results.push(await this.feishuProvider.send({
           topicId: rootMsgId,
           text,
           mentionAll: body.type === "stop" || body.type === "ask_user",
           sendAsUser: body.type === "user_prompt",
         }));
+        this.feishuProgress?.track(tmuxSession, body.transcriptPath);
       }
     }
     const success = results.some((r) => r);
@@ -364,9 +373,11 @@ export class Server {
       return;
     }
 
+    this.feishuProgress?.track(body.tmuxSession, body.transcriptPath);
     const origin = this.promptOrigins.consume(body.tmuxSession, body.fingerprint)
       ? "im"
       : "local";
+    if (origin === "local") this.feishuProgress?.observeLocalPrompt(body.tmuxSession);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ origin }));
   }
@@ -415,13 +426,11 @@ function detectTmuxSession(): string | undefined {
 
 function formatSessionTitle(tmuxSession: string): string {
   const projectName = deriveProjectName(tmuxSession);
-  return `🔗 ${projectName}`;
+  return `🔗${projectName}`;
 }
 
 function deriveProjectName(tmuxSession: string): string {
-  return tmuxSession
-    .replace(/^(claude|codex)-/, "")
-    .replace(/-[0-9a-f]{6}$/i, "");
+  return tmuxSession.replace(/-[0-9a-f]{6}$/i, "");
 }
 
 async function readPromptImagePaths(

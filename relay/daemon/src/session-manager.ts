@@ -196,7 +196,7 @@ export class SessionManager {
         binding.feishuMissingSince = now;
         changed = true;
       }
-      if (now - binding.feishuMissingSince < graceMs) {
+      if (binding.feishuKeepHistory || now - binding.feishuMissingSince < graceMs) {
         retained.push(binding);
       } else {
         changed = true;

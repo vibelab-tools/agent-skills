@@ -9,7 +9,18 @@ export interface ProxyConfig {
   url: string;
 }
 
+export interface AlertConfig {
+  host: string;
+  port: number;
+  signing_secret: string;
+  tmux_session: string;
+  environment: string;
+  base_url: string;
+  policy: string;
+}
+
 export interface DaemonConfig {
+  alerts?: AlertConfig;
   port: number;
   relayHome: string;
   workerUrl: string;
@@ -47,6 +58,7 @@ export interface SessionBinding {
   feishuLastMessageIds?: string[];
   feishuRecentMessageIds?: string[];
   feishuMissingSince?: number;
+  feishuKeepHistory?: boolean;
   createdAt: number;
 }
 
@@ -101,6 +113,7 @@ export interface NotifyRequest {
 export interface PromptOriginRequest {
   tmuxSession: string;
   fingerprint: string;
+  transcriptPath?: string;
 }
 
 /** POST /bind request */

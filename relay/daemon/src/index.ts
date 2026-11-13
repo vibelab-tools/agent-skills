@@ -28,8 +28,9 @@ import { requestJson } from "./http";
 import { summarizeError } from "./proxy";
 // 2026-03-20: Use pino for structured logging
 import { createLogger } from "./logger";
-import { Attachment } from "./types";
 import { injectRemotePrompt, PromptOriginTracker } from "./prompt-origin";
+import { FeishuProgress } from "./feishu-progress";
+import { TaskAlerts } from "./task-alerts";
 
 const log = createLogger("daemon");
 
@@ -89,35 +90,14 @@ async function main(): Promise<void> {
 
   // 2026-03-18: Feishu provider (via WebSocket, thread-based topic isolation)
   let feishuProvider: FeishuProvider | null = null;
+  let feishuProgress: FeishuProgress | null = null;
   if (config.feishuAppId && config.feishuAppSecret) {
     feishuProvider = new FeishuProvider(config);
+    feishuProgress = new FeishuProgress(
+      path.join(config.relayHome, "feishu-progress.json"), sessionManager, promptOrigins, feishuProvider
+    );
     feishuProvider.onMessage((msg, rootMessageId) => {
-      const binding = sessionManager.findByFeishuRootMessage(rootMessageId);
-      if (!binding) {
-        log.warn({ rootMessageId }, "No binding for Feishu root message");
-        return false;
-      }
-      const createdAt = msg.createdAtMs || msg.timestamp * 1000;
-      if (sessionManager.hasSeenFeishuMessage(rootMessageId, msg.id)) {
-        return true;
-      }
-      if (!sessionExists(binding.tmuxSession)) {
-        log.warn({ tmuxSession: binding.tmuxSession }, "tmux session not found");
-        return false;
-      }
-      // 2026-03-20: Build injection text with attachment file paths for agent sessions
-      const injectionText = buildInjectionText(msg.text, msg.attachments);
-      log.info({ tmuxSession: binding.tmuxSession }, "Injecting Feishu message");
-      if (injectRemotePrompt(
-        promptOrigins,
-        binding.tmuxSession,
-        injectionText,
-        injectText
-      )) {
-        sessionManager.rememberFeishuMessage(rootMessageId, msg.id);
-        return true;
-      }
-      return false;
+      return feishuProgress!.receive(msg, rootMessageId);
     });
     await feishuProvider.connect();
     feishuProvider.startRecovery({
@@ -130,6 +110,7 @@ async function main(): Promise<void> {
       },
     });
     enabledProviders.push(feishuProvider.name);
+    feishuProgress.start();
   }
 
   // Initialize server with all providers
@@ -139,11 +120,14 @@ async function main(): Promise<void> {
     promptOrigins,
     telegramProvider,
     dingtalkProvider,
-    feishuProvider
+    feishuProvider,
+    feishuProgress
   );
 
   // Start server and poller
   await server.start();
+  const taskAlerts = config.alerts ? new TaskAlerts(config.alerts, config.relayHome, feishuProgress) : null;
+  await taskAlerts?.start();
   if (poller) {
     poller.start();
   }
@@ -162,6 +146,8 @@ async function main(): Promise<void> {
       poller.stop();
     }
     server.stop();
+    taskAlerts?.stop();
+    feishuProgress?.stop();
     if (dingtalkProvider) {
       dingtalkProvider.disconnect();
     }
@@ -176,22 +162,6 @@ async function main(): Promise<void> {
   process.on("SIGTERM", shutdown);
 
   log.info({ providers: enabledProviders }, "Ready");
-}
-
-// 2026-03-20: Build tmux injection text that includes file paths for attachments
-// NOTE: Must be single-line because tmux send-keys -l treats \n as Enter key
-function buildInjectionText(text: string, attachments?: Attachment[]): string {
-  const parts: string[] = [];
-  if (text) {
-    parts.push(text);
-  }
-  if (attachments && attachments.length > 0) {
-    const fileList = attachments
-      .map((a) => `${a.fileName} (${a.mimeType || "unknown type"}): ${a.filePath}`)
-      .join(", ");
-    parts.push(`[Attached files: ${fileList}]`);
-  }
-  return parts.join(" ") || "";
 }
 
 function telegramIsConfigured(config: ReturnType<typeof loadConfig>): boolean {

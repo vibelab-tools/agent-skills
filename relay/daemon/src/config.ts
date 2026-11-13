@@ -7,7 +7,7 @@ import * as os from "os";
 import * as path from "path";
 import * as crypto from "crypto";
 import * as fs from "fs";
-import { DaemonConfig, ProxyConfig } from "./types";
+import { AlertConfig, DaemonConfig, ProxyConfig } from "./types";
 
 /**
  * Generate a stable machine ID based on hostname.
@@ -28,6 +28,7 @@ type RawProxyConfig = {
 };
 
 type RawRelayConfig = {
+  alerts?: unknown;
   daemon?: {
     port?: number | string;
     machine_id?: string;
@@ -115,6 +116,7 @@ export function loadConfig(): DaemonConfig {
   const relayDir = path.join(serviceRoot(), "runtime");
 
   return {
+    alerts: parseAlertConfig(raw.alerts),
     port: parseNumber(raw.daemon?.port ?? legacyEnv(raw, "RELAY_DAEMON_PORT"), 3580),
     relayHome: relayDir,
     workerUrl: raw.worker?.url || legacyEnv(raw, "RELAY_WORKER_URL") || legacyEnv(raw, "CLAUDE_RELAY_WORKER_URL") || "",
@@ -138,4 +140,30 @@ export function loadConfig(): DaemonConfig {
     dingtalkProxy: loadProxyConfig(raw.dingtalk?.proxy, raw, "DINGTALK"),
     feishuProxy: loadProxyConfig(raw.feishu?.proxy, raw, "FEISHU"),
   };
+}
+
+/** An explicit alert block must be complete; never silently enable broad defaults. */
+export function parseAlertConfig(raw: unknown): AlertConfig | undefined {
+  if (raw === undefined) return undefined;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("alerts must be an object");
+  const value = raw as Record<string, unknown>;
+  const keys = ["host", "port", "signing_secret", "tmux_session", "environment", "base_url", "policy"];
+  if (Object.keys(value).some((key) => !keys.includes(key))) throw new Error("Unknown alerts configuration field");
+  for (const key of keys.filter((key) => key !== "port")) {
+    if (typeof value[key] !== "string" || !(value[key] as string).trim()) throw new Error(`alerts.${key} is required`);
+  }
+  if (!Number.isInteger(value.port) || (value.port as number) < 1 || (value.port as number) > 65535) throw new Error("Invalid alerts.port");
+  // Bind only literal loopback/private addresses, never wildcard/public/DNS names.
+  const host = value.host as string;
+  const octets = host.split(".");
+  const ipv4 = octets.length === 4 && octets.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255);
+  if (!ipv4 || !(octets[0] === "127" || octets[0] === "10" || (octets[0] === "172" && Number(octets[1]) >= 16 && Number(octets[1]) <= 31) || (octets[0] === "192" && octets[1] === "168"))) throw new Error("alerts.host must be a literal private or loopback IPv4 address");
+  if ((value.signing_secret as string).length < 32 || (value.signing_secret as string).length > 1024) throw new Error("alerts.signing_secret must contain 32 to 1024 characters");
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(value.tmux_session as string)) throw new Error("Invalid alerts.tmux_session");
+  if ((value.environment as string).length > 64 || /[\p{Cc}\p{Cf}]/u.test(value.environment as string)) throw new Error("Invalid alerts.environment");
+  if ((value.policy as string).length > 16000) throw new Error("alerts.policy is too long");
+  let url: URL;
+  try { url = new URL(value.base_url as string); } catch { throw new Error("Invalid alerts.base_url"); }
+  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash || url.pathname !== "/") throw new Error("alerts.base_url must be an HTTP(S) origin");
+  return { ...value, base_url: url.origin } as unknown as AlertConfig;
 }
