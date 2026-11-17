@@ -90,6 +90,17 @@ an incident; events without a business identity group by job. Distinct business
 identities stay separate. The listener accepts events while Codex is busy or
 offline; the queue survives restart independently of the sender.
 
+Each newly accepted alert also queues a visible receipt in that session's bound
+Feishu topic, even while Codex is busy or offline. It includes the environment,
+job ID, stage, a bounded error summary and the original task link. The receipt
+confirms durable intake and waiting for automatic processing, not that processing
+has started or recovery succeeded. The existing durable Feishu outbox retries
+delivery failures with stable message IDs. Duplicate alert keys do not add
+receipts; grouped incidents still acknowledge each new alert. Older journals
+remain compatible and do not replay historical receipts on upgrade. Ordinary
+human input retains its existing silent receipt behavior. No new configuration
+field is required.
+
 Before any paste, Relay reads the exact owned transcript and requires:
 
 - An existing Feishu binding to the configured tmux session.

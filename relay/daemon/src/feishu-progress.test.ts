@@ -664,10 +664,36 @@ test("HTTP alert batches wait for owned idle Codex, reconcile actual submissions
   const journal = () => JSON.parse(readFileSync(queuePath, "utf8"));
   const injections = () => f.captured(0).filter((line) => line.startsWith("Relay task-alert incident ")).length;
   await send(event("a"));
+  await send(event("a")); // Transport retries must not create extra receipts.
   await send(event("b"));
   await send(event("c", "2".repeat(32)));
+  f.fail("任务失败告警已接收");
   await alerts.tick();
   assert.equal(injections(), 0, "unknown transcript status is not idle");
+  await f.pump(1);
+  assert.equal(f.attempts.filter((reply) => reply.text.includes("任务失败告警已接收")).length, 1);
+  assert.equal(f.accepted.length, 0, "Feishu outage retains the receipt for retry");
+  // Recreate the crash window after the outbox commits but before the intake
+  // journal clears its receipt intent. Stable message IDs prevent duplication.
+  const receiptCut = journal();
+  receiptCut.incidents[0].receiptPending = ["failure:a"];
+  writeFileSync(queuePath, JSON.stringify(receiptCut));
+  await f.restart();
+  await receiver();
+  await send(event("a"));
+  await alerts.tick();
+  await f.pump(1);
+  assert.equal(f.attempts.length, 1, "restart preserves retry backoff");
+  f.fail();
+  f.now += 5_000;
+  await f.pump(3);
+  const receipts = f.accepted.filter((reply) => reply.text.includes("任务失败告警已接收"));
+  assert.equal(receipts.length, 3, "one receipt per new alert, including grouped items");
+  assert.ok(receipts.every((reply) => reply.root === f.roots[0] &&
+    reply.text.includes("环境：production") && reply.text.includes("阶段：render") &&
+    reply.text.includes("错误摘要：Untrusted error") && reply.text.includes("https://studio.example.test/jobs") &&
+    reply.text.includes("仅确认告警已送达")));
+  assert.equal(injections(), 0, "receipt delivery never waits for or interrupts agent work");
   appendFileSync(f.rollouts[0], record("event_msg", { type: "task_started", turn_id: "existing-busy" }));
   await alerts.tick();
   assert.equal(injections(), 0, "running human work must not receive alert input");

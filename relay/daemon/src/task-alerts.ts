@@ -38,6 +38,7 @@ interface Incident {
   repair_outcome: "unknown";
   notice?: string;
   notified?: boolean;
+  receiptPending?: string[];
 }
 interface Journal { version: 1; route: { tmux_session: string; environment: string; base_url: string }; incidents: Incident[]; dedup: Record<string, string>; }
 type Automation = Pick<FeishuProgress, "automationStatus" | "submitAutomation" | "reportAutomation">;
@@ -99,6 +100,9 @@ export class TaskAlerts {
           if (Object.hasOwn(expected, event.alert_key) || incident.group !== this.group(event)) throw new Error("Invalid task-alert incident identity");
           expected[event.alert_key] = incident.id;
         }
+        if (incident.receiptPending !== undefined && (!Array.isArray(incident.receiptPending) ||
+            new Set(incident.receiptPending).size !== incident.receiptPending.length ||
+            incident.receiptPending.some((key) => !incident.events.some((event) => event.alert_key === key)))) throw new Error("Invalid task-alert receipt journal");
       }
       if (Object.keys(expected).length !== Object.keys(this.journal.dedup).length || Object.entries(expected).some(([key, id]) => this.journal.dedup[key] !== id) || this.journal.incidents.filter((entry) => ["submitting", "submitted", "uncertain"].includes(entry.state)).length > 1) throw new Error("Invalid task-alert deduplication journal");
     } catch (error: any) {
@@ -172,6 +176,7 @@ export class TaskAlerts {
         this.journal.incidents.push(incident);
       }
       incident.events.push(event);
+      (incident.receiptPending ??= []).push(event.alert_key);
       this.journal.dedup[event.alert_key] = incident.id;
       try { this.save(); } catch (error) { this.journal = previous; throw error; }
     }
@@ -183,6 +188,15 @@ export class TaskAlerts {
     this.ticking = true;
     try {
       for (const incident of this.journal.incidents) {
+        // Only newly accepted alerts have pending receipts. Older journals do
+        // not replay historical failures when this version is installed.
+        for (const key of [...(incident.receiptPending ?? [])]) {
+          const event = incident.events.find((entry) => entry.alert_key === key)!;
+          if (this.automation.reportAutomation(this.config.tmux_session, `receipt:${key}`, this.receipt(event))) {
+            incident.receiptPending = incident.receiptPending!.filter((entry) => entry !== key);
+            this.save(); // The independent Feishu outbox now owns delivery/retry.
+          }
+        }
         if (incident.notice && !incident.notified) {
           if (this.automation.reportAutomation(this.config.tmux_session, incident.id, incident.notice)) {
             incident.notified = true;
@@ -229,6 +243,18 @@ export class TaskAlerts {
   }
   private inputId(incident: Incident): string { return `task-alert:${incident.id}`; }
   private save(): void { writeDurableJson(this.statePath, this.journal); }
+  private receipt(event: TaskAlert): string {
+    return [
+      "⚠️ 任务失败告警已接收",
+      "告警已进入自动处理队列；会话忙时会等待，不会中断当前任务。",
+      `环境：${event.environment}`,
+      `任务：${event.job_id}`,
+      `阶段：${event.stage}`,
+      `错误摘要：${Array.from(event.reason).slice(0, 1200).join("")}${Array.from(event.reason).length > 1200 ? "…（完整内容见任务页）" : ""}`,
+      `任务链接：${event.url}`,
+      "此回执仅确认告警已送达，处理进展与恢复结果会在本话题继续报告。",
+    ].join("\n");
+  }
   private prompt(incident: Incident): string {
     return [
       "Relay task-alert incident " + incident.id,
